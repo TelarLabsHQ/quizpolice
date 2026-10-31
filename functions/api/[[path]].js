@@ -184,22 +184,27 @@ export async function onRequest(ctx) {
         const kind = body.kind, t = now();
         if (kind === 'leave' && p.status === 'ans') {
           const exits = p.exits + 1;
-          await db.batch([db.prepare("UPDATE participants SET status = 'away', exits = ?, left_at = ?, last_seen = ? WHERE id = ?").bind(exits, t, t, p.id),
-            await log(db, p, 'leave', `Left the quiz (exit ${exits})${body.how ? ' – ' + clean(body.how, 40) : ''}`)]);
-          return json({ status: 'away', exits });
+          const r = await db.prepare("UPDATE participants SET status = 'away', exits = ?, left_at = ?, last_seen = ? WHERE id = ? AND status = 'ans'").bind(exits, t, t, p.id).run();
+          if (r.meta.changes) { await (await log(db, p, 'leave', `Left the quiz (exit ${exits})${body.how ? ' – ' + clean(body.how, 40) : ''}`)).run(); return json({ status: 'away', exits }); }
+          const cur = await participant(db, token); return json({ status: cur.status, exits: cur.exits });
         }
         if (kind === 'back' && p.status === 'away') {
           const gone = Math.max(0, t - (p.left_at || t));
           const lock = s.strict && p.exits >= s.max_exits;
           const st = lock ? 'lock' : 'ans';
-          const stmts = [db.prepare('UPDATE participants SET status = ?, away_ms = away_ms + ?, last_seen = ? WHERE id = ?').bind(st, gone, t, p.id),
-            await log(db, p, 'back', `Came back after ${Math.round(gone / 1000)}s`)];
-          if (lock) stmts.push(await log(db, p, 'lock', 'Locked: reached the exit limit'));
-          await db.batch(stmts);
-          return json({ status: st, exits: p.exits, away_s: Math.round(gone / 1000) });
+          const r = await db.prepare("UPDATE participants SET status = ?, away_ms = away_ms + ?, last_seen = ? WHERE id = ? AND status = 'away'").bind(st, gone, t, p.id).run();
+          if (r.meta.changes) {
+            const stmts = [await log(db, p, 'back', `Came back after ${Math.round(gone / 1000)}s`)];
+            if (lock) stmts.push(await log(db, p, 'lock', 'Locked: reached the exit limit'));
+            await db.batch(stmts);
+            return json({ status: st, exits: p.exits, away_s: Math.round(gone / 1000) });
+          }
+          const cur = await participant(db, token); return json({ status: cur.status, exits: cur.exits });
         }
         if (kind === 'done' && p.status !== 'done') {
-          await db.batch([db.prepare("UPDATE participants SET status = 'done', last_seen = ? WHERE id = ?").bind(t, p.id), await log(db, p, 'done', 'Marked as submitted')]);
+          // finishing also closes an open "away" period so time away stays correct
+          const gone = p.status === 'away' && p.left_at ? Math.max(0, t - p.left_at) : 0;
+          await db.batch([db.prepare("UPDATE participants SET status = 'done', away_ms = away_ms + ?, last_seen = ? WHERE id = ?").bind(gone, t, p.id), await log(db, p, 'done', 'Marked as submitted')]);
           return json({ status: 'done', exits: p.exits });
         }
         return json({ status: p.status, exits: p.exits });
