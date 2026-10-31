@@ -13,19 +13,24 @@ LOGO = ('<svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="
         '<path d="M20 11l2.6 5.3 5.8.8-4.2 4.1 1 5.8L20 24.3 14.8 27l1-5.8-4.2-4.1 5.8-.8z" fill="#E8A317"/></svg>')
 
 
+import hashlib as _h
+CSSV = _h.md5(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'public', 'assets', 'site.css'), 'rb').read()).hexdigest()[:8]
+
 # ---------------------------------------------------------------- Telar Labs family links
 FAMILY = [f for f in CFG.get('family', []) if f['name'] != CFG['site_name']]
 HUB = CFG.get('studio_url', '')
 
+def slug_app(n): return ''.join(ch for ch in n.lower() if ch.isalnum())
+
 def family_row():
     if not FAMILY: return ''
     head = f'<a href="{E(HUB)}">More from {E(CFG["studio"])}</a>' if HUB else f'More from {E(CFG["studio"])}'
-    links = ''.join(f'<a href="{E(f["url"])}" title="{E(f["blurb"])}">{E(f["name"])}</a>' for f in FAMILY)
+    links = ''.join(f'<a class="app-{slug_app(f["name"])}" href="{E(f["url"])}" title="{E(f["blurb"])}">{E(f["name"])}</a>' for f in FAMILY)
     return f'<div class="wrap family"><span class="family-h">{head}:</span>{links}</div>'
 
 def family_promo(title):
     if not FAMILY: return ''
-    links = ''.join(f'<a href="{E(f["url"])}"><b>{E(f["name"])}</b><span>{E(f["blurb"])}</span></a>' for f in FAMILY)
+    links = ''.join(f'<a class="app-{slug_app(f["name"])}" href="{E(f["url"])}"><b>{E(f["name"])}</b><span>{E(f["blurb"])}</span></a>' for f in FAMILY)
     return f'<section class="wrap section family-promo"><h2>{title}</h2><div class="family-links">{links}</div></section>'
 
 def ad(key):
@@ -49,7 +54,7 @@ def page(path, title, desc, body):
 <meta property="og:title" content="{E(full)}"><meta property="og:description" content="{E(desc)}"><meta property="og:url" content="{E(URL + path)}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"><meta name="theme-color" content="#1C2F5E">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600;700&display=swap">
-<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/site.css?v={CSSV}">
 {ads}
 </head>
 <body>

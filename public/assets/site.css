@@ -44,3 +44,7 @@ p{margin:0 0 1em}.wrap{width:100%;max-width:1160px;margin:0 auto;padding:0 16px}
 .family-links a{display:block;text-decoration:none;color:inherit;padding:12px 14px;border:1px solid var(--line);border-radius:12px}
 .family-links a:hover{border-color:var(--muted)}.family-links b{display:block}.family-links span{display:block;font-size:13px;color:var(--muted);margin-top:3px;line-height:1.4}
 .family-promo .family-links a{padding:16px 18px}.family-promo .family-links b{font-size:17px}.family-promo .family-links span{font-size:14px}
+.app-telarclips b,.family>a.app-telarclips{color:#B86E00}.family-links a.app-telarclips{border-left:4px solid #B86E00}
+.app-pizarrapad b,.family>a.app-pizarrapad{color:#1D7A50}.family-links a.app-pizarrapad{border-left:4px solid #1D7A50}
+.app-quizpolice b,.family>a.app-quizpolice{color:#2556C8}.family-links a.app-quizpolice{border-left:4px solid #2556C8}
+.app-drafttrail b,.family>a.app-drafttrail{color:#7B3FC4}.family-links a.app-drafttrail{border-left:4px solid #7B3FC4}
