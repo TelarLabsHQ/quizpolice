@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teacher dashboard | QuizPolice</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="/assets/app.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <a class="logo" href="/"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l14 5v10c0 9-6 16-14 19C12 34 6 27 6 18V8z" fill="#1C2F5E"/><path d="M20 11l2.6 5.3 5.8.8-4.2 4.1 1 5.8L20 24.3 14.8 27l1-5.8-4.2-4.1 5.8-.8z" fill="#E8A317"/></svg><b>QuizPolice</b></a>
+    <div class="row"><a class="btn" href="#" id="toList">My quizzes</a><a class="btn pri" href="#new" id="toNew">New quiz</a></div>
+  </div>
+
+  <!-- LIST -->
+  <section id="vList" hidden>
+    <div class="panel"><div class="sec-h"><h3>My quizzes on this device</h3><span class="note">Quizzes and results are deleted automatically after 30 days.</span></div>
+      <div class="list" id="list"></div>
+      <div class="pad note" id="listEmpty">No quizzes yet. <a href="#new">Create your first quiz</a>.</div></div>
+  </section>
+
+  <!-- NEW -->
+  <section id="vNew" hidden>
+    <form class="panel pad" id="newForm" style="display:flex;flex-direction:column;gap:16px;max-width:720px">
+      <h1 style="font-size:26px">Set up a monitored quiz</h1>
+      <label class="field"><span>Quiz name</span><input id="fTitle" maxlength="120" placeholder="Science 7 · Quiz 2: Mixtures" required></label>
+      <label class="field"><span>Link to your quiz</span><input id="fUrl" type="url" placeholder="https://docs.google.com/forms/d/e/…/viewform" required>
+        <span class="note">Google Forms, Microsoft Forms or Wayground. Use the link you would send to students.</span></label>
+      <div class="row"><button type="button" class="btn" id="checkBtn">Check this link</button><span class="note" id="checkNote"></span></div>
+      <div id="checkMsg" class="msg" hidden></div>
+      <label class="field"><span>Sections (optional, one per line)</span><textarea id="fSec" placeholder="Grade 7 – Rizal&#10;Grade 7 – Bonifacio"></textarea></label>
+      <div class="row"><label class="row" style="gap:8px"><input type="checkbox" id="fStrict" checked> <b>Lock the quiz after</b></label>
+        <select id="fMax" class="btn"><option>1</option><option>2</option><option selected>3</option><option>5</option><option>10</option></select>
+        <span class="note">exits. Locked students need you to unlock them.</span></div>
+      <button class="btn pri" style="height:50px;font-size:17px">Create quiz</button>
+      <div id="newErr" class="msg bad" hidden></div>
+    </form>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="vDash" hidden style="display:flex;flex-direction:column;gap:16px">
+    <div class="panel pad share">
+      <div id="qr"></div>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+        <h1 id="dTitle" style="font-size:24px"></h1>
+        <div class="note">Students go to <b id="dHost"></b> and type the code, or scan the QR code:</div>
+        <div class="code bigcode" id="dCode"></div>
+        <div class="row"><button class="btn" id="copyLink">Copy student link</button><button class="btn" id="closeBtn"></button><button class="btn" id="previewBtn">Preview as student</button></div>
+      </div>
+    </div>
+    <div id="dClosed" class="msg warn" hidden>This quiz is closed. New students can't join.</div>
+    <div class="chips">
+      <div class="chip c-info"><span class="n" id="nAns">0</span><span class="l">Answering</span></div>
+      <div class="chip c-warn"><span class="n" id="nAway">0</span><span class="l">Left the quiz now</span></div>
+      <div class="chip c-bad"><span class="n" id="nLock">0</span><span class="l">Locked</span></div>
+      <div class="chip c-ok"><span class="n" id="nDone">0</span><span class="l">Submitted</span></div>
+    </div>
+    <div class="panel pad row">
+      <label class="row" style="gap:8px"><input type="checkbox" id="dStrict"> <b>Lock after</b></label>
+      <select id="dMax" class="btn"><option>1</option><option>2</option><option>3</option><option>5</option><option>10</option></select>
+      <span class="note">exits.</span>
+      <span class="note" style="margin-left:auto" id="dLive">Updating…</span>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="sec-h"><h3>Students (<span id="nAll">0</span>)</h3><button class="btn" id="csvBtn">Download results (CSV)</button></div>
+        <div class="tbl"><table><thead><tr><th>Student</th><th>Status</th><th>Exits</th><th>Time away</th></tr></thead><tbody id="rows"></tbody></table></div>
+        <div class="pad note" id="noStudents">Waiting for students to join…</div>
+      </div>
+      <div class="panel">
+        <div class="sec-h"><h3 id="logTitle">Activity: whole class</h3><button class="btn pri" id="unlock" hidden>Unlock student</button></div>
+        <ul class="log" id="log"></ul>
+      </div>
+    </div>
+    <div class="row"><button class="btn danger" id="delBtn">Delete this quiz and its results</button></div>
+  </section>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KEY='quizpolice.teacher.v1';
+const store=()=>{try{return JSON.parse(localStorage.getItem(KEY))||[]}catch(e){return []}};
+const saveStore=a=>{try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}};
+const api=async(path,opt={})=>{const r=await fetch('/api/'+path,{...opt,headers:{'content-type':'application/json',...(opt.headers||{})}}); let d={}; try{d=await r.json()}catch(e){} if(!r.ok) throw new Error(d.error||'Network problem. Please try again.'); return d};
+const fmt=ms=>{const s=Math.round(ms/1000); return s?`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`:'–'};
+const clock=t=>new Date(t).toLocaleTimeString([], {hour:'numeric',minute:'2-digit',second:'2-digit'});
+
+function route(){
+  const h=location.hash.slice(1);
+  ['vList','vNew','vDash'].forEach(id=>$('#'+id).hidden=true); stopPoll();
+  if(h==='new'){ $('#vNew').hidden=false; $('#fTitle').focus(); return }
+  if(/^\d{6}$/.test(h)){ const q=store().find(x=>x.code===h); if(q){ openDash(q); return } }
+  showList();
+}
+addEventListener('hashchange',route);
+$('#toList').onclick=e=>{e.preventDefault(); location.hash=''; route()};
+
+function showList(){
+  $('#vList').hidden=false; const a=store().sort((x,y)=>y.created-x.created);
+  $('#listEmpty').hidden=!!a.length;
+  $('#list').innerHTML=a.map(q=>`<a class="item" href="#${q.code}"><span><b>${esc(q.title)}</b><span class="sub">Code ${q.code} · ${new Date(q.created).toLocaleDateString()}</span></span><span class="note">Open ›</span></a>`).join('');
+}
+
+/* ---------- create ---------- */
+let checked=null;
+$('#checkBtn').onclick=async()=>{
+  const u=$('#fUrl').value.trim(); if(!u){$('#fUrl').focus(); return}
+  $('#checkNote').textContent='Checking…'; $('#checkMsg').hidden=true;
+  try{ const d=await api('check-link',{method:'POST',body:JSON.stringify({url:u})}); checked=d; $('#checkNote').textContent='';
+    const m=$('#checkMsg'); m.hidden=false;
+    if(d.signin){m.className='msg warn'; m.textContent=`${d.platform}: this quiz asks students to sign in. Signing in often doesn't work inside other sites. In your form settings, turn off "Restrict to users in your organization" / "Collect email addresses: Verified", or ask students to type their email instead.`}
+    else if(d.blocked){m.className='msg bad'; m.textContent=`${d.platform}: this site doesn't allow its quizzes to be shown inside QuizPolice, so it can't be monitored here. Try a Google Forms or Microsoft Forms quiz.`}
+    else if(!d.ok){m.className='msg warn'; m.textContent=`We couldn't open this link (${d.error||'the page returned an error'}). Check that it's shared publicly, then try again.`}
+    else {m.className='msg ok'; m.textContent=`${d.platform}: looks good. This quiz can be shown and monitored in QuizPolice.`}
+  }catch(e){$('#checkNote').textContent=e.message}
+};
+$('#newForm').onsubmit=async e=>{
+  e.preventDefault(); $('#newErr').hidden=true;
+  const body={title:$('#fTitle').value, quiz_url:$('#fUrl').value, embed_url:checked&&checked.embed||'', sections:$('#fSec').value.split('\n'), strict:$('#fStrict').checked, max_exits:$('#fMax').value};
+  try{ const d=await api('sessions',{method:'POST',body:JSON.stringify(body)});
+    const a=store(); a.push({code:d.code,key:d.teacher_key,title:body.title.trim(),created:Date.now()}); saveStore(a);
+    $('#newForm').reset(); checked=null; $('#checkMsg').hidden=true; location.hash=d.code;
+  }catch(err){$('#newErr').textContent=err.message; $('#newErr').hidden=false}
+};
+
+/* ---------- dashboard ---------- */
+let cur=null, data=null, sel=null, timer=0, events=[], lastId=0;
+function stopPoll(){clearTimeout(timer); timer=0}
+function joinLink(code){return `${location.origin}/join/?c=${code}`}
+function openDash(q){
+  cur=q; sel=null; events=[]; lastId=0; data=null; $('#vDash').hidden=false;
+  $('#dTitle').textContent=q.title; $('#dCode').textContent=q.code.replace(/(\d{3})(\d{3})/,'$1 $2'); $('#dHost').textContent=location.host+'/join';
+  $('#qr').innerHTML=''; try{ new QRCode($('#qr'),{text:joinLink(q.code),width:150,height:150,correctLevel:QRCode.CorrectLevel.M}) }catch(e){ $('#qr').hidden=true }
+  poll();
+}
+async function poll(){
+  stopPoll(); if(!cur) return;
+  try{ const d=await api(`sessions/${cur.code}/dashboard?since=${lastId}`,{headers:{'x-teacher-key':cur.key}});
+    data=d; for(const ev of d.events.slice().reverse()){ if(ev.id>lastId){events.unshift(ev); lastId=ev.id} } events=events.slice(0,500);
+    render(); $('#dLive').textContent='Live · updated '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit',second:'2-digit'});
+  }catch(e){ $('#dLive').textContent=e.message }
+  if(!$('#vDash').hidden) timer=setTimeout(poll, document.hidden?10000:3000);
+}
+const lab={ans:['p-ans','Answering'],away:['p-away','Left the quiz'],lock:['p-lock','Locked'],done:['p-done','Submitted'],gone:['p-gone','Offline?']};
+function statusOf(p){ if(p.status==='ans'&&data.server_time-p.last_seen>90000) return 'gone'; return p.status }
+function render(){
+  const s=data.session, ps=data.participants;
+  $('#dStrict').checked=!!s.strict; $('#dMax').value=String(s.max_exits);
+  $('#closeBtn').textContent=s.closed?'Reopen quiz':'Close quiz'; $('#dClosed').hidden=!s.closed;
+  const c={ans:0,away:0,lock:0,done:0,gone:0}; ps.forEach(p=>c[statusOf(p)]++);
+  $('#nAns').textContent=c.ans+c.gone; $('#nAway').textContent=c.away; $('#nLock').textContent=c.lock; $('#nDone').textContent=c.done; $('#nAll').textContent=ps.length;
+  $('#noStudents').hidden=!!ps.length;
+  const order={lock:0,away:1,gone:2,ans:3,done:4};
+  const now=data.server_time;
+  $('#rows').innerHTML=ps.slice().sort((a,b)=>order[statusOf(a)]-order[statusOf(b)]||b.exits-a.exits||a.name.localeCompare(b.name)).map(p=>{
+    const st=statusOf(p), away=p.away_ms+(p.status==='away'&&p.left_at?now-p.left_at:0);
+    return `<tr data-id="${p.id}" class="${sel===p.id?'sel':''}"><td><span class="name">${esc(p.name)}</span>${p.section?`<span class="sub">${esc(p.section)}</span>`:''}</td>
+    <td><span class="pill ${lab[st][0]}">${lab[st][1]}</span></td><td class="${s.strict&&p.exits>=s.max_exits?'hi':''}">${p.exits}</td><td>${fmt(away)}</td></tr>`}).join('');
+  const names=Object.fromEntries(ps.map(p=>[p.id,p.name]));
+  const pc=ps.find(p=>p.id===sel);
+  const list=pc?events.filter(e=>e.participant_id===sel):events;
+  $('#logTitle').textContent=pc?`Activity: ${pc.name}`:'Activity: whole class';
+  $('#unlock').hidden=!(pc&&pc.status==='lock');
+  $('#log').innerHTML=list.slice(0,200).map(e=>`<li><time>${clock(e.at)}</time><span class="k-${e.kind}">${pc?'':esc(names[e.participant_id]||'Student')+': '}${esc(e.detail||e.kind)}</span></li>`).join('')||'<li class="note">No activity yet.</li>';
+}
+$('#rows').onclick=e=>{const tr=e.target.closest('tr'); if(!tr) return; sel=sel===tr.dataset.id?null:tr.dataset.id; render()};
+$('#unlock').onclick=async()=>{ if(!sel) return; try{await api(`sessions/${cur.code}/unlock/${sel}`,{method:'POST',headers:{'x-teacher-key':cur.key},body:'{}'}); poll()}catch(e){alertMsg(e)} };
+const settings=async b=>{try{await api(`sessions/${cur.code}/settings`,{method:'POST',headers:{'x-teacher-key':cur.key},body:JSON.stringify(b)}); poll()}catch(e){alertMsg(e)}};
+$('#dStrict').onchange=()=>settings({strict:$('#dStrict').checked});
+$('#dMax').onchange=()=>settings({max_exits:$('#dMax').value});
+$('#closeBtn').onclick=()=>settings({closed:!data.session.closed});
+$('#copyLink').onclick=async()=>{ try{await navigator.clipboard.writeText(joinLink(cur.code)); $('#copyLink').textContent='Copied ✓'}catch(e){ prompt('Copy this link for your students:',joinLink(cur.code)) } setTimeout(()=>$('#copyLink').textContent='Copy student link',2000)};
+$('#previewBtn').onclick=()=>window.open(joinLink(cur.code),'_blank');
+$('#csvBtn').onclick=()=>{ if(!data) return; const rows=[['Name','Section','Status','Exits','Seconds away','Joined']].concat(data.participants.map(p=>[p.name,p.section||'',lab[statusOf(p)][1],p.exits,Math.round(p.away_ms/1000),new Date(p.joined_at).toLocaleString()]));
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'})); a.download=`quizpolice-${cur.code}.csv`; a.click()};
+$('#delBtn').onclick=async()=>{ if(!confirm('Delete this quiz and all student results? This cannot be undone.')) return;
+  try{await api(`sessions/${cur.code}/delete`,{method:'POST',headers:{'x-teacher-key':cur.key},body:'{}'})}catch(e){}
+  saveStore(store().filter(q=>q.code!==cur.code)); cur=null; location.hash=''; route()};
+function alertMsg(e){$('#dLive').textContent=e.message}
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&cur&&!$('#vDash').hidden) poll() });
+route();
+})();
+</script>
+</body>
+</html>

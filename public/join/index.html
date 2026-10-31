@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Join quiz | QuizPolice</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Source+Sans+3:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="/assets/app.css">
+</head>
+<body>
+<div class="wrap stu">
+  <div class="head"><a class="logo" href="/"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l14 5v10c0 9-6 16-14 19C12 34 6 27 6 18V8z" fill="#1C2F5E"/><path d="M20 11l2.6 5.3 5.8.8-4.2 4.1 1 5.8L20 24.3 14.8 27l1-5.8-4.2-4.1 5.8-.8z" fill="#E8A317"/></svg><b>QuizPolice</b></a></div>
+
+  <form class="panel pad" id="codeForm" style="display:flex;flex-direction:column;gap:14px">
+    <h1 style="font-size:24px">Join a quiz</h1>
+    <label class="field"><span>Quiz code from your teacher</span><input id="code" inputmode="numeric" autocomplete="off" maxlength="7" placeholder="123 456" required></label>
+    <button class="btn pri" style="height:50px">Next</button>
+    <div id="codeErr" class="msg bad" hidden></div>
+  </form>
+
+  <form class="panel pad" id="joinForm" hidden style="display:flex;flex-direction:column;gap:14px">
+    <h1 style="font-size:22px" id="jTitle"></h1>
+    <label class="field"><span>Your full name</span><input id="name" autocomplete="name" maxlength="80" required></label>
+    <label class="field" id="secField" hidden><span>Section</span><select id="section"></select></label>
+    <div class="msg info">This quiz is monitored. If you leave this screen, switch apps or open another tab, it is recorded and your teacher sees it<span id="lockNote"></span>. Nothing outside this quiz is monitored.</div>
+    <button class="btn pri" style="height:50px">I understand, start the quiz</button>
+    <div id="joinErr" class="msg bad" hidden></div>
+  </form>
+
+  <div id="quiz" hidden style="display:flex;flex-direction:column;gap:10px">
+    <div class="panel stubar"><b id="sWho"></b><span class="note">Exits: <b id="sExits">0</b><span id="sMax"></span></span><button class="btn pri" id="doneBtn">I've submitted</button></div>
+    <iframe class="frame" id="frame" title="Quiz" allow="fullscreen"></iframe>
+    <p class="note">Can't see the quiz? Tell your teacher. Don't open it in another tab, because that counts as leaving.</p>
+  </div>
+
+  <div class="panel pad" id="doneBox" hidden style="text-align:center"><h1 style="font-size:24px">All done</h1><p class="note">Your teacher can see that you finished. You may close this page.</p></div>
+</div>
+
+<div class="overlay" id="warnOv" hidden>
+  <div class="panel alertbox" role="alertdialog" aria-labelledby="wT">
+    <div class="big" id="wNum">1</div>
+    <h2 id="wT">You left the quiz</h2>
+    <p id="wMsg">This was reported to your teacher.</p>
+    <button class="btn pri" id="wOk" style="height:46px;min-width:180px">Back to the quiz</button>
+  </div>
+</div>
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const api=async(path,opt={})=>{const r=await fetch('/api/'+path,{...opt,headers:{'content-type':'application/json',...(opt.headers||{})}}); let d={}; try{d=await r.json()}catch(e){} if(!r.ok){const er=new Error(d.error||'Network problem. Please try again.'); er.status=r.status; throw er} return d};
+const TK='quizpolice.student.v1';
+let token=null, me={status:'ans',exits:0}, quiz=null, away=false, pending=false, poller=0;
+
+const params=new URLSearchParams(location.search);
+if(params.get('c')) $('#code').value=params.get('c');
+
+// resume after a reload in the same tab
+try{ const saved=JSON.parse(sessionStorage.getItem(TK)); if(saved&&saved.token){ token=saved.token; resume() } }catch(e){}
+
+$('#codeForm').onsubmit=async e=>{e.preventDefault(); $('#codeErr').hidden=true;
+  const code=$('#code').value.replace(/\D/g,'');
+  try{ quiz=await api('quiz/'+code); if(quiz.closed) throw new Error('This quiz is closed.');
+    $('#jTitle').textContent=quiz.title; $('#codeForm').hidden=true; $('#joinForm').hidden=false;
+    if(quiz.sections.length){ $('#secField').hidden=false; $('#section').innerHTML=quiz.sections.map(s=>`<option>${s.replace(/</g,'&lt;')}</option>`).join('') }
+    $('#lockNote').textContent=quiz.strict?`. After ${quiz.max_exits} exit${quiz.max_exits>1?'s':''}, your quiz locks until your teacher unlocks it`:'';
+    $('#name').focus();
+  }catch(err){ $('#codeErr').textContent=err.message; $('#codeErr').hidden=false }};
+
+$('#joinForm').onsubmit=async e=>{e.preventDefault(); $('#joinErr').hidden=true;
+  try{ const d=await api('join',{method:'POST',body:JSON.stringify({code:quiz.code,name:$('#name').value,section:$('#secField').hidden?'':$('#section').value})});
+    token=d.token; try{sessionStorage.setItem(TK,JSON.stringify({token}))}catch(e){}
+    start({title:d.title,embed_url:d.embed_url,max_exits:d.max_exits,strict:d.strict,name:$('#name').value.trim(),status:'ans',exits:0});
+  }catch(err){ $('#joinErr').textContent=err.message; $('#joinErr').hidden=false }};
+
+async function resume(){ try{ const d=await api('me',{headers:{'x-student-token':token}}); start(d) }catch(e){ try{sessionStorage.removeItem(TK)}catch(_){} token=null } }
+
+function start(d){
+  $('#codeForm').hidden=true; $('#joinForm').hidden=true;
+  me={status:d.status,exits:d.exits}; quiz={...(quiz||{}),max_exits:d.max_exits,strict:d.strict};
+  if(d.status==='done'){ $('#doneBox').hidden=false; return }
+  $('#quiz').hidden=false; $('#sWho').textContent=d.name||''; $('#frame').src=d.embed_url;
+  $('#sMax').textContent=d.strict?` of ${d.max_exits}`:''; showExits();
+  if(d.status==='lock') showWarn();
+  poller=setInterval(check,15000);
+}
+function showExits(){ $('#sExits').textContent=me.exits }
+async function send(kind,how){ if(!token) return; try{ const d=await api('me/event',{method:'POST',headers:{'x-student-token':token},body:JSON.stringify({kind,how})}); me.status=d.status; me.exits=d.exits; showExits(); return d }catch(e){} }
+async function check(){ if(!token) return; try{ const d=await api('me',{headers:{'x-student-token':token}}); const was=me.status; me.status=d.status; me.exits=d.exits; showExits();
+  if(was==='lock'&&d.status==='ans'){ $('#warnOv').hidden=true; $('#frame').hidden=false } }catch(e){} }
+
+// ---- detection ----
+// Clicking inside the quiz moves focus into the frame; that is not leaving, so check where focus went.
+function left(how){ if(!token||away||me.status!=='ans'||$('#quiz').hidden) return; away=true; pending=true; send('leave',how) }
+async function back(){ if(!away) return; away=false; const d=await send('back'); if(pending){ pending=false; showWarn() } }
+document.addEventListener('visibilitychange',()=>{ document.hidden?left('switched tab or app'):back() });
+addEventListener('blur',()=>setTimeout(()=>{ if(document.activeElement===$('#frame')) return; if(!document.hasFocus()) left('clicked outside the quiz') },0));
+addEventListener('focus',()=>back());
+
+function showWarn(){
+  const locked=me.status==='lock';
+  $('#wNum').textContent=me.exits; $('#wT').textContent=locked?'Quiz locked':'You left the quiz';
+  $('#wMsg').textContent=locked?`You left ${me.exits} times. Ask your teacher to unlock your quiz. This page will continue by itself once you're unlocked.`
+    :`This was reported to your teacher.${quiz&&quiz.strict?` Your quiz locks after ${quiz.max_exits} exits.`:''}`;
+  $('#wOk').hidden=locked; $('#frame').hidden=locked; $('#warnOv').hidden=false;
+  if(locked){ clearInterval(poller); poller=setInterval(check,4000) }
+}
+$('#wOk').onclick=()=>{ $('#warnOv').hidden=true; $('#frame').focus() };
+$('#doneBtn').onclick=async()=>{ if(!confirm('Only tap this after pressing Submit on the quiz itself. Are you done?')) return;
+  await send('done'); clearInterval(poller); $('#quiz').hidden=true; $('#doneBox').hidden=false; try{sessionStorage.removeItem(TK)}catch(e){} token=null };
+})();
+</script>
+</body>
+</html>
