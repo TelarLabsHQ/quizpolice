@@ -113,7 +113,7 @@ def pages():
 <tr><td>Other sites</td><td>Maybe</td><td>Any quiz page that allows embedding will work. Check this link will tell you.</td></tr></tbody></table>''')
     faq = [('Is QuizPolice free?', 'Yes. Teachers and students don\'t pay or create accounts.'),
            ('Do students need an account?', 'No. They type the code, their name and section.'),
-           ('Where are my quizzes saved?', 'Your quiz list is saved in your browser on this device, together with a secret key that lets only you see the results. To open a dashboard on another device, use the private teacher link on the dashboard (Copy teacher link or Email it to myself). Keep that link private: anyone who has it can see the results.'),
+           ('Where are my quizzes saved?', 'Your quiz list is saved in your browser on this device, together with a secret key that lets only you see the results. To open a dashboard on another device, use the private teacher link on the dashboard (copy it, send it with Gmail or Outlook, or scan its QR code with your phone). Keep that link private: anyone who has it can see the results.'),
            ('How long is student data kept?', 'Quizzes and student results are deleted automatically 30 days after the quiz is created. You can delete a quiz and its results any time from the dashboard.'),
            ('Does it work on phones?', 'Yes. Students can join on phones, tablets or computers. Detection is strongest when the quiz is opened in Chrome, Safari or Edge.'),
            ('Can students cheat anyway?', 'A determined student with a second device can. QuizPolice is a deterrent and a record, best combined with good quiz design and supervision.'),

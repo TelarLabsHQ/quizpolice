@@ -60,7 +60,11 @@
     </div>
     <div class="panel pad" style="display:flex;flex-direction:column;gap:10px">
       <div><b>Your private teacher link</b> <span class="note">Open this quiz's dashboard on any device: bookmark it, or send it to yourself. Anyone with this link can see the results, so don't share it with students.</span></div>
-      <div class="row"><button class="btn" id="copyTeacher">Copy teacher link</button><a class="btn" id="mailTeacher" href="#">Email it to myself</a></div>
+      <div class="row"><button class="btn" id="copyTeacher">Copy teacher link</button><button class="btn" id="qrTeacherBtn">Open on my phone (QR)</button>
+        <a class="btn" id="gmailTeacher" target="_blank" rel="noopener">Send with Gmail</a><a class="btn" id="outlookTeacher" target="_blank" rel="noopener">Send with Outlook</a>
+        <button class="btn" id="shareTeacher" hidden>Share…</button></div>
+      <div id="qrTeacherBox" hidden style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><div id="qrTeacher" style="background:#fff;padding:8px;border-radius:10px;border:1px solid var(--line)"></div>
+        <span class="note" style="max-width:360px">Scan this with your phone's camera to open this dashboard there. It's your private link, so don't show this code to the class.</span></div>
     </div>
     <div id="dClosed" class="msg warn" hidden>This quiz is closed. New students can't join.</div>
     <div class="chips">
@@ -160,7 +164,11 @@ function stopPoll(){clearTimeout(timer); timer=0}
 function joinLink(code){return `${location.origin}/join/?c=${code}`}
 function openDash(q){
   cur=q; sel=null; events=[]; lastId=0; data=null; $('#vDash').hidden=false;
-  $('#mailTeacher').href='mailto:?subject='+encodeURIComponent('QuizPolice teacher link: '+q.title)+'&body='+encodeURIComponent('Private link to the QuizPolice dashboard for "'+q.title+'" (code '+q.code+'). Don\'t share it with students.\n\n'+teacherLink(q));
+  { const subj='QuizPolice teacher link: '+q.title, body='Private link to the QuizPolice dashboard for "'+q.title+'" (code '+q.code+'). Don\'t share it with students.\n\n'+teacherLink(q);
+    $('#gmailTeacher').href='https://mail.google.com/mail/?view=cm&fs=1&su='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
+    $('#outlookTeacher').href='https://outlook.office.com/mail/deeplink/compose?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
+    $('#shareTeacher').hidden=!navigator.share; $('#shareTeacher').onclick=()=>navigator.share({title:subj,text:'Private QuizPolice teacher link (don\'t share with students)',url:teacherLink(q)}).catch(()=>{});
+    $('#qrTeacherBox').hidden=true; $('#qrTeacher').innerHTML=''; }
   $('#dTitle').textContent=q.title; $('#dCode').textContent=q.code.replace(/(\d{3})(\d{3})/,'$1 $2'); $('#dHost').textContent=location.host+'/join';
   $('#qr').innerHTML=''; try{ new QRCode($('#qr'),{text:joinLink(q.code),width:150,height:150,correctLevel:QRCode.CorrectLevel.M}) }catch(e){ $('#qr').hidden=true }
   poll();
@@ -203,6 +211,8 @@ $('#dMax').onchange=()=>settings({max_exits:$('#dMax').value});
 $('#closeBtn').onclick=()=>settings({closed:!data.session.closed});
 $('#copyLink').onclick=async()=>{ try{await navigator.clipboard.writeText(joinLink(cur.code)); $('#copyLink').textContent='Copied ✓'}catch(e){ prompt('Copy this link for your students:',joinLink(cur.code)) } setTimeout(()=>$('#copyLink').textContent='Copy student link',2000)};
 $('#previewBtn').onclick=()=>window.open(joinLink(cur.code),'_blank');
+$('#qrTeacherBtn').onclick=()=>{ const box=$('#qrTeacherBox'); box.hidden=!box.hidden; $('#qrTeacherBtn').textContent=box.hidden?'Open on my phone (QR)':'Hide QR';
+  if(!box.hidden&&!$('#qrTeacher').firstChild){ try{ new QRCode($('#qrTeacher'),{text:teacherLink(cur),width:170,height:170,correctLevel:QRCode.CorrectLevel.L}) }catch(e){ $('#qrTeacher').textContent='QR not available, use Copy teacher link.' } } };
 $('#copyTeacher').onclick=async()=>{ const l=teacherLink(cur); try{await navigator.clipboard.writeText(l); $('#copyTeacher').textContent='Copied ✓'}catch(e){ prompt('Your private teacher link:',l) } setTimeout(()=>$('#copyTeacher').textContent='Copy teacher link',2000)};
 $('#csvBtn').onclick=()=>{ if(!data) return; const rows=[['Name','Section','Status','Exits','Seconds away','Joined']].concat(data.participants.map(p=>[p.name,p.section||'',lab[statusOf(p)][1],p.exits,Math.round(p.away_ms/1000),new Date(p.joined_at).toLocaleString()]));
   const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
