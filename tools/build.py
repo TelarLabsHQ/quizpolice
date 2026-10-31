@@ -12,6 +12,22 @@ URL = CFG['site_url'].rstrip('/'); NAME = CFG['site_name']; ST = CFG['studio']; 
 LOGO = ('<svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l14 5v10c0 9-6 16-14 19C12 34 6 27 6 18V8z" fill="#1C2F5E"/>'
         '<path d="M20 11l2.6 5.3 5.8.8-4.2 4.1 1 5.8L20 24.3 14.8 27l1-5.8-4.2-4.1 5.8-.8z" fill="#E8A317"/></svg>')
 
+
+# ---------------------------------------------------------------- Telar Labs family links
+FAMILY = [f for f in CFG.get('family', []) if f['name'] != CFG['site_name']]
+HUB = CFG.get('studio_url', '')
+
+def family_row():
+    if not FAMILY: return ''
+    head = f'<a href="{E(HUB)}">More from {E(CFG["studio"])}</a>' if HUB else f'More from {E(CFG["studio"])}'
+    links = ''.join(f'<a href="{E(f["url"])}" title="{E(f["blurb"])}">{E(f["name"])}</a>' for f in FAMILY)
+    return f'<div class="wrap family"><span class="family-h">{head}:</span>{links}</div>'
+
+def family_promo(title):
+    if not FAMILY: return ''
+    links = ''.join(f'<a href="{E(f["url"])}"><b>{E(f["name"])}</b><span>{E(f["blurb"])}</span></a>' for f in FAMILY)
+    return f'<section class="wrap section family-promo"><h2>{title}</h2><div class="family-links">{links}</div></section>'
+
 def ad(key):
     slot = CFG['ad_slots'].get(key, '')
     if not (CFG['adsense_client'] and slot): return ''
@@ -51,7 +67,7 @@ def page(path, title, desc, body):
     <div><h4>Use it</h4><a href="/teacher/">Teacher dashboard</a><a href="/join/">Join a quiz</a><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/faq/">FAQ</a></div>
     <div><h4>{E(ST)}</h4><a href="/about/">About</a><a href="/privacy/">Privacy policy</a><a href="/terms/">Terms of use</a><a href="/contact/">Contact</a></div>
   </div>
-</div><div class="wrap fine">&copy; {date.today().year} {E(ST)}.</div></footer>
+</div>{family_row()}<div class="wrap fine">&copy; {date.today().year} {E(ST)}.</div></footer>
 </body>
 </html>'''
     out = os.path.join(PUB, path.strip('/'), 'index.html') if path.endswith('/') else os.path.join(PUB, path.strip('/'))
@@ -85,6 +101,7 @@ def home():
 <li><h3>Students join</h3><p>Show the code or QR on the board. Students type their name and section, then answer inside QuizPolice.</p></li>
 <li><h3>Watch and act</h3><p>See exits as they happen, unlock students, and download the results when the quiz is done.</p></li></ol></section>
 <section class="wrap section"><div class="callout"><h2>Honest about what it can and can't see</h2><p>QuizPolice only knows when a student leaves the quiz page on the same device. It can't see other phones, the student's screen, or what they search. It's a strong reminder and a record, not mind-reading, and we tell students exactly what is monitored before they start.</p><a class="btn" href="/how-it-works/">Read how it works</a></div></section>'''
+    body += family_promo('More free tools for teachers')
     page('/', f'{NAME} – Free Quiz Monitor for Google Forms, Microsoft Forms & Wayground',
          'Free online quiz monitoring for teachers. See when students leave a Google Forms, Microsoft Forms or Wayground quiz, lock after too many exits, and download results.', body)
 
