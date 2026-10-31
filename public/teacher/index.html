@@ -21,6 +21,12 @@
     <div class="panel"><div class="sec-h"><h3>My quizzes on this device</h3><span class="note">Quizzes and results are deleted automatically after 30 days.</span></div>
       <div class="list" id="list"></div>
       <div class="pad note" id="listEmpty">No quizzes yet. <a href="#new">Create your first quiz</a>.</div></div>
+    <form class="panel pad" id="importForm" style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
+      <h3>Open a quiz from another device</h3>
+      <span class="note">Paste the private teacher link of a quiz you created on another computer or phone.</span>
+      <div class="row"><input id="importUrl" class="field" style="flex:1;min-width:220px;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);padding:0 12px" placeholder="https://…/teacher/#t=…"><button class="btn pri">Open</button></div>
+      <div id="importErr" class="msg bad" hidden></div>
+    </form>
   </section>
 
   <!-- NEW -->
@@ -51,6 +57,10 @@
         <div class="code bigcode" id="dCode"></div>
         <div class="row"><button class="btn" id="copyLink">Copy student link</button><button class="btn" id="closeBtn"></button><button class="btn" id="previewBtn">Preview as student</button></div>
       </div>
+    </div>
+    <div class="panel pad" style="display:flex;flex-direction:column;gap:10px">
+      <div><b>Your private teacher link</b> <span class="note">Open this quiz's dashboard on any device: bookmark it, or send it to yourself. Anyone with this link can see the results, so don't share it with students.</span></div>
+      <div class="row"><button class="btn" id="copyTeacher">Copy teacher link</button><a class="btn" id="mailTeacher" href="#">Email it to myself</a></div>
     </div>
     <div id="dClosed" class="msg warn" hidden>This quiz is closed. New students can't join.</div>
     <div class="chips">
@@ -91,8 +101,20 @@ const api=async(path,opt={})=>{const r=await fetch('/api/'+path,{...opt,headers:
 const fmt=ms=>{const s=Math.round(ms/1000); return s?`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`:'–'};
 const clock=t=>new Date(t).toLocaleTimeString([], {hour:'numeric',minute:'2-digit',second:'2-digit'});
 
-function route(){
-  const h=location.hash.slice(1);
+function teacherLink(q){return `${location.origin}/teacher/#t=${q.code}.${q.key}`}
+async function importLink(text){
+  const m=/t=(\d{6})\.([a-z0-9]{16,64})/i.exec(text||''); if(!m) throw new Error("That doesn't look like a QuizPolice teacher link.");
+  const code=m[1], key=m[2];
+  let d; try{ d=await api(`sessions/${code}/dashboard?since=999999999`,{headers:{'x-teacher-key':key}}) }catch(e){ throw new Error("This teacher link doesn't work. The quiz may have been deleted (quizzes are removed after 30 days), or the link was copied incompletely.") }
+  const a=store(); if(!a.some(q=>q.code===code)){ a.push({code,key,title:d.session.title,created:d.session.created_at}); saveStore(a) }
+  return code;
+}
+async function route(){
+  let h=location.hash.slice(1);
+  if(h.startsWith('t=')){
+    try{ const code=await importLink(h); history.replaceState(null,'','#'+code); h=code }
+    catch(e){ history.replaceState(null,'',location.pathname); ['vList','vNew','vDash'].forEach(id=>$('#'+id).hidden=true); showList(); $('#importErr').textContent=e.message; $('#importErr').hidden=false; return }
+  }
   ['vList','vNew','vDash'].forEach(id=>$('#'+id).hidden=true); stopPoll();
   if(h==='new'){ $('#vNew').hidden=false; $('#fTitle').focus(); return }
   if(/^\d{6}$/.test(h)){ const q=store().find(x=>x.code===h); if(q){ openDash(q); return } }
@@ -100,6 +122,9 @@ function route(){
 }
 addEventListener('hashchange',route);
 $('#toList').onclick=e=>{e.preventDefault(); location.hash=''; route()};
+$('#importForm').onsubmit=async e=>{e.preventDefault(); $('#importErr').hidden=true;
+  try{ const code=await importLink($('#importUrl').value); $('#importUrl').value=''; location.hash=code }
+  catch(err){ $('#importErr').textContent=err.message; $('#importErr').hidden=false }};
 
 function showList(){
   $('#vList').hidden=false; const a=store().sort((x,y)=>y.created-x.created);
@@ -135,6 +160,7 @@ function stopPoll(){clearTimeout(timer); timer=0}
 function joinLink(code){return `${location.origin}/join/?c=${code}`}
 function openDash(q){
   cur=q; sel=null; events=[]; lastId=0; data=null; $('#vDash').hidden=false;
+  $('#mailTeacher').href='mailto:?subject='+encodeURIComponent('QuizPolice teacher link: '+q.title)+'&body='+encodeURIComponent('Private link to the QuizPolice dashboard for "'+q.title+'" (code '+q.code+'). Don\'t share it with students.\n\n'+teacherLink(q));
   $('#dTitle').textContent=q.title; $('#dCode').textContent=q.code.replace(/(\d{3})(\d{3})/,'$1 $2'); $('#dHost').textContent=location.host+'/join';
   $('#qr').innerHTML=''; try{ new QRCode($('#qr'),{text:joinLink(q.code),width:150,height:150,correctLevel:QRCode.CorrectLevel.M}) }catch(e){ $('#qr').hidden=true }
   poll();
@@ -177,6 +203,7 @@ $('#dMax').onchange=()=>settings({max_exits:$('#dMax').value});
 $('#closeBtn').onclick=()=>settings({closed:!data.session.closed});
 $('#copyLink').onclick=async()=>{ try{await navigator.clipboard.writeText(joinLink(cur.code)); $('#copyLink').textContent='Copied ✓'}catch(e){ prompt('Copy this link for your students:',joinLink(cur.code)) } setTimeout(()=>$('#copyLink').textContent='Copy student link',2000)};
 $('#previewBtn').onclick=()=>window.open(joinLink(cur.code),'_blank');
+$('#copyTeacher').onclick=async()=>{ const l=teacherLink(cur); try{await navigator.clipboard.writeText(l); $('#copyTeacher').textContent='Copied ✓'}catch(e){ prompt('Your private teacher link:',l) } setTimeout(()=>$('#copyTeacher').textContent='Copy teacher link',2000)};
 $('#csvBtn').onclick=()=>{ if(!data) return; const rows=[['Name','Section','Status','Exits','Seconds away','Joined']].concat(data.participants.map(p=>[p.name,p.section||'',lab[statusOf(p)][1],p.exits,Math.round(p.away_ms/1000),new Date(p.joined_at).toLocaleString()]));
   const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'})); a.download=`quizpolice-${cur.code}.csv`; a.click()};
