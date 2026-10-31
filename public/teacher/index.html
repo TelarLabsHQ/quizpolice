@@ -18,6 +18,9 @@
 
   <!-- LIST -->
   <section id="vList" hidden>
+    <div class="msg warn" id="sharedNote" hidden style="margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between">
+      <span><b>Using a shared or school computer?</b> Anyone who uses this browser after you can open these quizzes. When you're done, remove them from this device. Save each quiz's teacher link first if you want to see the results later.</span>
+      <button class="btn" id="removeAll" type="button">Remove all from this device</button></div>
     <div class="panel"><div class="sec-h"><h3>My quizzes on this device</h3><span class="note">Quizzes and results are deleted automatically after 30 days.</span></div>
       <div class="list" id="list"></div>
       <div class="pad note" id="listEmpty">No quizzes yet. <a href="#new">Create your first quiz</a>.</div></div>
@@ -90,7 +93,12 @@
         <ul class="log" id="log"></ul>
       </div>
     </div>
-    <div class="row"><button class="btn danger" id="delBtn">Delete this quiz and its results</button></div>
+    <div class="panel pad" style="display:flex;flex-direction:column;gap:12px">
+      <div><b>Done with this quiz?</b></div>
+      <div class="note"><b>On a shared or school computer,</b> remove this quiz from this device so the next person can't open it. The results stay safe; you can still open them with your teacher link on your own phone or laptop.</div>
+      <div class="row"><button class="btn" id="rmBtn">Remove from this device</button><button class="btn danger" id="delBtn">Delete this quiz and its results</button></div>
+      <div class="note">Delete erases the quiz and all student results everywhere, permanently. Download the CSV first if you need a copy.</div>
+    </div>
   </section>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -133,7 +141,8 @@ $('#importForm').onsubmit=async e=>{e.preventDefault(); $('#importErr').hidden=t
 function showList(){
   $('#vList').hidden=false; const a=store().sort((x,y)=>y.created-x.created);
   $('#listEmpty').hidden=!!a.length;
-  $('#list').innerHTML=a.map(q=>`<a class="item" href="#${q.code}"><span><b>${esc(q.title)}</b><span class="sub">Code ${q.code} · ${new Date(q.created).toLocaleDateString()}</span></span><span class="note">Open ›</span></a>`).join('');
+  $('#sharedNote').hidden=!a.length;
+  $('#list').innerHTML=a.map(q=>`<div class="item" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 16px;border-top:1px solid var(--line)"><a href="#${q.code}" style="flex:1;text-decoration:none;color:inherit;min-width:0"><b>${esc(q.title)}</b><span class="sub">Code ${q.code} · ${new Date(q.created).toLocaleDateString()}</span></a><button class="btn" data-rm="${q.code}" type="button">Remove from this device</button><a class="btn" href="#${q.code}">Open</a></div>`).join('');
 }
 
 /* ---------- create ---------- */
@@ -217,6 +226,14 @@ $('#copyTeacher').onclick=async()=>{ const l=teacherLink(cur); try{await navigat
 $('#csvBtn').onclick=()=>{ if(!data) return; const rows=[['Name','Section','Status','Exits','Seconds away','Joined']].concat(data.participants.map(p=>[p.name,p.section||'',lab[statusOf(p)][1],p.exits,Math.round(p.away_ms/1000),new Date(p.joined_at).toLocaleString()]));
   const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'})); a.download=`quizpolice-${cur.code}.csv`; a.click()};
+function removeLocal(code){ saveStore(store().filter(q=>q.code!==code)) }
+$('#list').onclick=e=>{ const b=e.target.closest('[data-rm]'); if(!b) return;
+  if(!confirm('Remove this quiz from this device? The results are not deleted. You can open them again with your teacher link.')) return;
+  removeLocal(b.dataset.rm); showList() };
+$('#removeAll').onclick=()=>{ if(!confirm('Remove all your quizzes from this device? Results are not deleted. You can open them again with their teacher links.')) return;
+  saveStore([]); showList() };
+$('#rmBtn').onclick=()=>{ if(!confirm('Remove this quiz from this device? The results stay saved. Make sure you have your teacher link if you want to open them again.')) return;
+  removeLocal(cur.code); cur=null; location.hash=''; route() };
 $('#delBtn').onclick=async()=>{ if(!confirm('Delete this quiz and all student results? This cannot be undone.')) return;
   try{await api(`sessions/${cur.code}/delete`,{method:'POST',headers:{'x-teacher-key':cur.key},body:'{}'})}catch(e){}
   saveStore(store().filter(q=>q.code!==cur.code)); cur=null; location.hash=''; route()};

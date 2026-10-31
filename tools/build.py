@@ -114,6 +114,7 @@ def pages():
     faq = [('Is QuizPolice free?', 'Yes. Teachers and students don\'t pay or create accounts.'),
            ('Do students need an account?', 'No. They type the code, their name and section.'),
            ('Where are my quizzes saved?', 'Your quiz list is saved in your browser on this device, together with a secret key that lets only you see the results. To open a dashboard on another device, use the private teacher link on the dashboard (copy it, send it with Gmail or Outlook, or scan its QR code with your phone). Keep that link private: anyone who has it can see the results.'),
+           ('I used a shared or school computer. What should I do?', 'When you\'re done, open My quizzes and tap Remove from this device (or Remove all). The results are not deleted. You can still open them with your private teacher link on your own phone or laptop, so save that link first.'),
            ('How long is student data kept?', 'Quizzes and student results are deleted automatically 30 days after the quiz is created. You can delete a quiz and its results any time from the dashboard.'),
            ('Does it work on phones?', 'Yes. Students can join on phones, tablets or computers. Detection is strongest when the quiz is opened in Chrome, Safari or Edge.'),
            ('Can students cheat anyway?', 'A determined student with a second device can. QuizPolice is a deterrent and a record, best combined with good quiz design and supervision.'),
