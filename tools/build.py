@@ -147,7 +147,7 @@ def pages():
 <p class="lead">{E(NAME)} is a free tool for teachers who give quizzes online, made by {E(ST)}, a small independent studio.</p>
 <p>Many teachers already use free Google Forms or Microsoft Forms for quizzes, but those can't tell when a student switches to another tab to search for answers. Exam lockdown tools are usually expensive, need installs, or require accounts for every student. {E(NAME)} adds a simple, honest layer of monitoring to the quizzes teachers already have.</p>
 <h2>Our promises</h2><ul><li>Free for teachers and students, no accounts.</li><li>We collect only what the teacher needs: name, section and quiz activity.</li><li>Student data is deleted after 30 days.</li><li>No ads on the student quiz screen or the teacher dashboard.</li></ul>
-<h2>Other {E(ST)} tools</h2><p><a href="https://pizarrapad.pages.dev">PizarraPad</a>, a free whiteboard for teachers, <a href="https://drafttrail-c4t.pages.dev">DraftTrail</a>, a writing-process recorder, and <a href="https://telarclips.pages.dev">Telar Clips</a>, free motion backgrounds for videos.</p>''')
+<h2>Other {E(ST)} tools</h2><p><a href="https://pizarrapad.telarlabs.net">PizarraPad</a>, a free whiteboard for teachers, <a href="https://drafttrail-c4t.pages.dev">DraftTrail</a>, a writing-process recorder, and <a href="https://clips.telarlabs.net">Telar Clips</a>, free motion backgrounds for videos.</p>''')
     prose('/privacy/', 'Privacy Policy', f'Privacy policy for {NAME}.', f'''
 <h1>Privacy policy</h1>
 <p class="lead">{E(NAME)} is run by {E(ST)}. We collect as little as possible and delete it quickly.</p>
