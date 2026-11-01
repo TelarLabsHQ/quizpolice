@@ -2,4 +2,4 @@ User-agent: *
 Disallow: /api/
 Disallow: /teacher/
 Disallow: /join/
-Sitemap: https://quizpolice.pages.dev/sitemap.xml
+Sitemap: https://quizpolice.telarlabs.net/sitemap.xml

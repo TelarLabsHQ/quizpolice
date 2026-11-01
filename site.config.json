@@ -1,7 +1,7 @@
 {
   "site_name": "QuizPolice",
   "studio": "Telar Labs",
-  "site_url": "https://quizpolice.pages.dev",
+  "site_url": "https://quizpolice.telarlabs.net",
   "contact_email": "telarlabs@gmail.com",
   "adsense_client": "",
   "ad_slots": {
@@ -21,7 +21,7 @@
     },
     {
       "name": "QuizPolice",
-      "url": "https://quizpolice.pages.dev",
+      "url": "https://quizpolice.telarlabs.net",
       "blurb": "Free quiz monitor that shows you when students leave an online quiz."
     },
     {
