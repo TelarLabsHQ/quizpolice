@@ -159,6 +159,7 @@ def pages():
 <h2>How long we keep it</h2><p>Everything about a quiz is deleted automatically 30 days after it was created. Teachers can delete a quiz and its results earlier from the dashboard.</p>
 <h2>Advertising</h2><p>The information pages of this site may show ads from Google AdSense, which uses cookies; you can manage personalized ads in <a href="https://adssettings.google.com" rel="noopener">Google Ads Settings</a>. <b>The student quiz screen and the teacher dashboard never show ads.</b></p>
 <h2>Children</h2><p>{E(NAME)} is used in schools, including by students under 18. We only process the minimum needed for the teacher to run the quiz, and teachers are responsible for following their school's rules about using online tools with their students.</p>
+<h2>Analytics</h2><p>We use Cloudflare Web Analytics to count page visits. It does not use cookies and does not track you across websites.</p>
 <h2>Hosting</h2><p>The site and data are hosted on Cloudflare.</p>
 <h2>Contact</h2><p><a href="mailto:{E(MAIL)}">{E(MAIL)}</a></p><p class="muted">Last updated {E(CFG["launch_date"])}.</p>''')
     prose('/terms/', 'Terms of Use', f'Terms of use for {NAME}.', f'''
