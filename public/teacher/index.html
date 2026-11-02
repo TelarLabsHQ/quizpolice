@@ -8,6 +8,21 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="/assets/fonts/source-sans-3-400.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/assets/fonts/fonts.css">
 <link rel="stylesheet" href="/assets/app.css">
+<style>
+.timing{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;margin:0}
+.timing legend{padding:0 6px}
+.topt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.topt:has(input:checked){border-color:var(--info);background:var(--info-bg)}
+.topt input{margin-top:4px}.topt span{display:flex;flex-direction:column}.topt small{color:var(--muted);font-size:14px}
+.tfields{display:flex;flex-direction:column;gap:8px;padding:4px 2px}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.tfields input,.tfields select{min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);padding:0 10px;font:inherit;color:inherit}
+.tpanel{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
+.tinfo{display:flex;flex-direction:column;gap:2px;min-width:220px;flex:1}
+.tclock{font-family:var(--f-head);font-weight:800;font-size:28px}
+.chips{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))!important}
+.c-time{background:#ece7f8;color:#4b3a8c}.p-time{background:#ece7f8;color:#4b3a8c}.k-timeup{color:#4b3a8c;font-weight:700}.k-extra{color:var(--ok);font-weight:600}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -45,6 +60,22 @@
       <div class="row"><label class="row" style="gap:8px"><input type="checkbox" id="fStrict" checked> <b>Lock the quiz after</b></label>
         <select id="fMax" class="btn"><option>1</option><option>2</option><option selected>3</option><option>5</option><option>10</option></select>
         <span class="note">exits. Locked students need you to unlock them.</span></div>
+      <fieldset class="timing">
+        <legend><b>When do students take it?</b></legend>
+        <label class="topt"><input type="radio" name="timing" value="any" checked><span><b>Anytime</b><small>Students start whenever you share the code. You can add a time limit.</small></span></label>
+        <label class="topt"><input type="radio" name="timing" value="scheduled"><span><b>Scheduled exam</b><small>Everyone takes it together, at the same date and time. It starts and ends for the whole class at once.</small></span></label>
+        <label class="topt"><input type="radio" name="timing" value="window"><span><b>Open period</b><small>Students can start any time between an opening and a closing date, for example for homework.</small></span></label>
+        <div class="tfields" data-for="any"><label class="field"><span>Time limit for each student</span><select id="tAnyLim"><option value="0">No time limit</option><option value="10">10 minutes</option><option value="15">15 minutes</option><option value="20">20 minutes</option><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60">1 hour</option><option value="90">1½ hours</option><option value="120">2 hours</option><option value="180">3 hours</option></select></label>
+          <span class="note">The time starts when each student joins.</span></div>
+        <div class="tfields" data-for="scheduled" hidden><div class="row2"><label class="field"><span>Exam starts</span><input type="datetime-local" id="tSchStart"></label>
+          <label class="field"><span>Exam length</span><select id="tSchLim"><option value="10">10 minutes</option><option value="15">15 minutes</option><option value="20">20 minutes</option><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60" selected>1 hour</option><option value="90">1½ hours</option><option value="120">2 hours</option><option value="180">3 hours</option></select></label></div>
+          <span class="note">Students who open the link early wait on a countdown screen. The quiz appears for everyone at the start time and closes for everyone at the end. Students who join late get only the time that is left.</span></div>
+        <div class="tfields" data-for="window" hidden><div class="row2"><label class="field"><span>Opens</span><input type="datetime-local" id="tWinStart"></label>
+          <label class="field"><span>Closes</span><input type="datetime-local" id="tWinEnd"></label></div>
+          <label class="field"><span>Time limit for each student (optional)</span><select id="tWinLim"><option value="0">No time limit</option><option value="10">10 minutes</option><option value="15">15 minutes</option><option value="20">20 minutes</option><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60">1 hour</option><option value="90">1½ hours</option><option value="120">2 hours</option><option value="180">3 hours</option></select></label>
+          <span class="note">With a time limit, each student's time starts when they join, and never runs past the closing time.</span></div>
+        <span class="note" id="tzNote"></span>
+      </fieldset>
       <button class="btn pri" style="height:50px;font-size:17px">Create quiz</button>
       <div id="newErr" class="msg bad" hidden></div>
     </form>
@@ -70,11 +101,17 @@
         <span class="note" style="max-width:360px">Scan this with your phone's camera to open this dashboard there. It's your private link, so don't show this code to the class.</span></div>
     </div>
     <div id="dClosed" class="msg warn" hidden>This quiz is closed. New students can't join.</div>
+    <div class="panel pad tpanel" id="dTiming" hidden>
+      <div class="tinfo"><b id="dTimingName"></b><span class="note" id="dTimingDesc"></span></div>
+      <div class="tclock" id="dClock"></div>
+      <div class="row"><button class="btn" id="startNow" hidden>Start now</button><button class="btn danger" id="endNow">End the quiz for everyone</button><button class="btn" id="undoEnd" hidden>Undo end</button></div>
+    </div>
     <div class="chips">
       <div class="chip c-info"><span class="n" id="nAns">0</span><span class="l">Answering</span></div>
       <div class="chip c-warn"><span class="n" id="nAway">0</span><span class="l">Left the quiz now</span></div>
       <div class="chip c-bad"><span class="n" id="nLock">0</span><span class="l">Locked</span></div>
       <div class="chip c-ok"><span class="n" id="nDone">0</span><span class="l">Submitted</span></div>
+      <div class="chip c-time" id="chipTime" hidden><span class="n" id="nTime">0</span><span class="l">Time's up</span></div>
     </div>
     <div class="panel pad row">
       <label class="row" style="gap:8px"><input type="checkbox" id="dStrict"> <b>Lock after</b></label>
@@ -85,11 +122,11 @@
     <div class="grid2">
       <div class="panel">
         <div class="sec-h"><h3>Students (<span id="nAll">0</span>)</h3><button class="btn" id="csvBtn">Download results (CSV)</button></div>
-        <div class="tbl"><table><thead><tr><th>Student</th><th>Status</th><th>Exits</th><th>Time away</th></tr></thead><tbody id="rows"></tbody></table></div>
+        <div class="tbl"><table><thead><tr><th>Student</th><th>Status</th><th>Exits</th><th>Time away</th><th class="tcol">Time left</th></tr></thead><tbody id="rows"></tbody></table></div>
         <div class="pad note" id="noStudents">Waiting for students to join…</div>
       </div>
       <div class="panel">
-        <div class="sec-h"><h3 id="logTitle">Activity: whole class</h3><button class="btn pri" id="unlock" hidden>Unlock student</button></div>
+        <div class="sec-h"><h3 id="logTitle">Activity: whole class</h3><span class="row" style="gap:8px"><button class="btn" id="extra" hidden>+5 minutes</button><button class="btn pri" id="unlock" hidden>Unlock student</button></span></div>
         <ul class="log" id="log"></ul>
       </div>
     </div>
@@ -145,6 +182,24 @@ function showList(){
   $('#list').innerHTML=a.map(q=>`<div class="item" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 16px;border-top:1px solid var(--line)"><a href="#${q.code}" style="flex:1;text-decoration:none;color:inherit;min-width:0"><b>${esc(q.title)}</b><span class="sub">Code ${q.code} · ${new Date(q.created).toLocaleDateString()}</span></a><button class="btn" data-rm="${q.code}" type="button">Remove from this device</button><a class="btn" href="#${q.code}">Open</a></div>`).join('');
 }
 
+/* ---------- timing ---------- */
+const tVal=()=>document.querySelector('input[name=timing]:checked').value;
+function showTiming(){const v=tVal(); document.querySelectorAll('.tfields').forEach(f=>f.hidden=f.dataset.for!==v);}
+document.querySelectorAll('input[name=timing]').forEach(r=>r.onchange=showTiming);
+const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'';
+$('#tzNote').textContent=tz?`Times are in your time zone (${tz}). Students see them in their own time zone.`:'';
+const ts=v=>v?new Date(v).getTime():NaN;
+function readTimingForm(){const v=tVal();
+  if(v==='scheduled'){const st=ts($('#tSchStart').value); if(!st) return {error:'Please choose the date and time the exam starts.'};
+    return {timing:v,start_at:st,limit_min:+$('#tSchLim').value};}
+  if(v==='window'){const st=ts($('#tWinStart').value), en=ts($('#tWinEnd').value);
+    if(!st||!en) return {error:'Please choose when the quiz opens and when it closes.'}; if(en<=st) return {error:'The closing time must be after the opening time.'};
+    return {timing:v,start_at:st,end_at:en,limit_min:+$('#tWinLim').value};}
+  return {timing:'any',limit_min:+$('#tAnyLim').value};}
+const when=t=>new Date(t).toLocaleString([], {weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+const dur=ms=>{ms=Math.max(0,ms);const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`:`${m}:${String(x).padStart(2,'0')}`};
+const mins=m=>m>=60?(m%60?`${Math.floor(m/60)} h ${m%60} min`:`${m/60} hour${m>60?'s':''}`):`${m} minute${m===1?'':'s'}`;
+
 /* ---------- create ---------- */
 let checked=null;
 $('#checkBtn').onclick=async()=>{
@@ -160,10 +215,11 @@ $('#checkBtn').onclick=async()=>{
 };
 $('#newForm').onsubmit=async e=>{
   e.preventDefault(); $('#newErr').hidden=true;
-  const body={title:$('#fTitle').value, quiz_url:$('#fUrl').value, embed_url:checked&&checked.embed||'', sections:$('#fSec').value.split('\n'), strict:$('#fStrict').checked, max_exits:$('#fMax').value};
+  const tm=readTimingForm(); if(tm.error){$('#newErr').textContent=tm.error; $('#newErr').hidden=false; return}
+  const body={title:$('#fTitle').value, quiz_url:$('#fUrl').value, embed_url:checked&&checked.embed||'', sections:$('#fSec').value.split('\n'), strict:$('#fStrict').checked, max_exits:$('#fMax').value, ...tm};
   try{ const d=await api('sessions',{method:'POST',body:JSON.stringify(body)});
     const a=store(); a.push({code:d.code,key:d.teacher_key,title:body.title.trim(),created:Date.now()}); saveStore(a);
-    $('#newForm').reset(); checked=null; $('#checkMsg').hidden=true; location.hash=d.code;
+    $('#newForm').reset(); showTiming(); checked=null; $('#checkMsg').hidden=true; location.hash=d.code;
   }catch(err){$('#newErr').textContent=err.message; $('#newErr').hidden=false}
 };
 
@@ -190,28 +246,60 @@ async function poll(){
   }catch(e){ $('#dLive').textContent=e.message }
   if(!$('#vDash').hidden) timer=setTimeout(poll, document.hidden?10000:3000);
 }
-const lab={ans:['p-ans','Answering'],away:['p-away','Left the quiz'],lock:['p-lock','Locked'],done:['p-done','Submitted'],gone:['p-gone','Offline?']};
+const lab={time:['p-time',"Time's up"],ans:['p-ans','Answering'],away:['p-away','Left the quiz'],lock:['p-lock','Locked'],done:['p-done','Submitted'],gone:['p-gone','Offline?']};
 function statusOf(p){ if(p.status==='ans'&&data.server_time-p.last_seen>90000) return 'gone'; return p.status }
 function render(){
   const s=data.session, ps=data.participants;
   $('#dStrict').checked=!!s.strict; $('#dMax').value=String(s.max_exits);
   $('#closeBtn').textContent=s.closed?'Reopen quiz':'Close quiz'; $('#dClosed').hidden=!s.closed;
-  const c={ans:0,away:0,lock:0,done:0,gone:0}; ps.forEach(p=>c[statusOf(p)]++);
+  const c={ans:0,away:0,lock:0,done:0,gone:0,time:0}; ps.forEach(p=>c[statusOf(p)]++);
+  $('#nTime').textContent=c.time; $('#chipTime').hidden=!hasTimer(s);
+  renderTiming();
   $('#nAns').textContent=c.ans+c.gone; $('#nAway').textContent=c.away; $('#nLock').textContent=c.lock; $('#nDone').textContent=c.done; $('#nAll').textContent=ps.length;
   $('#noStudents').hidden=!!ps.length;
-  const order={lock:0,away:1,gone:2,ans:3,done:4};
+  const order={lock:0,away:1,gone:2,ans:3,time:4,done:5};
+  const showT=hasTimer(s); document.querySelectorAll('.tcol').forEach(e=>e.hidden=!showT);
   const now=data.server_time;
   $('#rows').innerHTML=ps.slice().sort((a,b)=>order[statusOf(a)]-order[statusOf(b)]||b.exits-a.exits||a.name.localeCompare(b.name)).map(p=>{
     const st=statusOf(p), away=p.away_ms+(p.status==='away'&&p.left_at?now-p.left_at:0);
     return `<tr data-id="${p.id}" class="${sel===p.id?'sel':''}"><td><span class="name">${esc(p.name)}</span>${p.section?`<span class="sub">${esc(p.section)}</span>`:''}</td>
-    <td><span class="pill ${lab[st][0]}">${lab[st][1]}</span></td><td class="${s.strict&&p.exits>=s.max_exits?'hi':''}">${p.exits}</td><td>${fmt(away)}</td></tr>`}).join('');
+    <td><span class="pill ${lab[st][0]}">${lab[st][1]}</span></td><td class="${s.strict&&p.exits>=s.max_exits?'hi':''}">${p.exits}</td><td>${fmt(away)}</td>${showT?`<td class="tleft" data-dl="${p.deadline||''}" data-st="${st}">${leftTxt(p.deadline,st)}</td>`:''}</tr>`}).join('');
   const names=Object.fromEntries(ps.map(p=>[p.id,p.name]));
   const pc=ps.find(p=>p.id===sel);
   const list=pc?events.filter(e=>e.participant_id===sel):events;
   $('#logTitle').textContent=pc?`Activity: ${pc.name}`:'Activity: whole class';
   $('#unlock').hidden=!(pc&&pc.status==='lock');
+  $('#extra').hidden=!(pc&&pc.status!=='done'&&pc.deadline);
   $('#log').innerHTML=list.slice(0,200).map(e=>`<li><time>${clock(e.at)}</time><span class="k-${e.kind}">${pc?'':esc(names[e.participant_id]||'Student')+': '}${esc(e.detail||e.kind)}</span></li>`).join('')||'<li class="note">No activity yet.</li>';
 }
+/* ---------- timer on the dashboard ---------- */
+let skew=0;
+const hasTimer=s=>s&&(s.timing!=='any'||s.limit_min>0||s.stop_at);
+const tnow=()=>Date.now()+skew;
+function leftTxt(dl,st){ if(st==='done') return '–'; if(st==='time') return "Time's up"; if(!dl) return '–';
+  const s=data&&data.session; if(s&&s.timing==='scheduled'&&tnow()<s.start_at) return 'Waiting';
+  return dur(dl-tnow()); }
+function renderTiming(){
+  const s=data.session, box=$('#dTiming'); box.hidden=!hasTimer(s); if(box.hidden) return;
+  skew=data.server_time-Date.now();
+  const t=tnow(), ended=s.stop_at&&t>=s.stop_at;
+  let name='',desc='',clk='';
+  if(s.timing==='scheduled'){ name='Scheduled exam'; desc=`${when(s.start_at)} · ${mins(s.limit_min)} · ends ${new Date(s.start_at+s.limit_min*60000).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}`;
+    clk= ended?'Ended': t<s.start_at?`Starts in ${dur(s.start_at-t)}`: t<s.deadline?`${dur(s.deadline-t)} left`:'Ended';}
+  else if(s.timing==='window'){ name='Open period'; desc=`Opens ${when(s.start_at)} · closes ${when(s.end_at)}${s.limit_min?` · ${mins(s.limit_min)} per student`:''}`;
+    clk= ended?'Ended': t<s.start_at?`Opens in ${dur(s.start_at-t)}`: t<s.end_at?`Closes in ${dur(s.end_at-t)}`:'Closed';}
+  else { name='Anytime'; desc=s.limit_min?`${mins(s.limit_min)} per student, from when they join`:'No time limit'; clk=ended?'Ended':''; }
+  $('#dTimingName').textContent=name; $('#dTimingDesc').textContent=desc; $('#dClock').textContent=clk;
+  $('#startNow').hidden=!(s.timing==='scheduled'&&t<s.start_at&&!ended);
+  $('#endNow').hidden=!!ended || clk==='Ended' || clk==='Closed'; $('#undoEnd').hidden=!ended;
+}
+setInterval(()=>{ if(!data||$('#vDash').hidden) return; renderTiming();
+  document.querySelectorAll('.tleft').forEach(td=>{td.textContent=leftTxt(+td.dataset.dl||null,td.dataset.st)}); },1000);
+$('#startNow').onclick=()=>{ if(confirm('Start the exam now for everyone? The timer starts for the whole class.')) settings({start_now:true}) };
+$('#endNow').onclick=()=>{ if(confirm("End the quiz for everyone now? Students who haven't submitted will see \"Time's up\".")) settings({end_now:true}) };
+$('#undoEnd').onclick=()=>settings({undo_end:true});
+$('#extra').onclick=async()=>{ if(!sel) return; try{await api(`sessions/${cur.code}/extra/${sel}`,{method:'POST',headers:{'x-teacher-key':cur.key},body:JSON.stringify({min:5})}); poll()}catch(e){alertMsg(e)} };
+
 $('#rows').onclick=e=>{const tr=e.target.closest('tr'); if(!tr) return; sel=sel===tr.dataset.id?null:tr.dataset.id; render()};
 $('#unlock').onclick=async()=>{ if(!sel) return; try{await api(`sessions/${cur.code}/unlock/${sel}`,{method:'POST',headers:{'x-teacher-key':cur.key},body:'{}'}); poll()}catch(e){alertMsg(e)} };
 const settings=async b=>{try{await api(`sessions/${cur.code}/settings`,{method:'POST',headers:{'x-teacher-key':cur.key},body:JSON.stringify(b)}); poll()}catch(e){alertMsg(e)}};
@@ -223,7 +311,7 @@ $('#previewBtn').onclick=()=>window.open(joinLink(cur.code),'_blank');
 $('#qrTeacherBtn').onclick=()=>{ const box=$('#qrTeacherBox'); box.hidden=!box.hidden; $('#qrTeacherBtn').textContent=box.hidden?'Open on my phone (QR)':'Hide QR';
   if(!box.hidden&&!$('#qrTeacher').firstChild){ try{ new QRCode($('#qrTeacher'),{text:teacherLink(cur),width:170,height:170,correctLevel:QRCode.CorrectLevel.L}) }catch(e){ $('#qrTeacher').textContent='QR not available, use Copy teacher link.' } } };
 $('#copyTeacher').onclick=async()=>{ const l=teacherLink(cur); try{await navigator.clipboard.writeText(l); $('#copyTeacher').textContent='Copied ✓'}catch(e){ prompt('Your private teacher link:',l) } setTimeout(()=>$('#copyTeacher').textContent='Copy teacher link',2000)};
-$('#csvBtn').onclick=()=>{ if(!data) return; const rows=[['Name','Section','Status','Exits','Seconds away','Joined']].concat(data.participants.map(p=>[p.name,p.section||'',lab[statusOf(p)][1],p.exits,Math.round(p.away_ms/1000),new Date(p.joined_at).toLocaleString()]));
+$('#csvBtn').onclick=()=>{ if(!data) return; const rows=[['Name','Section','Status','Exits','Seconds away','Joined','Time limit ended']].concat(data.participants.map(p=>[p.name,p.section||'',lab[statusOf(p)][1],p.exits,Math.round(p.away_ms/1000),new Date(p.joined_at).toLocaleString(),p.deadline?new Date(p.deadline).toLocaleString():'']));
   const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'})); a.download=`quizpolice-${cur.code}.csv`; a.click()};
 function removeLocal(code){ saveStore(store().filter(q=>q.code!==code)) }

@@ -8,6 +8,13 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="/assets/fonts/source-sans-3-400.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/assets/fonts/fonts.css">
 <link rel="stylesheet" href="/assets/app.css">
+<style>
+.tbadge{font-family:var(--f-head);font-weight:800;font-size:18px;padding:4px 12px;border-radius:999px;background:var(--info-bg);color:var(--info)}
+.tbadge.low{background:var(--warn-bg);color:var(--warn)}.tbadge.crit{background:var(--bad-bg);color:var(--bad)}
+.lobby{text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.lobby .count{font-family:var(--f-head);font-weight:800;font-size:56px;line-height:1}
+.toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:30;padding:12px 18px;border-radius:12px;background:var(--warn-bg);color:var(--warn);font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+</style>
 </head>
 <body>
 <div class="wrap stu">
@@ -24,13 +31,20 @@
     <h1 style="font-size:22px" id="jTitle"></h1>
     <label class="field"><span>Your full name</span><input id="name" autocomplete="name" maxlength="80" required></label>
     <label class="field" id="secField" hidden><span>Section</span><select id="section"></select></label>
+    <div class="msg ok" id="timeNote" hidden></div>
     <div class="msg info">This quiz is monitored. If you leave this screen, switch apps or open another tab, it is recorded and your teacher sees it<span id="lockNote"></span>. Nothing outside this quiz is monitored.</div>
     <button class="btn pri" style="height:50px">I understand, start the quiz</button>
     <div id="joinErr" class="msg bad" hidden></div>
   </form>
 
+  <div class="panel pad lobby" id="lobby" hidden>
+    <h1 style="font-size:24px" id="lTitle"></h1>
+    <p class="note" style="margin:0">The exam starts for everyone at <b id="lAt"></b>. Stay on this page.</p>
+    <div class="count" id="lCount">–</div>
+    <p class="note" style="margin:0" id="lLen"></p>
+  </div>
   <div id="quiz" hidden style="display:flex;flex-direction:column;gap:10px">
-    <div class="panel stubar"><b id="sWho"></b><span class="note">Exits: <b id="sExits">0</b><span id="sMax"></span></span><button class="btn pri" id="doneBtn">I've submitted</button></div>
+    <div class="panel stubar"><b id="sWho"></b><span class="tbadge" id="sTime" hidden></span><span class="note">Exits: <b id="sExits">0</b><span id="sMax"></span></span><button class="btn pri" id="doneBtn">I've submitted</button></div>
     <iframe class="frame" id="frame" title="Quiz" allow="fullscreen"></iframe>
     <p class="note">Can't see the quiz? Tell your teacher. Don't open it in another tab, because that counts as leaving.</p>
   </div>
@@ -44,6 +58,16 @@
     <p>Only finish here after your answers were submitted on the quiz itself.</p>
     <button class="btn pri" id="dYes" style="height:46px;min-width:200px">Yes, I'm done</button>
     <button class="btn" id="dNo" style="height:46px;min-width:200px">Not yet</button>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+<div class="overlay" id="timeOv" hidden>
+  <div class="panel alertbox" role="alertdialog" aria-labelledby="tT">
+    <div class="big" style="color:#4b3a8c">⏱</div>
+    <h2 id="tT">Time's up</h2>
+    <p>The time for this quiz has ended, and your teacher can see it. If you pressed Submit on the quiz before the time ran out, tap the button below.</p>
+    <button class="btn pri" id="tDone" style="height:46px;min-width:220px">I submitted in time</button>
+    <p class="note" style="font-size:14px">If your teacher gives you more time, the quiz comes back by itself.</p>
   </div>
 </div>
 <div class="overlay" id="warnOv" hidden>
@@ -61,6 +85,18 @@ const api=async(path,opt={})=>{const r=await fetch('/api/'+path,{...opt,headers:
 const TK='quizpolice.student.v1';
 let token=null, me={status:'ans',exits:0}, quiz=null, away=false, pending=false, poller=0;
 
+const when=t=>new Date(t).toLocaleString([], {weekday:'long',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+const hm=t=>new Date(t).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+const mins=m=>m>=60?(m%60?`${Math.floor(m/60)} h ${m%60} min`:`${m/60} hour${m>60?'s':''}`):`${m} minute${m===1?'':'s'}`;
+const dur=ms=>{ms=Math.max(0,ms);const s=Math.ceil(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`:`${m}:${String(x).padStart(2,'0')}`};
+let skew=0, T=null, warned={}, frameSrc='';
+const tnow=()=>Date.now()+skew;
+function timingNote(q){
+  if(q.timing==='scheduled') return `Scheduled exam: starts ${when(q.start_at)} and lasts ${mins(q.limit_min)}. It ends at ${hm(q.start_at+q.limit_min*60000)} for everyone.`;
+  if(q.timing==='window') return `Open until ${when(q.end_at)}.${q.limit_min?` Once you start, you have ${mins(q.limit_min)}.`:''}`;
+  if(q.limit_min) return `Once you start, you have ${mins(q.limit_min)}. The timer starts when you press Start.`;
+  return '';
+}
 const params=new URLSearchParams(location.search);
 if(params.get('c')) $('#code').value=params.get('c');
 
@@ -70,6 +106,9 @@ try{ const saved=JSON.parse(sessionStorage.getItem(TK)); if(saved&&saved.token){
 $('#codeForm').onsubmit=async e=>{e.preventDefault(); $('#codeErr').hidden=true;
   const code=$('#code').value.replace(/\D/g,'');
   try{ quiz=await api('quiz/'+code); if(quiz.closed) throw new Error('This quiz is closed.');
+    if(quiz.block==='not_open') throw new Error(`This quiz opens on ${when(quiz.start_at)}. Come back then.`);
+    if(quiz.block) throw new Error(quiz.block);
+    const tn=timingNote(quiz); $('#timeNote').hidden=!tn; $('#timeNote').textContent=tn;
     $('#jTitle').textContent=quiz.title; $('#codeForm').hidden=true; $('#joinForm').hidden=false;
     if(quiz.sections.length){ $('#secField').hidden=false; $('#section').innerHTML=quiz.sections.map(s=>`<option>${s.replace(/</g,'&lt;')}</option>`).join('') }
     $('#lockNote').textContent=quiz.strict?`. After ${quiz.max_exits} exit${quiz.max_exits>1?'s':''}, your quiz locks until your teacher unlocks it`:'';
@@ -79,7 +118,7 @@ $('#codeForm').onsubmit=async e=>{e.preventDefault(); $('#codeErr').hidden=true;
 $('#joinForm').onsubmit=async e=>{e.preventDefault(); $('#joinErr').hidden=true;
   try{ const d=await api('join',{method:'POST',body:JSON.stringify({code:quiz.code,name:$('#name').value,section:$('#secField').hidden?'':$('#section').value})});
     token=d.token; try{sessionStorage.setItem(TK,JSON.stringify({token}))}catch(e){}
-    start({title:d.title,embed_url:d.embed_url,max_exits:d.max_exits,strict:d.strict,name:$('#name').value.trim(),status:'ans',exits:0});
+    start(d);
   }catch(err){ $('#joinErr').textContent=err.message; $('#joinErr').hidden=false }};
 
 async function resume(){ try{ const d=await api('me',{headers:{'x-student-token':token}}); start(d) }catch(e){ try{sessionStorage.removeItem(TK)}catch(_){} token=null } }
@@ -88,19 +127,44 @@ function start(d){
   $('#codeForm').hidden=true; $('#joinForm').hidden=true;
   me={status:d.status,exits:d.exits}; quiz={...(quiz||{}),max_exits:d.max_exits,strict:d.strict};
   if(d.status==='done'){ $('#doneBox').hidden=false; return }
-  $('#quiz').hidden=false; $('#sWho').textContent=d.name||''; $('#frame').src=d.embed_url;
+  setTiming(d); frameSrc=d.embed_url;
+  $('#sWho').textContent=d.name||''; $('#lTitle').textContent=d.title||'';
   $('#sMax').textContent=d.strict?` of ${d.max_exits}`:''; showExits();
+  tick(); setInterval(tick,1000);
   if(d.status==='lock') showWarn();
+  if(d.status==='time') showTimeUp();
   poller=setInterval(check,15000);
 }
+function setTiming(d){ if(d.server_time) skew=d.server_time-Date.now(); T={timing:d.timing,start_at:d.start_at,limit_min:d.limit_min,deadline:d.deadline}; }
+function inLobby(){ return T&&T.timing==='scheduled'&&T.start_at&&tnow()<T.start_at }
+function tick(){
+  if(!T||me.status==='done') return;
+  if(inLobby()){ $('#quiz').hidden=true; $('#lobby').hidden=false; $('#lAt').textContent=hm(T.start_at);
+    $('#lCount').textContent=dur(T.start_at-tnow()); $('#lLen').textContent=`The exam lasts ${mins(T.limit_min)}.`; return; }
+  if(!$('#lobby').hidden||$('#quiz').hidden){ $('#lobby').hidden=true; $('#quiz').hidden=false; }
+  if(frameSrc&&!$('#frame').src) $('#frame').src=frameSrc;
+  const b=$('#sTime');
+  if(!T.deadline){ b.hidden=true; return; }
+  const left=T.deadline-tnow(); b.hidden=false; b.textContent='⏱ '+dur(left)+' left';
+  b.className='tbadge'+(left<=60000?' crit':left<=300000?' low':'');
+  if(left<=300000&&left>60000&&!warned[5]&&T.limit_min>=10){ warned[5]=1; toast('5 minutes left. Finish up and press Submit on the quiz.'); }
+  if(left<=60000&&left>0&&!warned[1]){ warned[1]=1; toast('1 minute left! Press Submit on the quiz now.'); }
+  if(left<=0&&me.status!=='time'){ me.status='time'; showTimeUp(); check(); }
+}
+let toastT=0; function toast(m){ const t=$('#toast'); t.textContent=m; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,6000); }
+function showTimeUp(){ $('#frame').hidden=true; $('#warnOv').hidden=true; $('#timeOv').hidden=false; $('#sTime').textContent="⏱ Time's up"; }
+$('#tDone').onclick=async()=>{ finishing=true; await send('done'); me.status='done'; clearInterval(poller); $('#timeOv').hidden=true; $('#quiz').hidden=true; $('#doneBox').hidden=false; try{sessionStorage.removeItem(TK)}catch(e){} token=null };
 function showExits(){ $('#sExits').textContent=me.exits }
-async function send(kind,how){ if(!token) return; try{ const d=await api('me/event',{method:'POST',headers:{'x-student-token':token},body:JSON.stringify({kind,how})}); me.status=d.status; me.exits=d.exits; showExits(); return d }catch(e){} }
-async function check(){ if(!token) return; try{ const d=await api('me',{headers:{'x-student-token':token}}); const was=me.status; me.status=d.status; me.exits=d.exits; showExits();
-  if(was==='lock'&&d.status==='ans'){ $('#warnOv').hidden=true; $('#frame').hidden=false } }catch(e){} }
+async function send(kind,how){ if(!token) return; try{ const d=await api('me/event',{method:'POST',headers:{'x-student-token':token},body:JSON.stringify({kind,how})}); me.status=d.status; me.exits=d.exits; if(T&&d.deadline!==undefined)T.deadline=d.deadline; showExits(); return d }catch(e){} }
+async function check(){ if(!token) return; try{ const d=await api('me',{headers:{'x-student-token':token}}); const was=me.status; me.status=d.status; me.exits=d.exits; setTiming(d); showExits();
+  if(was==='lock'&&d.status==='ans'){ $('#warnOv').hidden=true; $('#frame').hidden=false }
+  if(d.status==='time') showTimeUp();
+  if(was==='time'&&d.status==='ans'){ $('#timeOv').hidden=true; $('#frame').hidden=false; warned={}; toast('Your teacher gave you more time.'); }
+  if(d.status==='lock'&&was!=='lock') showWarn(); }catch(e){} }
 
 // ---- detection ----
 // Clicking inside the quiz moves focus into the frame; that is not leaving, so check where focus went.
-function left(how){ if(!token||away||finishing||me.status!=='ans'||$('#quiz').hidden||!$('#doneOv').hidden) return; away=true; pending=true; send('leave',how) }
+function left(how){ if(!token||away||finishing||me.status!=='ans'||inLobby()||$('#quiz').hidden||!$('#doneOv').hidden) return; away=true; pending=true; send('leave',how) }
 async function back(){ if(!away) return; away=false; const d=await send('back'); if(pending){ pending=false; showWarn() } }
 document.addEventListener('visibilitychange',()=>{ document.hidden?left('switched tab or app'):back() });
 addEventListener('blur',()=>setTimeout(()=>{ if(document.activeElement===$('#frame')) return; if(!document.hasFocus()) left('clicked outside the quiz') },0));
