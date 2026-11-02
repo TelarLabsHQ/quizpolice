@@ -83,6 +83,7 @@ def prose(path, title, desc, inner): page(path, title, desc, f'<article class="w
 FEATS = [('Works with the quizzes you already have', 'Paste a Google Forms, Microsoft Forms or Wayground link. No need to rebuild your questions.'),
          ('See who leaves the quiz', 'Switching tabs, opening another app or clicking outside the quiz is recorded with the time and how long they were away.'),
          ('Lock after too many exits', 'Choose how many exits are allowed. Locked students wait for you to unlock them from your dashboard.'),
+         ('Timers and scheduled exams', 'Add a time limit, schedule an exam for the whole class at the same time, or open a quiz between two dates for homework. Students see a countdown.'),
          ('Live dashboard', 'A class list that updates every few seconds: answering, left the quiz, locked, or submitted.'),
          ('Join with a code or QR', 'Students type a 6-digit code or scan the QR code. No student accounts needed.'),
          ('Results you can keep', 'Download a CSV of names, sections, exits and time away for your records.')]
@@ -102,9 +103,9 @@ def home():
 <section class="wrap section"><h2>What QuizPolice does</h2><div class="feats">{f}</div></section>
 {ad("home")}
 <section class="wrap section"><h2>How it works in class</h2>
-<ol class="steps"><li><h3>Create the quiz</h3><p>Open the <a href="/teacher/#new">teacher dashboard</a>, name your quiz and paste its link. Choose how many exits are allowed.</p></li>
+<ol class="steps"><li><h3>Create the quiz</h3><p>Open the <a href="/teacher/#new">teacher dashboard</a>, name your quiz and paste its link. Choose how many exits are allowed, and when students take it: anytime, as a scheduled exam, or within an open period.</p></li>
 <li><h3>Students join</h3><p>Show the code or QR on the board. Students type their name and section, then answer inside QuizPolice.</p></li>
-<li><h3>Watch and act</h3><p>See exits as they happen, unlock students, and download the results when the quiz is done.</p></li></ol></section>
+<li><h3>Watch and act</h3><p>See exits and time left as they happen, unlock students or give extra time, and download the results when the quiz is done.</p></li></ol></section>
 <section class="wrap section"><div class="callout"><h2>Honest about what it can and can't see</h2><p>QuizPolice only knows when a student leaves the quiz page on the same device. It can't see other phones, the student's screen, or what they search. It's a strong reminder and a record, not mind-reading, and we tell students exactly what is monitored before they start.</p><a class="btn" href="/how-it-works/">Read how it works</a></div></section>'''
     body += family_promo('More free tools for teachers')
     page('/', f'{NAME} – Free Quiz Monitor for Google Forms, Microsoft Forms & Wayground',
@@ -120,6 +121,13 @@ def pages():
 <p>Each exit is recorded with the time, and when the student comes back, how many seconds they were away.</p>
 <h2>Locking</h2>
 <p>With <b>Lock after</b> turned on, a student who reaches the exit limit sees "Quiz locked" and can't continue until you press <b>Unlock</b> on your dashboard. You can change the limit during the quiz.</p>
+<h2>Timers and schedules</h2>
+<p>When you set up a quiz, choose <b>When do students take it?</b></p>
+<ul><li><b>Anytime:</b> students start whenever you share the code. You can add a time limit (10 minutes to 3 hours) that starts when each student joins.</li>
+<li><b>Scheduled exam:</b> pick the date, start time and length. Students who open the link early wait on a countdown screen. The quiz appears for everyone at the start time and ends for everyone together. Students who join late get only the time that is left.</li>
+<li><b>Open period:</b> pick an opening and a closing date, for example Monday 8 am to Friday 5 pm. Students can start any time in between, with an optional time limit for each student that never runs past the closing time.</li></ul>
+<p>Students see a countdown above the quiz, with reminders at 5 minutes and 1 minute left. When time runs out, the quiz is covered with a <b>Time's up</b> screen. On your dashboard you see each student's time left, and you can <b>Start now</b>, give one student <b>+5 minutes</b>, or <b>End the quiz for everyone</b>. Times are set in your time zone; students see them in their own.</p>
+<p><b>Important:</b> QuizPolice can't press Submit on the Google or Microsoft form for the student. Answers that weren't submitted before the time ran out are not sent, so remind students to submit before the end. For a hard cut-off, you can also turn off "Accepting responses" on the form itself.</p>
 <h2>What it can't see</h2>
 <ul><li>Another phone or a book on the desk.</li><li>Screenshots, or what is happening on the student's screen.</li>
 <li>Whether the student actually pressed Submit on the form. Students tap <b>I've submitted</b>; check the form's own responses for the official answers.</li></ul>
@@ -138,6 +146,8 @@ def pages():
            ('Where are my quizzes saved?', 'Your quiz list is saved in your browser on this device, together with a secret key that lets only you see the results. To open a dashboard on another device, use the private teacher link on the dashboard (copy it, send it with Gmail or Outlook, or scan its QR code with your phone). Keep that link private: anyone who has it can see the results.'),
            ('I used a shared or school computer. What should I do?', 'When you\'re done, open My quizzes and tap Remove from this device (or Remove all). The results are not deleted. You can still open them with your private teacher link on your own phone or laptop, so save that link first.'),
            ('How long is student data kept?', 'Quizzes and student results are deleted automatically 30 days after the quiz is created. You can delete a quiz and its results any time from the dashboard.'),
+           ('Can I set a time limit or schedule an exam?', 'Yes. When you create a quiz, choose Anytime (with an optional time limit), Scheduled exam (everyone starts and ends together at a set date and time) or Open period (students start any time between two dates). Students see a countdown, and you can give extra time or end the quiz for everyone from your dashboard.'),
+           ('What happens when the time runs out?', 'The quiz is covered with a Time\'s up screen and the student is marked "Time\'s up" on your dashboard. QuizPolice can\'t submit the form for them, so answers that weren\'t submitted are not sent. Give the student +5 minutes if they need more time; the quiz comes back by itself.'),
            ('Does it work on phones?', 'Yes. Students can join on phones, tablets or computers. Detection is strongest when the quiz is opened in Chrome, Safari or Edge.'),
            ('Can students cheat anyway?', 'A determined student with a second device can. QuizPolice is a deterrent and a record, best combined with good quiz design and supervision.'),
            ('Does it see the students\' answers?', 'No. Answers go straight to your Google or Microsoft form. QuizPolice only sees joins, exits, returns, locks and "I\'ve submitted".')]
@@ -152,7 +162,7 @@ def pages():
 <h1>Privacy policy</h1>
 <p class="lead">{E(NAME)} is run by {E(ST)}. We collect as little as possible and delete it quickly.</p>
 <h2>What we collect from students</h2>
-<ul><li>The name and section the student types when joining.</li><li>Quiz activity: when they joined, left the quiz page, came back, were locked or unlocked, and tapped "I've submitted".</li></ul>
+<ul><li>The name and section the student types when joining.</li><li>Quiz activity: when they joined, left the quiz page, came back, were locked or unlocked, ran out of time or were given extra time, and tapped "I've submitted".</li></ul>
 <p>We do <b>not</b> collect quiz answers (those go directly to the teacher's form), email addresses, location, or anything that happens outside the quiz page.</p>
 <h2>What we collect from teachers</h2><p>The quiz name, quiz link and settings. There are no teacher accounts; a secret key stored in the teacher's browser gives access to the dashboard.</p>
 <h2>Who can see it</h2><p>Only the teacher who created the quiz (the browser holding its secret key). We don't sell or share the data.</p>
@@ -161,13 +171,13 @@ def pages():
 <h2>Children</h2><p>{E(NAME)} is used in schools, including by students under 18. We only process the minimum needed for the teacher to run the quiz, and teachers are responsible for following their school's rules about using online tools with their students.</p>
 <h2>Analytics</h2><p>We use Cloudflare Web Analytics to count page visits. It does not use cookies and does not track you across websites.</p>
 <h2>Hosting</h2><p>The site and data are hosted on Cloudflare.</p>
-<h2>Contact</h2><p><a href="mailto:{E(MAIL)}">{E(MAIL)}</a></p><p class="muted">Last updated {E(CFG["launch_date"])}.</p>''')
+<h2>Contact</h2><p><a href="mailto:{E(MAIL)}">{E(MAIL)}</a></p><p class="muted">Last updated {E(CFG.get("updated", CFG["launch_date"]))}.</p>''')
     prose('/terms/', 'Terms of Use', f'Terms of use for {NAME}.', f'''
 <h1>Terms of use</h1><ul>
 <li>{E(NAME)} is free to use for quizzes, tests and practice.</li><li>Teachers should tell students that the quiz is monitored (QuizPolice also shows this before every quiz).</li>
 <li>Use it fairly: exits are a sign to talk with a student, not automatic proof of cheating.</li>
 <li>The service is provided as it is, without warranty. Download your results after each quiz; data is deleted after 30 days.</li></ul>
-<p>Questions: <a href="mailto:{E(MAIL)}">{E(MAIL)}</a></p><p class="muted">Last updated {E(CFG["launch_date"])}.</p>''')
+<p>Questions: <a href="mailto:{E(MAIL)}">{E(MAIL)}</a></p><p class="muted">Last updated {E(CFG.get("updated", CFG["launch_date"]))}.</p>''')
     prose('/contact/', 'Contact', f'Contact {NAME}.', f'<h1>Contact us</h1><p class="lead">Questions, problems or ideas?</p><p>Email: <a href="mailto:{E(MAIL)}">{E(MAIL)}</a></p><p>If a quiz link doesn\'t work, include the platform (Google Forms, Microsoft Forms or Wayground) and the device students use.</p>')
 
 def extras():
