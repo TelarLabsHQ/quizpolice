@@ -97,7 +97,7 @@ def home():
   <div class="cta"><a class="btn btn-big" href="/teacher/#new">Set up a quiz</a><a class="btn btn-ghost btn-big" href="/join/">Join a quiz</a></div></div>
   <div class="mock"><div class="mrow"><b>Science 7 · Quiz 2</b><span class="code">482 915</span></div>
     <div class="mchips"><span class="c-info">18<br><small>Answering</small></span><span class="c-warn">2<br><small>Left now</small></span><span class="c-bad">1<br><small>Locked</small></span><span class="c-ok">9<br><small>Submitted</small></span></div>
-    <div class="mlist"><div><b>Angelica R.</b><span class="pill p-lock">Locked · 3 exits</span></div><div><b>Mark V.</b><span class="pill p-away">Left the quiz · 0:34</span></div><div><b>Andrea S.</b><span class="pill p-ans">Answering</span></div><div><b>Carlo B.</b><span class="pill p-done">Submitted</span></div></div></div>
+    <div class="mlist"><div><b>Emily R.</b><span class="pill p-lock">Locked · 3 exits</span></div><div><b>Jacob M.</b><span class="pill p-away">Left the quiz · 0:34</span></div><div><b>Olivia S.</b><span class="pill p-ans">Answering</span></div><div><b>Ethan B.</b><span class="pill p-done">Submitted</span></div></div></div>
 </div></section>
 <section class="wrap section"><h2>What QuizPolice does</h2><div class="feats">{f}</div></section>
 {ad("home")}
