@@ -16,7 +16,7 @@ const SCHEMA = [
 ];
 // Columns added later (timers and schedules); added to older databases automatically.
 const ADD = {
-  sessions: { timing: "TEXT NOT NULL DEFAULT 'any'", start_at: 'INTEGER', end_at: 'INTEGER', limit_min: 'INTEGER NOT NULL DEFAULT 0', stop_at: 'INTEGER' },
+  sessions: { timing: "TEXT NOT NULL DEFAULT 'any'", start_at: 'INTEGER', end_at: 'INTEGER', limit_min: 'INTEGER NOT NULL DEFAULT 0', stop_at: 'INTEGER', grace_s: 'INTEGER NOT NULL DEFAULT 60' },
   participants: { extra_ms: 'INTEGER NOT NULL DEFAULT 0' },
 };
 let ready = false;
@@ -56,9 +56,10 @@ function joinBlock(s, t) {
   }
   return null;
 }
-const timingPub = s => ({ timing: s.timing || 'any', start_at: s.start_at, end_at: s.end_at, limit_min: s.limit_min || 0, stop_at: s.stop_at });
+const timingPub = s => ({ timing: s.timing || 'any', start_at: s.start_at, end_at: s.end_at, limit_min: s.limit_min || 0, stop_at: s.stop_at, grace_s: s.grace_s ?? 60 });
 async function timeup(db, s, p) {
-  const d = deadlineOf(s, p), t = now();
+  const d0 = deadlineOf(s, p), t = now();
+  const d = d0 == null ? null : d0 + (s.grace_s ?? 60) * 1000;
   if (d == null || t < d || !['ans', 'away', 'lock'].includes(p.status)) return p;
   const gone = p.status === 'away' && p.left_at ? Math.max(0, Math.min(t, d) - p.left_at) : 0;
   const r = await db.prepare("UPDATE participants SET status = 'time', away_ms = away_ms + ? WHERE id = ? AND status IN ('ans','away','lock')").bind(gone, p.id).run();
@@ -85,6 +86,7 @@ function readTiming(body) {
   }
   return { timing, start_at: null, end_at: null, limit_min: lim };
 }
+const readGrace = b => b.grace_s === undefined ? 60 : Math.min(300, Math.max(0, parseInt(b.grace_s) || 0));
 
 const json = (data, status = 200) => new Response(JSON.stringify(data), {
   status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
@@ -183,8 +185,8 @@ export async function onRequest(ctx) {
         if (!(await getSession(db, code))) break;
       }
       const key = rid(32);
-      await db.prepare('INSERT INTO sessions (code, teacher_key, title, quiz_url, embed_url, platform, sections, max_exits, strict, created_at, timing, start_at, end_at, limit_min) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
-        .bind(code, key, title, quiz, embed, e.platform, JSON.stringify(sections), maxExits, strict, now(), tm.timing, tm.start_at, tm.end_at, tm.limit_min).run();
+      await db.prepare('INSERT INTO sessions (code, teacher_key, title, quiz_url, embed_url, platform, sections, max_exits, strict, created_at, timing, start_at, end_at, limit_min, grace_s) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
+        .bind(code, key, title, quiz, embed, e.platform, JSON.stringify(sections), maxExits, strict, now(), tm.timing, tm.start_at, tm.end_at, tm.limit_min, readGrace(body)).run();
       return json({ code, teacher_key: key });
     }
     if (parts[0] === 'sessions' && parts[1]) {
@@ -292,7 +294,9 @@ export async function onRequest(ctx) {
         if (kind === 'done' && p.status !== 'done') {
           // finishing also closes an open "away" period so time away stays correct
           const gone = p.status === 'away' && p.left_at ? Math.max(0, t - p.left_at) : 0;
-          await db.batch([db.prepare("UPDATE participants SET status = 'done', away_ms = away_ms + ?, last_seen = ? WHERE id = ?").bind(gone, t, p.id), await log(db, p, 'done', 'Marked as submitted')]);
+          const dl = deadlineOf(s, p), late = dl != null && t > dl ? Math.round((t - dl) / 1000) : 0;
+          const msg = p.status === 'time' ? 'Says they submitted before time ran out' : late ? `Marked as submitted (late by ${late}s)` : 'Marked as submitted';
+          await db.batch([db.prepare("UPDATE participants SET status = 'done', away_ms = away_ms + ?, last_seen = ? WHERE id = ?").bind(gone, t, p.id), await log(db, p, late || p.status === 'time' ? 'late' : 'done', msg)]);
           return json({ status: 'done', exits: p.exits });
         }
         return json({ status: p.status, exits: p.exits, deadline: deadlineOf(s, p) });

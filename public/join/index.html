@@ -45,6 +45,7 @@
   </div>
   <div id="quiz" hidden style="display:flex;flex-direction:column;gap:10px">
     <div class="panel stubar"><b id="sWho"></b><span class="tbadge" id="sTime" hidden></span><span class="note">Exits: <b id="sExits">0</b><span id="sMax"></span></span><button class="btn pri" id="doneBtn">I've submitted</button></div>
+    <div class="msg bad" id="graceBar" hidden style="font-weight:700;font-size:17px;text-align:center">⏱ Time's up! Press <u>Submit</u> on the quiz now. <span id="graceLeft"></span> left to submit. Your teacher will see it as late.</div>
     <iframe class="frame" id="frame" title="Quiz" allow="fullscreen"></iframe>
     <p class="note">Can't see the quiz? Tell your teacher. Don't open it in another tab, because that counts as leaving.</p>
   </div>
@@ -65,9 +66,9 @@
   <div class="panel alertbox" role="alertdialog" aria-labelledby="tT">
     <div class="big" style="color:#4b3a8c">⏱</div>
     <h2 id="tT">Time's up</h2>
-    <p>The time for this quiz has ended, and your teacher can see it. If you pressed Submit on the quiz before the time ran out, tap the button below.</p>
-    <button class="btn pri" id="tDone" style="height:46px;min-width:220px">I submitted in time</button>
-    <p class="note" style="font-size:14px">If your teacher gives you more time, the quiz comes back by itself.</p>
+    <p>The time for this quiz has ended, and your teacher can see it. <b>Don't close or refresh this page:</b> if your teacher gives you more time, your answers come back. If you already pressed Submit on the quiz, tap the button below.</p>
+    <button class="btn pri" id="tDone" style="height:46px;min-width:220px">I already submitted</button>
+    <p class="note" style="font-size:14px">Didn't submit? Ask your teacher for more time.</p>
   </div>
 </div>
 <div class="overlay" id="warnOv" hidden>
@@ -135,7 +136,7 @@ function start(d){
   if(d.status==='time') showTimeUp();
   poller=setInterval(check,15000);
 }
-function setTiming(d){ if(d.server_time) skew=d.server_time-Date.now(); T={timing:d.timing,start_at:d.start_at,limit_min:d.limit_min,deadline:d.deadline}; }
+function setTiming(d){ if(d.server_time) skew=d.server_time-Date.now(); T={timing:d.timing,start_at:d.start_at,limit_min:d.limit_min,deadline:d.deadline,grace_s:d.grace_s}; }
 function inLobby(){ return T&&T.timing==='scheduled'&&T.start_at&&tnow()<T.start_at }
 function tick(){
   if(!T||me.status==='done') return;
@@ -149,7 +150,10 @@ function tick(){
   b.className='tbadge'+(left<=60000?' crit':left<=300000?' low':'');
   if(left<=300000&&left>60000&&!warned[5]&&T.limit_min>=10){ warned[5]=1; toast('5 minutes left. Finish up and press Submit on the quiz.'); }
   if(left<=60000&&left>0&&!warned[1]){ warned[1]=1; toast('1 minute left! Press Submit on the quiz now.'); }
-  if(left<=0&&me.status!=='time'){ me.status='time'; showTimeUp(); check(); }
+  const grace=(T.grace_s??60)*1000;
+  if(left<=0&&left>-grace&&me.status==='ans'){ b.textContent='⏱ Submit now! '+dur(left+grace); b.className='tbadge crit';
+    if(!warned[0]){ warned[0]=1; $('#graceBar').hidden=false; } $('#graceLeft').textContent=dur(left+grace); return; }
+  if(left<=-grace&&me.status!=='time'&&me.status!=='done'){ me.status='time'; $('#graceBar').hidden=true; showTimeUp(); check(); }
 }
 let toastT=0; function toast(m){ const t=$('#toast'); t.textContent=m; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,6000); }
 function showTimeUp(){ $('#frame').hidden=true; $('#warnOv').hidden=true; $('#timeOv').hidden=false; $('#sTime').textContent="⏱ Time's up"; }
@@ -159,7 +163,7 @@ async function send(kind,how){ if(!token) return; try{ const d=await api('me/eve
 async function check(){ if(!token) return; try{ const d=await api('me',{headers:{'x-student-token':token}}); const was=me.status; me.status=d.status; me.exits=d.exits; setTiming(d); showExits();
   if(was==='lock'&&d.status==='ans'){ $('#warnOv').hidden=true; $('#frame').hidden=false }
   if(d.status==='time') showTimeUp();
-  if(was==='time'&&d.status==='ans'){ $('#timeOv').hidden=true; $('#frame').hidden=false; warned={}; toast('Your teacher gave you more time.'); }
+  if(was==='time'&&d.status==='ans'){ $('#timeOv').hidden=true; $('#frame').hidden=false; $('#graceBar').hidden=true; warned={}; toast('Your teacher gave you more time. Your answers are still there.'); }
   if(d.status==='lock'&&was!=='lock') showWarn(); }catch(e){} }
 
 // ---- detection ----

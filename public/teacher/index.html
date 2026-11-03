@@ -21,7 +21,7 @@
 .tinfo{display:flex;flex-direction:column;gap:2px;min-width:220px;flex:1}
 .tclock{font-family:var(--f-head);font-weight:800;font-size:28px}
 .chips{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))!important}
-.c-time{background:#ece7f8;color:#4b3a8c}.p-time{background:#ece7f8;color:#4b3a8c}.k-timeup{color:#4b3a8c;font-weight:700}.k-extra{color:var(--ok);font-weight:600}
+.c-time{background:#ece7f8;color:#4b3a8c}.p-time{background:#ece7f8;color:#4b3a8c}.k-timeup{color:#4b3a8c;font-weight:700}.k-extra{color:var(--ok);font-weight:600}.k-late{color:var(--warn);font-weight:700}
 </style>
 </head>
 <body>
@@ -74,6 +74,8 @@
           <label class="field"><span>Closes</span><input type="datetime-local" id="tWinEnd"></label></div>
           <label class="field"><span>Time limit for each student (optional)</span><select id="tWinLim"><option value="0">No time limit</option><option value="10">10 minutes</option><option value="15">15 minutes</option><option value="20">20 minutes</option><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60">1 hour</option><option value="90">1½ hours</option><option value="120">2 hours</option><option value="180">3 hours</option></select></label>
           <span class="note">With a time limit, each student's time starts when they join, and never runs past the closing time.</span></div>
+        <label class="field"><span>When time runs out</span><select id="tGrace"><option value="60" selected>Give 1 minute to press Submit (recommended)</option><option value="120">Give 2 minutes to press Submit</option><option value="0">Close the quiz immediately</option></select></label>
+        <span class="note">QuizPolice can't press Submit on the form for students. With extra time to submit, the quiz stays open with a "Submit now" warning, and late submissions are marked on your dashboard.</span>
         <span class="note" id="tzNote"></span>
       </fieldset>
       <button class="btn pri" style="height:50px;font-size:17px">Create quiz</button>
@@ -216,7 +218,7 @@ $('#checkBtn').onclick=async()=>{
 $('#newForm').onsubmit=async e=>{
   e.preventDefault(); $('#newErr').hidden=true;
   const tm=readTimingForm(); if(tm.error){$('#newErr').textContent=tm.error; $('#newErr').hidden=false; return}
-  const body={title:$('#fTitle').value, quiz_url:$('#fUrl').value, embed_url:checked&&checked.embed||'', sections:$('#fSec').value.split('\n'), strict:$('#fStrict').checked, max_exits:$('#fMax').value, ...tm};
+  const body={title:$('#fTitle').value, quiz_url:$('#fUrl').value, embed_url:checked&&checked.embed||'', sections:$('#fSec').value.split('\n'), strict:$('#fStrict').checked, max_exits:$('#fMax').value, grace_s:+$('#tGrace').value, ...tm};
   try{ const d=await api('sessions',{method:'POST',body:JSON.stringify(body)});
     const a=store(); a.push({code:d.code,key:d.teacher_key,title:body.title.trim(),created:Date.now()}); saveStore(a);
     $('#newForm').reset(); showTiming(); checked=null; $('#checkMsg').hidden=true; location.hash=d.code;
@@ -278,7 +280,7 @@ const hasTimer=s=>s&&(s.timing!=='any'||s.limit_min>0||s.stop_at);
 const tnow=()=>Date.now()+skew;
 function leftTxt(dl,st){ if(st==='done') return '–'; if(st==='time') return "Time's up"; if(!dl) return '–';
   const s=data&&data.session; if(s&&s.timing==='scheduled'&&tnow()<s.start_at) return 'Waiting';
-  return dur(dl-tnow()); }
+  const left=dl-tnow(), g=((data&&data.session.grace_s)??60)*1000; if(left<=0) return left>-g?'Submitting… '+dur(left+g):"Time's up"; return dur(left); }
 function renderTiming(){
   const s=data.session, box=$('#dTiming'); box.hidden=!hasTimer(s); if(box.hidden) return;
   skew=data.server_time-Date.now();
