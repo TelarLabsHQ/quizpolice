@@ -21,6 +21,7 @@
 .tinfo{display:flex;flex-direction:column;gap:2px;min-width:220px;flex:1}
 .tclock{font-family:var(--f-head);font-weight:800;font-size:28px}
 .chips{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))!important}
+.k-paste{color:var(--warn);font-weight:700}
 .c-time{background:#ece7f8;color:#4b3a8c}.p-time{background:#ece7f8;color:#4b3a8c}.k-timeup{color:#4b3a8c;font-weight:700}.k-extra{color:var(--ok);font-weight:600}.k-late{color:var(--warn);font-weight:700}
 </style>
 </head>
@@ -52,10 +53,18 @@
     <form class="panel pad" id="newForm" style="display:flex;flex-direction:column;gap:16px;max-width:720px">
       <h1 style="font-size:26px">Set up a monitored quiz</h1>
       <label class="field"><span>Quiz name</span><input id="fTitle" maxlength="120" placeholder="Science 7 · Quiz 2: Mixtures" required></label>
+      <fieldset class="timing" style="gap:8px">
+        <legend><b>What will students do?</b></legend>
+        <label class="topt"><input type="radio" name="kind" value="quiz" checked><span><b>Answer a quiz</b><small>Google Forms, Microsoft Forms or Wayground.</small></span></label>
+        <label class="topt"><input type="radio" name="kind" value="writing"><span><b>Write an essay or short answers (DraftTrail)</b><small>Students write in DraftTrail inside QuizPolice. You see exits, big pastes and word counts live, and download every essay at the end. When the time runs out, essays are handed in automatically.</small></span></label>
+      </fieldset>
+      <label class="field" id="writingRow" hidden><span>Writing task (students see this)</span><input id="fWriting" maxlength="140" placeholder="Short answer: Why do leaves change color in autumn?"></label>
+      <div id="quizRows">
       <label class="field"><span>Link to your quiz</span><input id="fUrl" type="url" placeholder="https://docs.google.com/forms/d/e/…/viewform" required>
         <span class="note">Google Forms, Microsoft Forms or Wayground. Use the link you would send to students.</span></label>
       <div class="row"><button type="button" class="btn" id="checkBtn">Check this link</button><span class="note" id="checkNote"></span></div>
       <div id="checkMsg" class="msg" hidden></div>
+      </div>
       <label class="field"><span>Sections (optional, one per line)</span><textarea id="fSec" placeholder="Grade 7 – Lincoln&#10;Grade 7 – Washington"></textarea></label>
       <div class="row"><label class="row" style="gap:8px"><input type="checkbox" id="fStrict" checked> <b>Lock the quiz after</b></label>
         <select id="fMax" class="btn"><option>1</option><option>2</option><option selected>3</option><option>5</option><option>10</option></select>
@@ -108,6 +117,10 @@
       <div class="tclock" id="dClock"></div>
       <div class="row"><button class="btn" id="startNow" hidden>Start now</button><button class="btn danger" id="endNow">End the quiz for everyone</button><button class="btn" id="undoEnd" hidden>Undo end</button></div>
     </div>
+    <div class="panel pad row" id="dtBar" hidden style="justify-content:space-between">
+      <span><b>Writing task (DraftTrail)</b> <span class="note">Essays save as students write. Download them to replay how each one was written.</span></span>
+      <span class="row" style="gap:8px"><button class="btn pri" id="essaysBtn">Download all essays</button><a class="btn" href="https://drafttrail.telarlabs.net/review/" target="_blank" rel="noopener">Open DraftTrail review</a></span>
+    </div>
     <div class="chips">
       <div class="chip c-info"><span class="n" id="nAns">0</span><span class="l">Answering</span></div>
       <div class="chip c-warn"><span class="n" id="nAway">0</span><span class="l">Left the quiz now</span></div>
@@ -124,11 +137,11 @@
     <div class="grid2">
       <div class="panel">
         <div class="sec-h"><h3>Students (<span id="nAll">0</span>)</h3><button class="btn" id="csvBtn">Download results (CSV)</button></div>
-        <div class="tbl"><table><thead><tr><th>Student</th><th>Status</th><th>Exits</th><th>Time away</th><th class="tcol">Time left</th></tr></thead><tbody id="rows"></tbody></table></div>
+        <div class="tbl"><table><thead><tr><th>Student</th><th>Status</th><th>Exits</th><th>Time away</th><th class="dcol">Words</th><th class="dcol">Pasted</th><th class="tcol">Time left</th></tr></thead><tbody id="rows"></tbody></table></div>
         <div class="pad note" id="noStudents">Waiting for students to join…</div>
       </div>
       <div class="panel">
-        <div class="sec-h"><h3 id="logTitle">Activity: whole class</h3><span class="row" style="gap:8px"><button class="btn" id="extra" hidden>+5 minutes</button><button class="btn pri" id="unlock" hidden>Unlock student</button></span></div>
+        <div class="sec-h"><h3 id="logTitle">Activity: whole class</h3><span class="row" style="gap:8px"><button class="btn" id="essayOne" hidden>Download essay</button><button class="btn" id="extra" hidden>+5 minutes</button><button class="btn pri" id="unlock" hidden>Unlock student</button></span></div>
         <ul class="log" id="log"></ul>
       </div>
     </div>
@@ -204,6 +217,12 @@ const when=t=>new Date(t).toLocaleString([], {weekday:'short',month:'short',day:
 const dur=ms=>{ms=Math.max(0,ms);const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`:`${m}:${String(x).padStart(2,'0')}`};
 const mins=m=>m>=60?(m%60?`${Math.floor(m/60)} h ${m%60} min`:`${m/60} hour${m>60?'s':''}`):`${m} minute${m===1?'':'s'}`;
 
+const DTB='https://drafttrail.telarlabs.net';
+const kindV=()=>document.querySelector('input[name=kind]:checked').value;
+function showKind(){ const w=kindV()==='writing'; $('#writingRow').hidden=!w; $('#quizRows').hidden=w; $('#fUrl').required=!w; $('#fWriting').required=w; }
+document.querySelectorAll('input[name=kind]').forEach(r=>r.onchange=showKind);
+{ const q=new URLSearchParams(location.search).get('writing'); if(q){ document.querySelector('input[name=kind][value=writing]').checked=true; $('#fWriting').value=q.slice(0,140); if(!$('#fTitle').value) $('#fTitle').value=q.slice(0,120); showKind(); history.replaceState(null,'',location.pathname+location.hash); } }
+
 /* ---------- create ---------- */
 let checked=null;
 $('#checkBtn').onclick=async()=>{
@@ -220,10 +239,11 @@ $('#checkBtn').onclick=async()=>{
 $('#newForm').onsubmit=async e=>{
   e.preventDefault(); $('#newErr').hidden=true;
   const tm=readTimingForm(); if(tm.error){$('#newErr').textContent=tm.error; $('#newErr').hidden=false; return}
+  if(kindV()==='writing'){ const w=$('#fWriting').value.trim()||$('#fTitle').value.trim(); const u=DTB+'/write/?task='+encodeURIComponent(w); $('#fUrl').value=u; checked={embed:u}; }
   const body={title:$('#fTitle').value, quiz_url:$('#fUrl').value, embed_url:checked&&checked.embed||'', sections:$('#fSec').value.split('\n'), strict:$('#fStrict').checked, max_exits:$('#fMax').value, grace_s:+$('#tGrace').value, ...tm};
   try{ const d=await api('sessions',{method:'POST',body:JSON.stringify(body)});
     const a=store(); a.push({code:d.code,key:d.teacher_key,title:body.title.trim(),created:Date.now()}); saveStore(a);
-    $('#newForm').reset(); showTiming(); ['tAnyLimC','tSchLimC','tWinLimC'].forEach(i=>$('#'+i).hidden=true); checked=null; $('#checkMsg').hidden=true; location.hash=d.code;
+    $('#newForm').reset(); showTiming(); showKind(); ['tAnyLimC','tSchLimC','tWinLimC'].forEach(i=>$('#'+i).hidden=true); checked=null; $('#checkMsg').hidden=true; location.hash=d.code;
   }catch(err){$('#newErr').textContent=err.message; $('#newErr').hidden=false}
 };
 
@@ -263,17 +283,20 @@ function render(){
   $('#noStudents').hidden=!!ps.length;
   const order={lock:0,away:1,gone:2,ans:3,time:4,done:5};
   const showT=hasTimer(s); document.querySelectorAll('.tcol').forEach(e=>e.hidden=!showT);
+  const isDT=s.platform==='DraftTrail'; document.querySelectorAll('.dcol').forEach(e=>e.hidden=!isDT); $('#dtBar').hidden=!isDT;
+  lab.done[1]=isDT?'Handed in':'Submitted'; lab.ans[1]=isDT?'Writing':'Answering'; $('#nAns').nextElementSibling.textContent=isDT?'Writing':'Answering'; $('#nAway').nextElementSibling.textContent=isDT?'Left the page now':'Left the quiz now'; $('#nDone').nextElementSibling.textContent=isDT?'Handed in':'Submitted';
   const now=data.server_time;
   $('#rows').innerHTML=ps.slice().sort((a,b)=>order[statusOf(a)]-order[statusOf(b)]||b.exits-a.exits||a.name.localeCompare(b.name)).map(p=>{
     const st=statusOf(p), away=p.away_ms+(p.status==='away'&&p.left_at?now-p.left_at:0);
     return `<tr data-id="${p.id}" class="${sel===p.id?'sel':''}"><td><span class="name">${esc(p.name)}</span>${p.section?`<span class="sub">${esc(p.section)}</span>`:''}</td>
-    <td><span class="pill ${lab[st][0]}">${lab[st][1]}</span></td><td class="${s.strict&&p.exits>=s.max_exits?'hi':''}">${p.exits}</td><td>${fmt(away)}</td>${showT?`<td class="tleft" data-dl="${p.deadline||''}" data-st="${st}">${leftTxt(p.deadline,st)}</td>`:''}</tr>`}).join('');
+    <td><span class="pill ${lab[st][0]}">${lab[st][1]}</span></td><td class="${s.strict&&p.exits>=s.max_exits?'hi':''}">${p.exits}</td><td>${fmt(away)}</td>${isDT?`<td>${p.words||0}</td><td class="${p.words&&p.pasted/p.words>0.3?'hi':''}">${p.pasted||0}</td>`:''}${showT?`<td class="tleft" data-dl="${p.deadline||''}" data-st="${st}">${leftTxt(p.deadline,st)}</td>`:''}</tr>`}).join('');
   const names=Object.fromEntries(ps.map(p=>[p.id,p.name]));
   const pc=ps.find(p=>p.id===sel);
   const list=pc?events.filter(e=>e.participant_id===sel):events;
   $('#logTitle').textContent=pc?`Activity: ${pc.name}`:'Activity: whole class';
   $('#unlock').hidden=!(pc&&pc.status==='lock');
-  $('#extra').hidden=!(pc&&pc.status!=='done'&&pc.deadline);
+  $('#extra').hidden=!(pc&&(pc.status!=='done'||pc.essay_auto)&&pc.deadline);
+  $('#essayOne').hidden=!(pc&&pc.has_essay);
   $('#log').innerHTML=list.slice(0,200).map(e=>`<li><time>${clock(e.at)}</time><span class="k-${e.kind}">${pc?'':esc(names[e.participant_id]||'Student')+': '}${esc(e.detail||e.kind)}</span></li>`).join('')||'<li class="note">No activity yet.</li>';
 }
 /* ---------- timer on the dashboard ---------- */
@@ -302,6 +325,12 @@ setInterval(()=>{ if(!data||$('#vDash').hidden) return; renderTiming();
 $('#startNow').onclick=()=>{ if(confirm('Start the exam now for everyone? The timer starts for the whole class.')) settings({start_now:true}) };
 $('#endNow').onclick=()=>{ if(confirm("End the quiz for everyone now? Students who haven't submitted will see \"Time's up\".")) settings({end_now:true}) };
 $('#undoEnd').onclick=()=>settings({undo_end:true});
+const saveJSON=(obj,name)=>{ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(obj)],{type:'application/json'})); a.download=name; document.body.append(a); a.click(); a.remove(); };
+const fileSafe=t=>String(t).replace(/[^\p{L}\p{N}]+/gu,'-').replace(/^-|-$/g,'').slice(0,60)||'essays';
+$('#essaysBtn').onclick=async()=>{ try{ const d=await api(`sessions/${cur.code}/essays`,{headers:{'x-teacher-key':cur.key}});
+  if(!d.essays.length){ alertMsg(new Error('No essays saved yet.')); return } saveJSON(d,`${fileSafe(cur.title)}-all-essays.drafttrail`);
+  $('#dLive').textContent=`Downloaded ${d.essays.length} essay${d.essays.length>1?'s':''}. Open the file on the DraftTrail review page.` }catch(e){alertMsg(e)} };
+$('#essayOne').onclick=async()=>{ if(!sel) return; try{ const d=await api(`sessions/${cur.code}/essay/${sel}`,{headers:{'x-teacher-key':cur.key}}); saveJSON(d,`${fileSafe(d.name||'essay')}.drafttrail`) }catch(e){alertMsg(e)} };
 $('#extra').onclick=async()=>{ if(!sel) return; try{await api(`sessions/${cur.code}/extra/${sel}`,{method:'POST',headers:{'x-teacher-key':cur.key},body:JSON.stringify({min:5})}); poll()}catch(e){alertMsg(e)} };
 
 $('#rows').onclick=e=>{const tr=e.target.closest('tr'); if(!tr) return; sel=sel===tr.dataset.id?null:tr.dataset.id; render()};
@@ -315,7 +344,7 @@ $('#previewBtn').onclick=()=>window.open(joinLink(cur.code),'_blank');
 $('#qrTeacherBtn').onclick=()=>{ const box=$('#qrTeacherBox'); box.hidden=!box.hidden; $('#qrTeacherBtn').textContent=box.hidden?'Open on my phone (QR)':'Hide QR';
   if(!box.hidden&&!$('#qrTeacher').firstChild){ try{ new QRCode($('#qrTeacher'),{text:teacherLink(cur),width:170,height:170,correctLevel:QRCode.CorrectLevel.L}) }catch(e){ $('#qrTeacher').textContent='QR not available, use Copy teacher link.' } } };
 $('#copyTeacher').onclick=async()=>{ const l=teacherLink(cur); try{await navigator.clipboard.writeText(l); $('#copyTeacher').textContent='Copied ✓'}catch(e){ prompt('Your private teacher link:',l) } setTimeout(()=>$('#copyTeacher').textContent='Copy teacher link',2000)};
-$('#csvBtn').onclick=()=>{ if(!data) return; const rows=[['Name','Section','Status','Exits','Seconds away','Joined','Time limit ended']].concat(data.participants.map(p=>[p.name,p.section||'',lab[statusOf(p)][1],p.exits,Math.round(p.away_ms/1000),new Date(p.joined_at).toLocaleString(),p.deadline?new Date(p.deadline).toLocaleString():'']));
+$('#csvBtn').onclick=()=>{ if(!data) return; const rows=[['Name','Section','Status','Exits','Seconds away','Joined','Time limit ended','Words','Pasted words']].concat(data.participants.map(p=>[p.name,p.section||'',lab[statusOf(p)][1],p.exits,Math.round(p.away_ms/1000),new Date(p.joined_at).toLocaleString(),p.deadline?new Date(p.deadline).toLocaleString():'',p.words||0,p.pasted||0]));
   const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'})); a.download=`quizpolice-${cur.code}.csv`; a.click()};
 function removeLocal(code){ saveStore(store().filter(q=>q.code!==code)) }

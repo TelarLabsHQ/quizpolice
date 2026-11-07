@@ -129,6 +129,10 @@ function start(d){
   me={status:d.status,exits:d.exits}; quiz={...(quiz||{}),max_exits:d.max_exits,strict:d.strict};
   if(d.status==='done'){ $('#doneBox').hidden=false; return }
   setTiming(d); frameSrc=d.embed_url;
+  DT=d.platform==='DraftTrail';
+  if(DT){ const u=new URL(d.embed_url); DTO=u.origin; u.searchParams.set('embed','1'); u.searchParams.set('s',d.code||''); u.searchParams.set('n',d.name||''); u.searchParams.set('po',location.origin); frameSrc=u.toString();
+    $('#doneBtn').hidden=true; $('#frame').title='Writing'; document.querySelector('#quiz > p.note').textContent="Write in the box above. When you finish, tap Hand in my writing. Don't open other tabs or apps: that counts as leaving.";
+    if(d.status==='done'&&d.essay_auto){ me.status='done'; showAutoDone(); } }
   $('#sWho').textContent=d.name||''; $('#lTitle').textContent=d.title||'';
   $('#sMax').textContent=d.strict?` of ${d.max_exits}`:''; showExits();
   tick(); setInterval(tick,1000);
@@ -136,6 +140,21 @@ function start(d){
   if(d.status==='time') showTimeUp();
   poller=setInterval(check,15000);
 }
+// ---- DraftTrail writing task (inside the frame) ----
+let DT=false, DTO='', lastProg=0, progQ=null, snapT=0;
+const toDT=m=>{ try{ $('#frame').contentWindow.postMessage({src:'quizpolice',...m},DTO) }catch(e){} };
+async function sendEssay(rec,final,auto){ if(!token) return; try{ const d=await api('me/essay',{method:'POST',headers:{'x-student-token':token},body:JSON.stringify({rec,final,auto})}); return d }catch(e){ return null } }
+function showAutoDone(){ $('#frame').hidden=true; $('#warnOv').hidden=true; $('#timeOv').hidden=false; $('#tT').textContent="Time's up";
+  $('#timeOv p').textContent='The time for this task has ended. Your writing was handed in automatically, and your teacher can see it.'; $('#tDone').hidden=true; $('#sTime').textContent="⏱ Time's up"; }
+addEventListener('message',async e=>{ if(!DT||e.origin!==DTO||!e.data||e.data.src!=='drafttrail') return; const m=e.data;
+  if(m.type==='progress'||m.type==='ready'){ progQ=m; const n=Date.now(); if(n-lastProg>20000){ lastProg=n; send('progress',''); } }
+  if(m.type==='paste') send('paste','',{words:m.words});
+  if(m.type==='snapshot'&&me.status!=='done') sendEssay(m.rec,false,false);
+  if(m.type==='submit'){ finishing=true; const r=await sendEssay(m.rec,true,m.auto); me.status='done';
+    if(m.auto){ showAutoDone(); }
+    else { clearInterval(poller); $('#quiz').hidden=true; $('#doneBox').hidden=false; $('#doneBox h1').textContent='Handed in'; $('#doneBox .note').textContent='Your teacher received your writing. You may close this page.'; try{sessionStorage.removeItem(TK)}catch(_){} token=null; }
+    finishing=false; } });
+setInterval(()=>{ if(DT&&token&&me.status!=='done'&&!$('#quiz').hidden) toDT({type:'snapshot'}) },60000);
 function setTiming(d){ if(d.server_time) skew=d.server_time-Date.now(); T={timing:d.timing,start_at:d.start_at,limit_min:d.limit_min,deadline:d.deadline,grace_s:d.grace_s}; }
 function inLobby(){ return T&&T.timing==='scheduled'&&T.start_at&&tnow()<T.start_at }
 function tick(){
@@ -151,6 +170,7 @@ function tick(){
   if(left<=300000&&left>60000&&!warned[5]&&T.limit_min>=10){ warned[5]=1; toast('5 minutes left. Finish up and press Submit on the quiz.'); }
   if(left<=60000&&left>0&&!warned[1]){ warned[1]=1; toast('1 minute left! Press Submit on the quiz now.'); }
   const grace=(T.grace_s??60)*1000;
+  if(DT&&left<=0&&me.status!=='done'){ if(!warned.collect){ warned.collect=1; toDT({type:'collect'}); } b.textContent="⏱ Time's up"; b.className='tbadge crit'; return; }
   if(left<=0&&left>-grace&&me.status==='ans'){ b.textContent='⏱ Submit now! '+dur(left+grace); b.className='tbadge crit';
     if(!warned[0]){ warned[0]=1; $('#graceBar').hidden=false; } $('#graceLeft').textContent=dur(left+grace); return; }
   if(left<=-grace&&me.status!=='time'&&me.status!=='done'){ me.status='time'; $('#graceBar').hidden=true; showTimeUp(); check(); }
@@ -159,10 +179,12 @@ let toastT=0; function toast(m){ const t=$('#toast'); t.textContent=m; t.hidden=
 function showTimeUp(){ $('#frame').hidden=true; $('#warnOv').hidden=true; $('#timeOv').hidden=false; $('#sTime').textContent="⏱ Time's up"; }
 $('#tDone').onclick=async()=>{ finishing=true; await send('done'); me.status='done'; clearInterval(poller); $('#timeOv').hidden=true; $('#quiz').hidden=true; $('#doneBox').hidden=false; try{sessionStorage.removeItem(TK)}catch(e){} token=null };
 function showExits(){ $('#sExits').textContent=me.exits }
-async function send(kind,how){ if(!token) return; try{ const d=await api('me/event',{method:'POST',headers:{'x-student-token':token},body:JSON.stringify({kind,how})}); me.status=d.status; me.exits=d.exits; if(T&&d.deadline!==undefined)T.deadline=d.deadline; showExits(); return d }catch(e){} }
+async function send(kind,how,extra){ if(!token) return; if(kind==='progress'&&progQ) extra={words:progQ.words,pasted:progQ.pasted};
+  try{ const d=await api('me/event',{method:'POST',headers:{'x-student-token':token},body:JSON.stringify({kind,how,...(extra||{})})}); me.status=d.status; me.exits=d.exits; if(T&&d.deadline!==undefined)T.deadline=d.deadline; showExits(); return d }catch(e){} }
 async function check(){ if(!token) return; try{ const d=await api('me',{headers:{'x-student-token':token}}); const was=me.status; me.status=d.status; me.exits=d.exits; setTiming(d); showExits();
   if(was==='lock'&&d.status==='ans'){ $('#warnOv').hidden=true; $('#frame').hidden=false }
   if(d.status==='time') showTimeUp();
+  if(DT&&was==='done'&&d.status==='ans'){ me.status='ans'; $('#timeOv').hidden=true; $('#frame').hidden=false; warned={}; toDT({type:'reopen'}); toast('Your teacher gave you more time. Keep writing.'); }
   if(was==='time'&&d.status==='ans'){ $('#timeOv').hidden=true; $('#frame').hidden=false; $('#graceBar').hidden=true; warned={}; toast('Your teacher gave you more time. Your answers are still there.'); }
   if(d.status==='lock'&&was!=='lock') showWarn(); }catch(e){} }
 
@@ -176,7 +198,7 @@ addEventListener('focus',()=>back());
 
 function showWarn(){
   const locked=me.status==='lock';
-  $('#wNum').textContent=me.exits; $('#wT').textContent=locked?'Quiz locked':'You left the quiz';
+  $('#wNum').textContent=me.exits; $('#wT').textContent=locked?(DT?'Writing locked':'Quiz locked'):(DT?'You left the writing page':'You left the quiz'); $('#wOk').textContent=DT?'Back to writing':'Back to the quiz';
   $('#wMsg').textContent=locked?`You left ${me.exits} times. Ask your teacher to unlock your quiz. This page will continue by itself once you're unlocked.`
     :`This was reported to your teacher.${quiz&&quiz.strict?` Your quiz locks after ${quiz.max_exits} exits.`:''}`;
   $('#wOk').hidden=locked; $('#frame').hidden=locked; $('#warnOv').hidden=false;

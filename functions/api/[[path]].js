@@ -17,7 +17,7 @@ const SCHEMA = [
 // Columns added later (timers and schedules); added to older databases automatically.
 const ADD = {
   sessions: { timing: "TEXT NOT NULL DEFAULT 'any'", start_at: 'INTEGER', end_at: 'INTEGER', limit_min: 'INTEGER NOT NULL DEFAULT 0', stop_at: 'INTEGER', grace_s: 'INTEGER NOT NULL DEFAULT 60' },
-  participants: { extra_ms: 'INTEGER NOT NULL DEFAULT 0' },
+  participants: { extra_ms: 'INTEGER NOT NULL DEFAULT 0', words: 'INTEGER NOT NULL DEFAULT 0', pasted: 'INTEGER NOT NULL DEFAULT 0', essay: 'TEXT', essay_auto: 'INTEGER NOT NULL DEFAULT 0' },
 };
 let ready = false;
 async function ensure(db) {
@@ -68,7 +68,7 @@ async function timeup(db, s, p) {
 }
 function stuPayload(s, p) {
   return { status: p.status, exits: p.exits, max_exits: s.max_exits, strict: !!s.strict, closed: !!s.closed, embed_url: s.embed_url, title: s.title,
-    name: p.name, joined_at: p.joined_at, deadline: deadlineOf(s, p), server_time: now(), ...timingPub(s) };
+    code: s.code, platform: s.platform, essay_auto: !!p.essay_auto, name: p.name, joined_at: p.joined_at, deadline: deadlineOf(s, p), server_time: now(), ...timingPub(s) };
 }
 function readTiming(body) {
   const timing = ['any', 'scheduled', 'window'].includes(body.timing) ? body.timing : 'any';
@@ -106,6 +106,7 @@ export function toEmbed(raw) {
     u.searchParams.set('embedded', 'true');
     return { platform: 'Google Forms', embed: u.toString() };
   }
+  if (h === 'drafttrail.telarlabs.net' && u.pathname.startsWith('/write')) return { platform: 'DraftTrail', embed: u.toString() };
   if (h === 'forms.gle') return { platform: 'Google Forms (short link)', embed: u.toString(), resolve: true };
   if (h.endsWith('forms.office.com') || h === 'forms.microsoft.com' || h.endsWith('forms.cloud.microsoft')) {
     u.searchParams.set('embed', 'true');
@@ -196,7 +197,7 @@ export async function onRequest(ctx) {
       if (!s) return bad('Quiz not found, or this browser is not the teacher of this quiz.', 404);
       if (method === 'GET' && parts[2] === 'dashboard') {
         const since = parseInt(url.searchParams.get('since')) || 0;
-        let ps = (await db.prepare('SELECT id, name, section, status, exits, away_ms, left_at, last_seen, joined_at, extra_ms FROM participants WHERE code = ? ORDER BY joined_at').bind(code).all()).results;
+        let ps = (await db.prepare('SELECT id, name, section, status, exits, away_ms, left_at, last_seen, joined_at, extra_ms, words, pasted, essay_auto, (essay IS NOT NULL) AS has_essay FROM participants WHERE code = ? ORDER BY joined_at').bind(code).all()).results;
         ps = await Promise.all(ps.map(async p => { const q = await timeup(db, s, { ...p, code }); return { ...q, deadline: deadlineOf(s, q) }; }));
         const evs = (await db.prepare('SELECT id, participant_id, kind, detail, at FROM events WHERE code = ? AND id > ? ORDER BY id DESC LIMIT 300').bind(code, since).all()).results;
         s.deadline = deadlineOf(s, null);
@@ -226,9 +227,19 @@ export async function onRequest(ctx) {
         let add = m * MIN;
         // if time already ran out, count the extra minutes from now
         const d = deadlineOf(s, p); if (d != null && d < now()) add += now() - d;
-        await db.batch([db.prepare("UPDATE participants SET extra_ms = extra_ms + ?, status = CASE WHEN status = 'time' THEN 'ans' ELSE status END WHERE id = ?").bind(add, p.id),
+        await db.batch([db.prepare("UPDATE participants SET extra_ms = extra_ms + ?, status = CASE WHEN status = 'time' OR (status = 'done' AND essay_auto = 1) THEN 'ans' ELSE status END, essay_auto = 0 WHERE id = ?").bind(add, p.id),
           await log(db, p, 'extra', `Given ${m} more minute${m > 1 ? 's' : ''}`)]);
         return json({ ok: true });
+      }
+      if (method === 'GET' && parts[2] === 'essays') {
+        const rows = (await db.prepare('SELECT name, section, essay FROM participants WHERE code = ? AND essay IS NOT NULL ORDER BY name').bind(code).all()).results;
+        const essays = rows.map(r => { try { const e = JSON.parse(r.essay); if (r.section) e.section = r.section; return e; } catch { return null; } }).filter(Boolean);
+        return json({ app: 'DraftTrail', bundle: true, title: s.title, code, essays });
+      }
+      if (method === 'GET' && parts[2] === 'essay' && parts[3]) {
+        const r = await db.prepare('SELECT essay FROM participants WHERE id = ? AND code = ?').bind(parts[3], code).first();
+        if (!r || !r.essay) return bad('No essay yet', 404);
+        return new Response(r.essay, { headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
       }
       if (method === 'POST' && parts[2] === 'delete') {
         await db.batch([db.prepare('DELETE FROM events WHERE code = ?').bind(code), db.prepare('DELETE FROM participants WHERE code = ?').bind(code), db.prepare('DELETE FROM sessions WHERE code = ?').bind(code)]);
@@ -275,7 +286,7 @@ export async function onRequest(ctx) {
         if (kind === 'leave' && p.status === 'ans') {
           const exits = p.exits + 1;
           const r = await db.prepare("UPDATE participants SET status = 'away', exits = ?, left_at = ?, last_seen = ? WHERE id = ? AND status = 'ans'").bind(exits, t, t, p.id).run();
-          if (r.meta.changes) { await (await log(db, p, 'leave', `Left the quiz (exit ${exits})${body.how ? ' – ' + clean(body.how, 40) : ''}`)).run(); return json({ status: 'away', exits, deadline: deadlineOf(s, p) }); }
+          if (r.meta.changes) { await (await log(db, p, 'leave', `Left the ${s.platform === 'DraftTrail' ? 'writing page' : 'quiz'} (exit ${exits})${body.how ? ' – ' + clean(body.how, 40) : ''}`)).run(); return json({ status: 'away', exits, deadline: deadlineOf(s, p) }); }
           const cur = await participant(db, token); return json({ status: cur.status, exits: cur.exits });
         }
         if (kind === 'back' && p.status === 'away') {
@@ -291,6 +302,16 @@ export async function onRequest(ctx) {
           }
           const cur = await participant(db, token); return json({ status: cur.status, exits: cur.exits });
         }
+        if (kind === 'progress') {
+          const w = Math.min(100000, Math.max(0, parseInt(body.words) || 0)), pa = Math.min(100000, Math.max(0, parseInt(body.pasted) || 0));
+          await db.prepare('UPDATE participants SET words = ?, pasted = ?, last_seen = ? WHERE id = ?').bind(w, pa, t, p.id).run();
+          return json({ status: p.status, exits: p.exits, deadline: deadlineOf(s, p) });
+        }
+        if (kind === 'paste') {
+          const w = Math.min(100000, Math.max(0, parseInt(body.words) || 0));
+          await (await log(db, p, 'paste', `Pasted ${w} words`)).run();
+          return json({ status: p.status, exits: p.exits, deadline: deadlineOf(s, p) });
+        }
         if (kind === 'done' && p.status !== 'done') {
           // finishing also closes an open "away" period so time away stays correct
           const gone = p.status === 'away' && p.left_at ? Math.max(0, t - p.left_at) : 0;
@@ -299,6 +320,26 @@ export async function onRequest(ctx) {
           await db.batch([db.prepare("UPDATE participants SET status = 'done', away_ms = away_ms + ?, last_seen = ? WHERE id = ?").bind(gone, t, p.id), await log(db, p, late || p.status === 'time' ? 'late' : 'done', msg)]);
           return json({ status: 'done', exits: p.exits });
         }
+        return json({ status: p.status, exits: p.exits, deadline: deadlineOf(s, p) });
+      }
+      if (method === 'POST' && parts[1] === 'essay') {
+        const rec = body.rec;
+        if (!rec || !Array.isArray(rec.ops)) return bad('No writing received.');
+        const txt = JSON.stringify({ ...rec, name: p.name });
+        if (txt.length > 900000) return bad('This essay is too long to save here. Download the DraftTrail file instead.', 413);
+        const t = now(), text = String(rec.text || '');
+        const w = (text.trim().match(/\S+/g) || []).length;
+        const pa = rec.ops.filter(o => o && o.k === 'paste').reduce((n, o) => n + ((String(o.i).trim().match(/\S+/g) || []).length), 0);
+        if (p.status === 'done' && !body.final) return json({ status: p.status, exits: p.exits });
+        if (body.final) {
+          const gone = p.status === 'away' && p.left_at ? Math.max(0, t - p.left_at) : 0;
+          const dl = deadlineOf(s, p), late = !body.auto && dl != null && t > dl ? Math.round((t - dl) / 1000) : 0;
+          const msg = body.auto ? `Time's up: essay handed in automatically (${w} words)` : late ? `Handed in the essay, late by ${late}s (${w} words)` : `Handed in the essay (${w} words)`;
+          await db.batch([db.prepare("UPDATE participants SET essay = ?, words = ?, pasted = ?, essay_auto = ?, status = 'done', away_ms = away_ms + ?, last_seen = ? WHERE id = ?")
+            .bind(txt, w, pa, body.auto ? 1 : 0, gone, t, p.id), await log(db, p, late || body.auto ? 'late' : 'done', msg)]);
+          return json({ status: 'done', exits: p.exits });
+        }
+        await db.prepare('UPDATE participants SET essay = ?, words = ?, pasted = ?, last_seen = ? WHERE id = ?').bind(txt, w, pa, t, p.id).run();
         return json({ status: p.status, exits: p.exits, deadline: deadlineOf(s, p) });
       }
     }

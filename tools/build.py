@@ -83,6 +83,7 @@ def prose(path, title, desc, inner): page(path, title, desc, f'<article class="w
 FEATS = [('Works with the quizzes you already have', 'Paste a Google Forms, Microsoft Forms or Wayground link. No need to rebuild your questions.'),
          ('See who leaves the quiz', 'Switching tabs, opening another app or clicking outside the quiz is recorded with the time and how long they were away.'),
          ('Lock after too many exits', 'Choose how many exits are allowed. Locked students wait for you to unlock them from your dashboard.'),
+         ('In-class writing with DraftTrail', 'Choose a writing task instead of a quiz. Students write in DraftTrail; you see exits, big pastes and word counts live, and download every essay to replay.'),
          ('Timers and scheduled exams', 'Add a time limit, schedule an exam for the whole class at the same time, or open a quiz between two dates for homework. Students see a countdown.'),
          ('Live dashboard', 'A class list that updates every few seconds: answering, left the quiz, locked, or submitted.'),
          ('Join with a code or QR', 'Students type a 6-digit code or scan the QR code. No student accounts needed.'),
@@ -148,6 +149,7 @@ def pages():
            ('How long is student data kept?', 'Quizzes and student results are deleted automatically 30 days after the quiz is created. You can delete a quiz and its results any time from the dashboard.'),
            ('Can I set a time limit or schedule an exam?', 'Yes. When you create a quiz, choose Anytime (with an optional time limit), Scheduled exam (everyone starts and ends together at a set date and time) or Open period (students start any time between two dates). Students see a countdown, and you can give extra time or end the quiz for everyone from your dashboard.'),
            ('What happens when the time runs out?', 'The quiz is covered with a Time\'s up screen and the student is marked "Time\'s up" on your dashboard. By default students first get 1 more minute with a "Submit now" warning, and late submissions are marked on your dashboard. QuizPolice can\'t submit the form for them, so answers that were never submitted are not sent. If a student missed it, give them +5 minutes: as long as they didn\'t refresh the page, the quiz comes back with their answers still filled in.'),
+           ('Can students write an essay instead of answering a quiz?', 'Yes. When you create a quiz, choose "Write an essay or short answers (DraftTrail)". Students write inside QuizPolice. You see who leaves the page, large pastes and word counts live, can lock and time the task, and download all essays as one DraftTrail file. When the time runs out, essays are handed in automatically. Essays are saved with the quiz and deleted after 30 days.'),
            ('Does it work on phones?', 'Yes. Students can join on phones, tablets or computers. Detection is strongest when the quiz is opened in Chrome, Safari or Edge.'),
            ('Can students cheat anyway?', 'A determined student with a second device can. QuizPolice is a deterrent and a record, best combined with good quiz design and supervision.'),
            ('Does it see the students\' answers?', 'No. Answers go straight to your Google or Microsoft form. QuizPolice only sees joins, exits, returns, locks and "I\'ve submitted".')]
@@ -162,7 +164,7 @@ def pages():
 <h1>Privacy policy</h1>
 <p class="lead">{E(NAME)} is run by {E(ST)}. We collect as little as possible and delete it quickly.</p>
 <h2>What we collect from students</h2>
-<ul><li>The name and section the student types when joining.</li><li>Quiz activity: when they joined, left the quiz page, came back, were locked or unlocked, ran out of time or were given extra time, and tapped "I've submitted".</li></ul>
+<ul><li>The name and section the student types when joining.</li><li>Quiz activity: when they joined, left the quiz page, came back, were locked or unlocked, ran out of time or were given extra time, and tapped "I've submitted".</li><li>For writing tasks (DraftTrail): the essay the student writes, its recording of edits, word counts and large pastes.</li></ul>
 <p>We do <b>not</b> collect quiz answers (those go directly to the teacher's form), email addresses, location, or anything that happens outside the quiz page.</p>
 <h2>What we collect from teachers</h2><p>The quiz name, quiz link and settings. There are no teacher accounts; a secret key stored in the teacher's browser gives access to the dashboard.</p>
 <h2>Who can see it</h2><p>Only the teacher who created the quiz (the browser holding its secret key). We don't sell or share the data.</p>
