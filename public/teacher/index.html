@@ -117,6 +117,16 @@
       <div class="tclock" id="dClock"></div>
       <div class="row"><button class="btn" id="startNow" hidden>Start now</button><button class="btn danger" id="endNow">End the quiz for everyone</button><button class="btn" id="undoEnd" hidden>Undo end</button></div>
     </div>
+    <details class="panel pad" id="mkPanel">
+      <summary><b>Re-open for some students (make-up quiz)</b> <span class="note">For students who missed the quiz or asked for consideration.</span></summary>
+      <p class="note" style="margin:10px 0">This opens a <b>new code</b> for the same quiz. Share it only with the students you allow. This quiz's results stay as they are. A student who ran out of time here can also get more time instead: click their name below and press <b>Give more time</b>.</p>
+      <div class="row" style="gap:12px;align-items:flex-end">
+        <label>Time each student gets<br><select id="mkLim"></select></label>
+        <label>Make-up closes<br><select id="mkUntil"><option value="1">1 hour from now</option><option value="3">3 hours from now</option><option value="today" selected>Tonight, 11:59 PM</option><option value="tom">Tomorrow, 11:59 PM</option><option value="72">3 days from now</option><option value="168">1 week from now</option></select></label>
+        <button class="btn pri" id="mkGo">Open make-up quiz</button>
+      </div>
+      <div id="mkDone" class="msg ok" hidden style="margin-top:12px"></div>
+    </details>
     <div class="panel pad row" id="dtBar" hidden style="justify-content:space-between">
       <span><b>Writing task (DraftTrail)</b> <span class="note">Essays save as students write. Download them to replay how each one was written.</span></span>
       <span class="row" style="gap:8px"><button class="btn pri" id="essaysBtn">Download all essays</button><a class="btn" href="https://drafttrail.telarlabs.net/review/" target="_blank" rel="noopener">Open DraftTrail review</a></span>
@@ -141,7 +151,7 @@
         <div class="pad note" id="noStudents">Waiting for students to join…</div>
       </div>
       <div class="panel">
-        <div class="sec-h"><h3 id="logTitle">Activity: whole class</h3><span class="row" style="gap:8px"><button class="btn" id="essayOne" hidden>Download essay</button><button class="btn" id="extra" hidden>+5 minutes</button><button class="btn pri" id="unlock" hidden>Unlock student</button></span></div>
+        <div class="sec-h"><h3 id="logTitle">Activity: whole class</h3><span class="row" style="gap:8px"><button class="btn" id="essayOne" hidden>Download essay</button><span class="row" id="extraBox" hidden style="gap:6px"><select id="extraMin"><option>5</option><option selected>10</option><option>15</option><option>20</option><option>30</option><option>45</option><option>60</option></select><button class="btn" id="extra">Give more time (min)</button></span><button class="btn pri" id="unlock" hidden>Unlock student</button></span></div>
         <ul class="log" id="log"></ul>
       </div>
     </div>
@@ -247,12 +257,36 @@ $('#newForm').onsubmit=async e=>{
   }catch(err){$('#newErr').textContent=err.message; $('#newErr').hidden=false}
 };
 
+/* ---------- make-up quiz ---------- */
+function mkFill(){
+  const L=data&&data.session.limit_min||0, o=[];
+  if(L) o.push(`<option value="${L}" selected>Same as before (${L} min)</option>`);
+  [15,20,30,45,60,90,120].filter(m=>m!==L).forEach(m=>o.push(`<option value="${m}">${m} minutes</option>`));
+  o.push(`<option value="0"${L?'':' selected'}>No time limit</option>`); $('#mkLim').innerHTML=o.join('');
+}
+$('#mkPanel').addEventListener('toggle',()=>{ if($('#mkPanel').open) mkFill() });
+$('#mkGo').onclick=async()=>{
+  const S=data&&data.session; if(!S) return;
+  const u=$('#mkUntil').value, t=Date.now(); let end;
+  if(u==='today'||u==='tom'){const d=new Date(); if(u==='tom') d.setDate(d.getDate()+1); d.setHours(23,59,0,0); end=d.getTime()} else end=t+(+u)*3600000;
+  const body={title:(S.title.replace(/ \(make-up\)$/,'')+' (make-up)').slice(0,120), quiz_url:S.quiz_url, embed_url:S.embed_url||'', sections:S.sections||[], strict:!!S.strict, max_exits:S.max_exits, grace_s:S.grace_s??60,
+    timing:'window', start_at:t-60000, end_at:end, limit_min:+$('#mkLim').value};
+  try{ const d=await api('sessions',{method:'POST',body:JSON.stringify(body)});
+    const a=store(); a.push({code:d.code,key:d.teacher_key,title:body.title,created:Date.now()}); saveStore(a);
+    const link=location.origin+'/join/?c='+d.code;
+    $('#mkDone').innerHTML=`Make-up quiz is open. Code <b style="font-size:1.25em;letter-spacing:.06em">${d.code}</b>. Share only with the students you allow: <a href="${link}" target="_blank" rel="noopener">${link}</a>.<div class="row" style="gap:8px;margin-top:8px"><button class="btn" id="mkCopy">Copy message</button><a class="btn pri" href="#${d.code}">Open its dashboard</a></div>`;
+    $('#mkDone').hidden=false;
+    const until=new Date(end).toLocaleString([], {weekday:'short',hour:'numeric',minute:'2-digit'});
+    $('#mkCopy').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(`Make-up quiz: ${S.title}\nOpen ${link} (code ${d.code}).\nIt closes ${until}.${body.limit_min?` You get ${body.limit_min} minutes once you start, so start at least ${body.limit_min} minutes before it closes.`:''}\nStay on the quiz page until you submit.`); $('#mkCopy').textContent='Copied'};
+  }catch(e){alertMsg(e)}
+};
+
 /* ---------- dashboard ---------- */
 let cur=null, data=null, sel=null, timer=0, events=[], lastId=0;
 function stopPoll(){clearTimeout(timer); timer=0}
 function joinLink(code){return `${location.origin}/join/?c=${code}`}
 function openDash(q){
-  cur=q; sel=null; events=[]; lastId=0; data=null; $('#vDash').hidden=false;
+  cur=q; sel=null; events=[]; lastId=0; data=null; $('#vDash').hidden=false; $('#mkPanel').open=false; $('#mkDone').hidden=true;
   { const subj='QuizPolice teacher link: '+q.title, body='Private link to the QuizPolice dashboard for "'+q.title+'" (code '+q.code+'). Don\'t share it with students.\n\n'+teacherLink(q);
     $('#gmailTeacher').href='https://mail.google.com/mail/?view=cm&fs=1&su='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
     $('#outlookTeacher').href='https://outlook.office.com/mail/deeplink/compose?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);
@@ -295,7 +329,7 @@ function render(){
   const list=pc?events.filter(e=>e.participant_id===sel):events;
   $('#logTitle').textContent=pc?`Activity: ${pc.name}`:'Activity: whole class';
   $('#unlock').hidden=!(pc&&pc.status==='lock');
-  $('#extra').hidden=!(pc&&(pc.status!=='done'||pc.essay_auto)&&pc.deadline);
+  $('#extraBox').hidden=!(pc&&(pc.status!=='done'||pc.essay_auto)&&pc.deadline);
   $('#essayOne').hidden=!(pc&&pc.has_essay);
   $('#log').innerHTML=list.slice(0,200).map(e=>`<li><time>${clock(e.at)}</time><span class="k-${e.kind}">${pc?'':esc(names[e.participant_id]||'Student')+': '}${esc(e.detail||e.kind)}</span></li>`).join('')||'<li class="note">No activity yet.</li>';
 }
@@ -331,7 +365,7 @@ $('#essaysBtn').onclick=async()=>{ try{ const d=await api(`sessions/${cur.code}/
   if(!d.essays.length){ alertMsg(new Error('No essays saved yet.')); return } saveJSON(d,`${fileSafe(cur.title)}-all-essays.drafttrail`);
   $('#dLive').textContent=`Downloaded ${d.essays.length} essay${d.essays.length>1?'s':''}. Open the file on the DraftTrail review page.` }catch(e){alertMsg(e)} };
 $('#essayOne').onclick=async()=>{ if(!sel) return; try{ const d=await api(`sessions/${cur.code}/essay/${sel}`,{headers:{'x-teacher-key':cur.key}}); saveJSON(d,`${fileSafe(d.name||'essay')}.drafttrail`) }catch(e){alertMsg(e)} };
-$('#extra').onclick=async()=>{ if(!sel) return; try{await api(`sessions/${cur.code}/extra/${sel}`,{method:'POST',headers:{'x-teacher-key':cur.key},body:JSON.stringify({min:5})}); poll()}catch(e){alertMsg(e)} };
+$('#extra').onclick=async()=>{ if(!sel) return; try{await api(`sessions/${cur.code}/extra/${sel}`,{method:'POST',headers:{'x-teacher-key':cur.key},body:JSON.stringify({min:+$('#extraMin').value})}); poll()}catch(e){alertMsg(e)} };
 
 $('#rows').onclick=e=>{const tr=e.target.closest('tr'); if(!tr) return; sel=sel===tr.dataset.id?null:tr.dataset.id; render()};
 $('#unlock').onclick=async()=>{ if(!sel) return; try{await api(`sessions/${cur.code}/unlock/${sel}`,{method:'POST',headers:{'x-teacher-key':cur.key},body:'{}'}); poll()}catch(e){alertMsg(e)} };
