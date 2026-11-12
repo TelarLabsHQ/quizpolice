@@ -28,6 +28,11 @@
       "name": "DraftTrail",
       "url": "https://drafttrail.telarlabs.net",
       "blurb": "Free writing recorder that replays how an essay was written, step by step."
+    },
+    {
+      "name": "Tixward",
+      "url": "https://tixward.telarlabs.net",
+      "blurb": "Event tickets and free bookings for courts and rooms, paid directly to organizers. Free for most events."
     }
   ],
   "studio_url": "https://telarlabs.net",
