@@ -59,7 +59,7 @@ def page(path, title, desc, body):
 </head>
 <body>
 <header class="top"><div class="wrap top-in">
-  <a class="logo" href="/">{LOGO}<span>{E(NAME)}</span></a>
+  <span class="tl-wrap"><a class="logo" href="/">{LOGO}<span>{E(NAME)}</span></a><a class="tl-by" href="https://telarlabs.net" title="Telar Labs home" aria-label="Telar Labs home"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#ffb547"/><path d="M8 11h16M8 16h16M8 21h16" stroke="#1b1206" stroke-width="2.6" stroke-linecap="round"/><path d="M12 7v18M20 7v18" stroke="#1b1206" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="3 3"/></svg><span>Telar Labs</span></a><style>.tl-wrap{{display:flex;align-items:center;min-width:0}}.tl-by{{display:inline-flex;align-items:center;gap:6px;margin-left:12px;padding:4px 10px 4px 5px;border:1px solid rgba(128,128,128,.35);border-radius:999px;font-size:12.5px;font-weight:600;line-height:1;color:inherit;opacity:.8;text-decoration:none;white-space:nowrap;flex:none}}.tl-by:hover{{opacity:1;border-color:#ffb547}}.tl-by svg{{width:18px;height:18px;flex:none;display:block}}@media(max-width:560px){{.tl-by span{{display:none}}.tl-by{{padding:4px;margin-left:8px}}}}</style></span>
   <nav class="nav"><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/faq/">FAQ</a></nav>
   <a class="btn btn-ghost btn-sm" href="/join/">I'm a student</a><a class="btn btn-sm" href="/teacher/">Teacher dashboard</a>
 </div></header>
