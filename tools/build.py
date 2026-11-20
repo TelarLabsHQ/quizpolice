@@ -193,3 +193,13 @@ def extras():
 
 if __name__ == '__main__':
     home(); pages(); extras(); print('Built QuizPolice pages')
+
+    # AdSense: no ad code on error or contact pages (screens without publisher content)
+    import re as _re
+    for _p in ('404.html', 'contact/index.html'):
+        _f = os.path.join(PUB, _p)
+        if os.path.exists(_f):
+            _s = open(_f).read()
+            _s = _re.sub(r'<script async src="https://pagead2\.googlesyndication\.com[^>]*></script>', '', _s)
+            _s = _re.sub(r'<div class="ad">.*?</ins>(<script>.*?</script>)?</div>', '', _s, flags=_re.S)
+            open(_f, 'w').write(_s)
