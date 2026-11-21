@@ -13,6 +13,8 @@ const SCHEMA = [
      kind TEXT NOT NULL, detail TEXT, at INTEGER NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS idx_part_code ON participants(code)`,
   `CREATE INDEX IF NOT EXISTS idx_ev_code ON events(code, id)`,
+  `CREATE INDEX IF NOT EXISTS idx_part_token ON participants(token)`,   // every student request looks up its token
+  `CREATE INDEX IF NOT EXISTS idx_sess_created ON sessions(created_at)`,
 ];
 // Columns added later (timers and schedules); added to older databases automatically.
 const ADD = {
