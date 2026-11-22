@@ -151,7 +151,6 @@ export async function onRequest(ctx) {
   const { request, env } = ctx;
   const db = env.DB;
   if (!db) return bad('Database is not connected yet (add a D1 binding named DB in Cloudflare Pages settings).', 503);
-  await ensure(db);
   const url = new URL(request.url);
   const parts = url.pathname.replace(/^\/api\/?/, '').split('/').filter(Boolean);
   const method = request.method;
@@ -159,6 +158,7 @@ export async function onRequest(ctx) {
   if (method === 'POST') { try { body = await request.json(); } catch { body = {}; } }
 
   try {
+    await ensure(db);
     // ---------- teacher ----------
     if (method === 'POST' && parts[0] === 'check-link') {
       const e = toEmbed(clean(body.url, 2000));
@@ -283,12 +283,13 @@ export async function onRequest(ctx) {
         return json(stuPayload(s, p));
       }
       if (method === 'POST' && parts[1] === 'event') {
-        const kind = body.kind, t = now();
+        const ago = Math.min(2 * 60 * 60 * 1000, Math.max(0, parseInt(body.ago_ms) || 0));
+        const kind = body.kind, t = now() - ago, lateNote = ago > 5000 ? ' (sent late after a connection problem)' : '';
         if (kind === 'leave' && p.status === 'ans' && s.timing === 'scheduled' && s.start_at && now() < s.start_at) return json({ status: p.status, exits: p.exits, deadline: deadlineOf(s, p) });
         if (kind === 'leave' && p.status === 'ans') {
           const exits = p.exits + 1;
           const r = await db.prepare("UPDATE participants SET status = 'away', exits = ?, left_at = ?, last_seen = ? WHERE id = ? AND status = 'ans'").bind(exits, t, t, p.id).run();
-          if (r.meta.changes) { await (await log(db, p, 'leave', `Left the ${s.platform === 'DraftTrail' ? 'writing page' : 'quiz'} (exit ${exits})${body.how ? ' – ' + clean(body.how, 40) : ''}`)).run(); return json({ status: 'away', exits, deadline: deadlineOf(s, p) }); }
+          if (r.meta.changes) { await (await log(db, p, 'leave', `Left the ${s.platform === 'DraftTrail' ? 'writing page' : 'quiz'} (exit ${exits})${body.how ? ' – ' + clean(body.how, 40) : ''}${lateNote}`)).run(); return json({ status: 'away', exits, deadline: deadlineOf(s, p) }); }
           const cur = await participant(db, token); return json({ status: cur.status, exits: cur.exits });
         }
         if (kind === 'back' && p.status === 'away') {
@@ -297,7 +298,7 @@ export async function onRequest(ctx) {
           const st = lock ? 'lock' : 'ans';
           const r = await db.prepare("UPDATE participants SET status = ?, away_ms = away_ms + ?, last_seen = ? WHERE id = ? AND status = 'away'").bind(st, gone, t, p.id).run();
           if (r.meta.changes) {
-            const stmts = [await log(db, p, 'back', `Came back after ${Math.round(gone / 1000)}s`)];
+            const stmts = [await log(db, p, 'back', `Came back after ${Math.round(gone / 1000)}s${lateNote}`)];
             if (lock) stmts.push(await log(db, p, 'lock', 'Locked: reached the exit limit'));
             await db.batch(stmts);
             return json({ status: st, exits: p.exits, away_s: Math.round(gone / 1000) });
@@ -347,6 +348,6 @@ export async function onRequest(ctx) {
     }
     return bad('Not found', 404);
   } catch (err) {
-    return bad('Something went wrong. Please try again.', 500);
+    return bad('QuizPolice is having a connection problem. Please try again in a minute.', 503);
   }
 }

@@ -82,8 +82,29 @@
 <script>
 (()=>{
 const $=s=>document.querySelector(s);
-const api=async(path,opt={})=>{const r=await fetch('/api/'+path,{...opt,headers:{'content-type':'application/json',...(opt.headers||{})}}); let d={}; try{d=await r.json()}catch(e){} if(!r.ok){const er=new Error(d.error||'Network problem. Please try again.'); er.status=r.status; throw er} return d};
-const TK='quizpolice.student.v1';
+const api=async(path,opt={})=>{let r; try{ r=await fetch('/api/'+path,{...opt,headers:{'content-type':'application/json',...(opt.headers||{})}}) }catch(e){ const er=new Error('Network problem. Please try again.'); er.status=0; throw er }
+  let d={}; try{d=await r.json()}catch(e){} if(!r.ok){const er=new Error(d.error||'Network problem. Please try again.'); er.status=r.status; throw er} return d};
+const TK='quizpolice.student.v1', OB='quizpolice.outbox.v1';
+// Connection problems: keep the student's place, queue what happened, and send it when the server is back.
+const temp=e=>!e.status||e.status>=500;
+let outbox=[]; try{ outbox=JSON.parse(sessionStorage.getItem(OB)||'[]') }catch(e){}
+const saveOB=()=>{ try{ sessionStorage.setItem(OB,JSON.stringify(outbox)) }catch(e){} };
+function netBar(on){ let b=$('#netBar'); if(!b){ b=document.createElement('div'); b.id='netBar'; b.setAttribute('role','status');
+    b.style.cssText='position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:40;padding:10px 16px;border-radius:12px;background:#3a2a05;color:#ffe3a3;font-weight:700;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:92vw;text-align:center';
+    b.textContent='Connection problem. Retrying… Keep answering, your quiz is not affected.'; document.body.appendChild(b) }
+  b.hidden=!on }
+let flushing=false;
+async function flush(){ if(flushing||!token||!outbox.length) return; flushing=true;
+  try{ while(outbox.length){ const q=outbox[0];
+      const d=await api('me/event',{method:'POST',headers:{'x-student-token':token},body:JSON.stringify({...q.b,ago_ms:Date.now()-q.at})});
+      outbox.shift(); saveOB(); me.status=d.status; me.exits=d.exits; showExits(); }
+    netBar(false); if(endAfter){ endAfter=false; flushing=false; finishLater(); return }
+  }catch(e){ if(!temp(e)){ outbox=[]; saveOB() } else netBar(true) }
+  flushing=false }
+setInterval(flush,5000);
+// after handing in, forget the student only once everything queued has reached the teacher
+let endAfter=false;
+function finishLater(){ if(outbox.length){ endAfter=true; return } try{sessionStorage.removeItem(TK);sessionStorage.removeItem(OB)}catch(e){} token=null }
 let token=null, me={status:'ans',exits:0}, quiz=null, away=false, pending=false, poller=0;
 
 const when=t=>new Date(t).toLocaleString([], {weekday:'long',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
@@ -122,7 +143,9 @@ $('#joinForm').onsubmit=async e=>{e.preventDefault(); $('#joinErr').hidden=true;
     start(d);
   }catch(err){ $('#joinErr').textContent=err.message; $('#joinErr').hidden=false }};
 
-async function resume(){ try{ const d=await api('me',{headers:{'x-student-token':token}}); start(d) }catch(e){ try{sessionStorage.removeItem(TK)}catch(_){} token=null } }
+async function resume(){ try{ const d=await api('me',{headers:{'x-student-token':token}}); netBar(false); start(d); flush() }catch(e){
+  if(temp(e)){ netBar(true); setTimeout(resume,5000); return }   // server busy: keep the student's place and try again
+  try{sessionStorage.removeItem(TK);sessionStorage.removeItem(OB)}catch(_){} token=null; outbox=[] } }
 
 function start(d){
   $('#codeForm').hidden=true; $('#joinForm').hidden=true;
@@ -152,7 +175,7 @@ addEventListener('message',async e=>{ if(!DT||e.origin!==DTO||!e.data||e.data.sr
   if(m.type==='snapshot'&&me.status!=='done') sendEssay(m.rec,false,false);
   if(m.type==='submit'){ finishing=true; const r=await sendEssay(m.rec,true,m.auto); me.status='done';
     if(m.auto){ showAutoDone(); }
-    else { clearInterval(poller); $('#quiz').hidden=true; $('#doneBox').hidden=false; $('#doneBox h1').textContent='Handed in'; $('#doneBox .note').textContent='Your teacher received your writing. You may close this page.'; try{sessionStorage.removeItem(TK)}catch(_){} token=null; }
+    else { clearInterval(poller); $('#quiz').hidden=true; $('#doneBox').hidden=false; $('#doneBox h1').textContent='Handed in'; $('#doneBox .note').textContent='Your teacher received your writing. You may close this page.'; finishLater(); }
     finishing=false; } });
 setInterval(()=>{ if(DT&&token&&me.status!=='done'&&!$('#quiz').hidden) toDT({type:'snapshot'}) },60000);
 function setTiming(d){ if(d.server_time) skew=d.server_time-Date.now(); T={timing:d.timing,start_at:d.start_at,limit_min:d.limit_min,deadline:d.deadline,grace_s:d.grace_s}; }
@@ -177,16 +200,18 @@ function tick(){
 }
 let toastT=0; function toast(m){ const t=$('#toast'); t.textContent=m; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,6000); }
 function showTimeUp(){ $('#frame').hidden=true; $('#warnOv').hidden=true; $('#timeOv').hidden=false; $('#sTime').textContent="⏱ Time's up"; }
-$('#tDone').onclick=async()=>{ finishing=true; await send('done'); me.status='done'; clearInterval(poller); $('#timeOv').hidden=true; $('#quiz').hidden=true; $('#doneBox').hidden=false; try{sessionStorage.removeItem(TK)}catch(e){} token=null };
+$('#tDone').onclick=async()=>{ finishing=true; await send('done'); me.status='done'; clearInterval(poller); $('#timeOv').hidden=true; $('#quiz').hidden=true; $('#doneBox').hidden=false; finishLater() };
 function showExits(){ $('#sExits').textContent=me.exits }
 async function send(kind,how,extra){ if(!token) return; if(kind==='progress'&&progQ) extra={words:progQ.words,pasted:progQ.pasted};
-  try{ const d=await api('me/event',{method:'POST',headers:{'x-student-token':token},body:JSON.stringify({kind,how,...(extra||{})})}); me.status=d.status; me.exits=d.exits; if(T&&d.deadline!==undefined)T.deadline=d.deadline; showExits(); return d }catch(e){} }
-async function check(){ if(!token) return; try{ const d=await api('me',{headers:{'x-student-token':token}}); const was=me.status; me.status=d.status; me.exits=d.exits; setTiming(d); showExits();
+  const b={kind,how,...(extra||{})};
+  if(outbox.length&&kind!=='progress'){ outbox.push({b,at:Date.now()}); saveOB(); flush(); return }
+  try{ const d=await api('me/event',{method:'POST',headers:{'x-student-token':token},body:JSON.stringify(b)}); netBar(false); me.status=d.status; me.exits=d.exits; if(T&&d.deadline!==undefined)T.deadline=d.deadline; showExits(); return d }catch(e){ if(temp(e)){ netBar(true); if(kind!=='progress'){ outbox.push({b,at:Date.now()}); saveOB() } } } }
+async function check(){ if(!token) return; try{ const d=await api('me',{headers:{'x-student-token':token}}); if(!outbox.length) netBar(false); const was=me.status; me.status=d.status; me.exits=d.exits; setTiming(d); showExits();
   if(was==='lock'&&d.status==='ans'){ $('#warnOv').hidden=true; $('#frame').hidden=false }
   if(d.status==='time') showTimeUp();
   if(DT&&was==='done'&&d.status==='ans'){ me.status='ans'; $('#timeOv').hidden=true; $('#frame').hidden=false; warned={}; toDT({type:'reopen'}); toast('Your teacher gave you more time. Keep writing.'); }
   if(was==='time'&&d.status==='ans'){ $('#timeOv').hidden=true; $('#frame').hidden=false; $('#graceBar').hidden=true; warned={}; toast('Your teacher gave you more time. Your answers are still there.'); }
-  if(d.status==='lock'&&was!=='lock') showWarn(); }catch(e){} }
+  if(d.status==='lock'&&was!=='lock') showWarn(); }catch(e){ if(temp(e)) netBar(true) } }
 
 // ---- detection ----
 // Clicking inside the quiz moves focus into the frame; that is not leaving, so check where focus went.
@@ -209,7 +234,7 @@ let finishing=false;
 $('#doneBtn').onclick=()=>{ $('#doneOv').hidden=false };
 $('#dNo').onclick=()=>{ $('#doneOv').hidden=true; $('#frame').focus() };
 $('#dYes').onclick=async()=>{ finishing=true; me.status='done'; $('#doneOv').hidden=true;
-  await send('done'); clearInterval(poller); $('#quiz').hidden=true; $('#doneBox').hidden=false; try{sessionStorage.removeItem(TK)}catch(e){} token=null };
+  await send('done'); clearInterval(poller); $('#quiz').hidden=true; $('#doneBox').hidden=false; finishLater() };
 })();
 </script>
 </body>
