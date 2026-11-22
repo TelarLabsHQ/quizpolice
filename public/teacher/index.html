@@ -9,6 +9,7 @@
 <link rel="preload" href="/assets/fonts/source-sans-3-400.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/assets/fonts/fonts.css">
 <link rel="stylesheet" href="/assets/app.css">
 <style>
+.tipcard ul{margin:8px 0 10px;padding-left:20px;display:flex;flex-direction:column;gap:6px}.tipcard a{color:var(--brand)}
 .timing{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;margin:0}
 .timing legend{padding:0 6px}
 .topt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
@@ -46,6 +47,17 @@
       <div class="row"><input id="importUrl" class="field" style="flex:1;min-width:220px;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg);padding:0 12px" placeholder="https://…/teacher/#t=…"><button class="btn pri">Open</button></div>
       <div id="importErr" class="msg bad" hidden></div>
     </form>
+    <div class="panel pad tipcard" style="margin-top:16px">
+      <b>Tips for your next quiz</b>
+      <ul>
+        <li><a href="/guides/stop-tab-switching-google-forms/" target="_blank" rel="noopener">How to stop students from switching tabs in Google Forms</a></li>
+        <li><a href="/guides/microsoft-forms-quiz-settings/" target="_blank" rel="noopener">Microsoft Forms quiz settings for tests</a></li>
+        <li><a href="/guides/online-exam-on-students-phones/" target="_blank" rel="noopener">How to give an online exam on students’ phones</a></li>
+        <li><a href="https://telarlabs.net/guides/reduce-cheating-online-quizzes/" target="_blank" rel="noopener">How to reduce cheating in online quizzes</a></li>
+      </ul>
+      <a class="note" href="/guides/" target="_blank" rel="noopener">All QuizPolice guides →</a>
+    </div>
+
   </section>
 
   <!-- NEW -->
@@ -160,6 +172,16 @@
       <div class="note"><b>On a shared or school computer,</b> remove this quiz from this device so the next person can't open it. The results stay safe; you can still open them with your teacher link on your own phone or laptop.</div>
       <div class="row"><button class="btn" id="rmBtn">Remove from this device</button><button class="btn danger" id="delBtn">Delete this quiz and its results</button></div>
       <div class="note">Delete erases the quiz and all student results everywhere, permanently. Download the CSV first if you need a copy.</div>
+    </div>
+    <div class="panel pad tipcard">
+      <b>Tips for your next quiz</b>
+      <ul>
+        <li><a href="/guides/stop-tab-switching-google-forms/" target="_blank" rel="noopener">How to stop students from switching tabs in Google Forms</a></li>
+        <li><a href="/guides/microsoft-forms-quiz-settings/" target="_blank" rel="noopener">Microsoft Forms quiz settings for tests</a></li>
+        <li><a href="/guides/online-exam-on-students-phones/" target="_blank" rel="noopener">How to give an online exam on students’ phones</a></li>
+        <li><a href="https://telarlabs.net/guides/reduce-cheating-online-quizzes/" target="_blank" rel="noopener">How to reduce cheating in online quizzes</a></li>
+      </ul>
+      <a class="note" href="/guides/" target="_blank" rel="noopener">All QuizPolice guides →</a>
     </div>
   </section>
 </div>

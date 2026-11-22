@@ -60,7 +60,7 @@ def page(path, title, desc, body):
 <body>
 <header class="top"><div class="wrap top-in">
   <span class="tl-wrap"><a class="logo" href="/">{LOGO}<span>{E(NAME)}</span></a><a class="tl-by" href="https://telarlabs.net" title="Telar Labs home"><span>by </span>Telar Labs</a><style>.tl-wrap{{display:flex;align-items:center;min-width:0}}.tl-by{{margin-left:10px;font-size:13px;font-weight:500;line-height:1;color:inherit;opacity:.65;text-decoration:none;white-space:nowrap;flex:none}}.tl-by:hover{{opacity:1;text-decoration:underline}}@media(max-width:560px){{.tl-wrap{{flex-direction:column;align-items:flex-start}}.tl-by{{margin:3px 0 0;font-size:11.5px}}}}</style></span>
-  <nav class="nav"><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/faq/">FAQ</a></nav>
+  <nav class="nav"><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/guides/">Guides</a><a href="/faq/">FAQ</a></nav>
   <a class="btn btn-ghost btn-sm" href="/join/">I'm a student</a><a class="btn btn-sm" href="/teacher/">Teacher dashboard</a>
 </div></header>
 <main>
@@ -69,7 +69,7 @@ def page(path, title, desc, body):
 <footer class="foot"><div class="wrap foot-in">
   <div><a class="logo" href="/">{LOGO}<span>{E(NAME)}</span></a><p class="muted">Free quiz monitoring for Google Forms, Microsoft Forms and Wayground. Part of the {E(ST)} teacher tools.</p></div>
   <div class="foot-cols">
-    <div><h4>Use it</h4><a href="/teacher/">Teacher dashboard</a><a href="/join/">Join a quiz</a><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/faq/">FAQ</a></div>
+    <div><h4>Use it</h4><a href="/teacher/">Teacher dashboard</a><a href="/join/">Join a quiz</a><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/guides/">Guides</a><a href="/faq/">FAQ</a></div>
     <div><h4><a href="https://telarlabs.net" style="color:inherit;margin:0">{E(ST)}</a></h4><a href="https://telarlabs.net">Telar Labs home</a><a href="https://telarlabs.net/guides/">Telar Labs guides</a><a href="/about/">About</a><a href="/privacy/">Privacy policy</a><a href="/terms/">Terms of use</a><a href="/contact/">Contact</a></div>
   </div>
 </div>{family_row()}<div class="wrap fine">&copy; {date.today().year} {E(ST)}.</div></footer>
@@ -108,6 +108,7 @@ def home():
 <li><h3>Students join</h3><p>Show the code or QR on the board. Students type their name and section, then answer inside QuizPolice.</p></li>
 <li><h3>Watch and act</h3><p>See exits and time left as they happen, unlock students or give extra time, and download the results when the quiz is done.</p></li></ol></section>
 <section class="wrap section"><div class="callout"><h2>Honest about what it can and can't see</h2><p>QuizPolice only knows when a student leaves the quiz page on the same device. It can't see other phones, the student's screen, or what they search. It's a strong reminder and a record, not mind-reading, and we tell students exactly what is monitored before they start.</p><a class="btn" href="/how-it-works/">Read how it works</a></div></section>'''
+    body += ('<section class="wrap section"><h2>Guides for teachers</h2><ul class="glist" style="list-style:none;padding:0;display:grid;gap:12px">' + ''.join(f'<li style="border:1px solid var(--line);border-radius:12px;padding:14px 16px"><a href="/guides/{g["slug"]}/" style="font-weight:700">{E(g["title"])}</a></li>' for g in GUIDES) + '</ul><p><a href="/guides/">All guides →</a></p></section>')
     body += family_promo('More free tools for teachers')
     page('/', f'{NAME} – Free Quiz Monitor for Google Forms, Microsoft Forms & Wayground',
          'Free online quiz monitoring for teachers. See when students leave a Google Forms, Microsoft Forms or Wayground quiz, lock after too many exits, and download results.', body)
@@ -241,15 +242,31 @@ def pages():
 
 def extras():
     open(os.path.join(PUB, 'favicon.svg'), 'w').write(LOGO.replace('class="logo-mark" ', 'xmlns="http://www.w3.org/2000/svg" '))
-    urls = ['/', '/how-it-works/', '/supported-quizzes/', '/faq/', '/about/', '/privacy/', '/terms/', '/contact/']
+    urls = ['/', '/how-it-works/', '/supported-quizzes/', '/faq/', '/guides/'] + [f'/guides/{g["slug"]}/' for g in GUIDES] + ['/about/', '/privacy/', '/terms/', '/contact/']
     open(os.path.join(PUB, 'sitemap.xml'), 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'<url><loc>{URL}{u}</loc></url>\n' for u in urls) + '</urlset>\n')
     open(os.path.join(PUB, 'robots.txt'), 'w').write(f'User-agent: *\nDisallow: /api/\nDisallow: /teacher/\nDisallow: /join/\nSitemap: {URL}/sitemap.xml\n')
     if CFG['adsense_client']:
         open(os.path.join(PUB, 'ads.txt'), 'w').write(f'google.com, {CFG["adsense_client"].replace("ca-", "")}, DIRECT, f08c47fec0942fa0\n')
     page('/404.html', 'Page not found', 'Page not found.', '<section class="wrap prose"><h1>Page not found</h1><p><a class="btn" href="/">Go home</a></p></section>')
 
+
+# ---------------------------------------------------------------- help guides (content pages)
+import sys as _sys; _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from guides_content import GUIDES, LEAD as GUIDES_LEAD
+GUIDE_STYLE = ('<style>.glist{list-style:none;padding:0;display:flex;flex-direction:column;gap:14px}.glist li{border:1px solid var(--line);border-radius:12px;padding:14px 16px}'
+               '.glist a{font-weight:700}.glist p{margin:6px 0 0}.gmeta{font-size:14px;margin:0 0 6px}</style>')
+def guides():
+    items = ''.join(f'<li><a href="/guides/{g["slug"]}/">{E(g["title"])}</a><p class="muted">{E(g["desc"])}</p></li>' for g in GUIDES)
+    prose('/guides/', f'{NAME} Guides for Teachers', f'{GUIDES_LEAD}', f'{GUIDE_STYLE}<h1>Guides</h1><p class="lead">{E(GUIDES_LEAD)}</p><ul class="glist">{items}</ul>'
+          f'<p>More guides for teachers and organizers: <a href="https://telarlabs.net/guides/">Telar Labs guides</a>.</p>')
+    for g in GUIDES:
+        more = ''.join(f'<li><a href="/guides/{o["slug"]}/">{E(o["title"])}</a></li>' for o in GUIDES if o is not g)
+        prose(f'/guides/{g["slug"]}/', g['title'], g['desc'],
+              f'{GUIDE_STYLE}<p class="gmeta muted"><a href="/guides/">Guides</a> · Updated {E(g["updated"])}</p><h1>{E(g["title"])}</h1>{g["body"]}'
+              f'<h2>More guides</h2><ul>{more}<li><a href="https://telarlabs.net/guides/">Telar Labs guides for teachers and organizers</a></li></ul>')
+
 if __name__ == '__main__':
-    home(); pages(); extras(); print('Built QuizPolice pages')
+    home(); pages(); guides(); extras(); print('Built QuizPolice pages')
 
     # AdSense: no ad code on error, contact and legal pages (no publisher content)
     import re as _re
