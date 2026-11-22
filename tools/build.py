@@ -135,13 +135,46 @@ def pages():
 <h2>Tips for fewer problems</h2>
 <ul><li>Use <b>Check this link</b> when you set up the quiz. It warns you if the quiz requires sign-in or can't be shown inside other sites.</li>
 <li>Ask students to close other apps before joining and to keep the phone plugged in.</li><li>Tell students that leaving is recorded. Most cheating stops once students know.</li></ul>''')
-    prose('/supported-quizzes/', 'Supported Quiz Platforms', 'Which quiz links work with QuizPolice: Google Forms, Microsoft Forms and Wayground, and the settings to check.', f'''
+    prose('/supported-quizzes/', 'Supported Quiz Platforms', 'Which quiz links work with QuizPolice: Google Forms, Microsoft Forms and Wayground, the settings to check, and how to fix a quiz that won’t load.', f"""
 <h1>Supported quizzes</h1>
+<p class="lead">QuizPolice doesn’t replace your quiz. It shows the quiz you already made inside a monitored page. So the quiz has to allow being shown inside another site, and it must not ask students to sign in.</p>
 <table class="tbl"><thead><tr><th>Platform</th><th>Works?</th><th>Settings to check</th></tr></thead><tbody>
 <tr><td><b>Google Forms</b></td><td>Yes</td><td>Turn off <i>Restrict to users in your organization</i> and <i>Collect email addresses: Verified</i>. Use <i>Responder input</i> for emails instead. Signing in inside another site often fails because browsers block the needed cookies.</td></tr>
 <tr><td><b>Microsoft Forms</b></td><td>Yes</td><td>Set <i>Who can fill out this form</i> to <i>Anyone can respond</i>. "Only people in my organization" requires a sign-in that may not work inside QuizPolice.</td></tr>
-<tr><td><b>Wayground</b></td><td>Depends</td><td>Some Wayground pages don't allow being shown inside other sites. Use <b>Check this link</b> when you create the quiz; if it's blocked, use a Google or Microsoft form instead.</td></tr>
-<tr><td>Other sites</td><td>Maybe</td><td>Any quiz page that allows embedding will work. Check this link will tell you.</td></tr></tbody></table>''')
+<tr><td><b>Wayground</b></td><td>Depends</td><td>Some Wayground pages don’t allow being shown inside other sites. Use <b>Check this link</b> when you create the quiz; if it’s blocked, use a Google or Microsoft form instead.</td></tr>
+<tr><td>Other sites</td><td>Maybe</td><td>Any quiz page that allows embedding will work. Check this link will tell you.</td></tr></tbody></table>
+
+<h2>Why sign-in is the usual problem</h2>
+<p>When a quiz asks students to sign in, the sign-in page needs cookies from Google or Microsoft. Most browsers block those cookies when the page is shown inside another site, which is exactly how QuizPolice shows your quiz. The student sees a sign-in loop or a blank box instead of the questions. Turning off the sign-in requirement fixes it, and students type their name in QuizPolice instead, so you still know who answered.</p>
+
+<h2>Google Forms, step by step</h2>
+<ol><li>Open the form and go to <b>Settings</b>.</li>
+<li>Under <b>Responses</b>, set <b>Collect email addresses</b> to <i>Do not collect</i> or <i>Responder input</i>, not <i>Verified</i>.</li>
+<li>If you use a school Google account, turn off <b>Restrict to users in [your school] and its trusted organizations</b>.</li>
+<li>Leave <b>Limit to 1 response</b> off, because it also needs a sign-in. To stop repeat submissions, check names on your QuizPolice dashboard and in the form’s responses instead.</li>
+<li>Copy the link with <b>Send → link icon</b>, and paste it in QuizPolice.</li></ol>
+<p>Our guide to <a href="https://telarlabs.net/guides/google-forms-quiz-settings/">Google Forms quiz settings that reduce cheating</a> explains the other settings worth turning on, like shuffling questions and releasing grades later.</p>
+
+<h2>Microsoft Forms, step by step</h2>
+<ol><li>Open the form and choose <b>Settings</b> (the three dots, then Settings).</li>
+<li>Under <b>Who can fill out this form</b>, choose <b>Anyone can respond</b>.</li>
+<li>Copy the link from <b>Collect responses</b>, and paste it in QuizPolice.</li></ol>
+<p>Shuffling questions, a start and end date, and showing results later all keep working; they are settings of the form itself.</p>
+
+<h2>Wayground and other sites</h2>
+<p>Whether a page can be shown inside another site is decided by that site, not by QuizPolice. Some quiz platforms allow it for some pages and block it for others, and the rules can change. That’s why QuizPolice has <b>Check this link</b>: it tries the link and tells you if it will load for students. If it’s blocked, copying the questions into a Google or Microsoft form is usually the quickest fix.</p>
+
+<h2>Before quiz day: a 2-minute check</h2>
+<ul><li>Press <b>Check this link</b> when you create the quiz.</li>
+<li>Open the join page on your own phone in a private window (not signed in), join with a test name, and answer one question.</li>
+<li>Check that the test response appears in the form’s own <b>Responses</b> tab, then delete it.</li>
+<li>On quiz day, show the 6-digit code or QR on the board and keep your dashboard open.</li></ul>
+
+<h2>What students need</h2>
+<p>Any phone, tablet or computer with a modern browser: Chrome, Safari, Edge, Samsung Internet or Firefox. No app to install and no accounts. Exits are detected most reliably in Chrome, Safari and Edge. Ask students to close other apps first and to keep their phone charged, because a phone that switches off counts as leaving the quiz.</p>
+
+<h2>A link still won’t load?</h2>
+<p>Send us the platform and the device students use through the <a href="/contact/">contact page</a>. We test new platforms as teachers ask for them.</p>""")
     faq = [('Is QuizPolice free?', 'Yes. Teachers and students don\'t pay or create accounts.'),
            ('Do students need an account?', 'No. They type the code, their name and section.'),
            ('Where are my quizzes saved?', 'Your quiz list is saved in your browser on this device, together with a secret key that lets only you see the results. To open a dashboard on another device, use the private teacher link on the dashboard (copy it, send it with Gmail or Outlook, or scan its QR code with your phone). Keep that link private: anyone who has it can see the results.'),
@@ -154,12 +187,36 @@ def pages():
            ('Can students cheat anyway?', 'A determined student with a second device can. QuizPolice is a deterrent and a record, best combined with good quiz design and supervision.'),
            ('Does it see the students\' answers?', 'No. Answers go straight to your Google or Microsoft form. QuizPolice only sees joins, exits, returns, locks and "I\'ve submitted".')]
     prose('/faq/', 'Frequently Asked Questions', f'Answers to common questions about {NAME}.', '<h1>Frequently asked questions</h1>' + ''.join(f'<h2>{E(q)}</h2><p>{E(a)}</p>' for q, a in faq))
-    prose('/about/', 'About', f'About {NAME} by {ST}.', f'''
+    prose('/about/', 'About', f'About {NAME}, the free quiz monitor for teachers, by {ST}.', f"""
 <h1>About {E(NAME)}</h1>
 <p class="lead">{E(NAME)} is a free tool for teachers who give quizzes online, made by {E(ST)}, a small independent studio.</p>
-<p>Many teachers already use free Google Forms or Microsoft Forms for quizzes, but those can't tell when a student switches to another tab to search for answers. Exam lockdown tools are usually expensive, need installs, or require accounts for every student. {E(NAME)} adds a simple, honest layer of monitoring to the quizzes teachers already have.</p>
+<p>Many teachers already use free Google Forms or Microsoft Forms for quizzes, but those can’t tell when a student switches to another tab to search for answers. Exam lockdown tools are usually expensive, need installs, or require accounts for every student. {E(NAME)} adds a simple, honest layer of monitoring to the quizzes teachers already have.</p>
+
+<h2>Who it’s for</h2>
+<ul><li><b>Classroom teachers</b> who give short quizzes on phones or laptops and want to know who stays on the quiz.</li>
+<li><b>Schools with mixed devices</b>, where some students use phones, some use tablets and some use the computer lab. It runs in any modern browser.</li>
+<li><b>Teachers giving homework quizzes</b> in an open period, who want a record of time spent away from the quiz.</li>
+<li><b>Tutors and trainers</b> who run short assessments in seminars or review classes.</li></ul>
+
+<h2>What makes it different</h2>
+<ul><li><b>It works with the quiz you already have.</b> You don’t rebuild questions in a new system. Answers keep going to your own form, so grading works the same way.</li>
+<li><b>No student accounts.</b> Students type a 6-digit code and their name. A class can start in under a minute.</li>
+<li><b>Honest by design.</b> Students are told what is recorded before they start. It records leaving the quiz page, not their screen, camera or microphone.</li>
+<li><b>Records, not verdicts.</b> An exit is a reason to ask, not proof of cheating. The dashboard shows the time and how long each student was away, so you can talk to the student with facts.</li></ul>
+
+<h2>How we decide what to build</h2>
+<p>We add features that solve everyday classroom problems: timers and scheduled exams, giving one student extra time, unlocking a student during the quiz, and in-class essays with <a href="https://drafttrail.telarlabs.net">DraftTrail</a>. We keep the teacher’s screen simple enough to use while walking around a classroom on a phone, and we design for low-cost Android phones and slow mobile data, because that’s what many students have.</p>
+
 <h2>Our promises</h2><ul><li>Free for teachers and students, no accounts.</li><li>We collect only what the teacher needs: name, section and quiz activity.</li><li>Student data is deleted after 30 days.</li><li>No ads on the student quiz screen or the teacher dashboard.</li></ul>
-<h2>Other {E(ST)} tools</h2><p><a href="https://pizarrapad.telarlabs.net">PizarraPad</a>, a free whiteboard for teachers, <a href="https://drafttrail.telarlabs.net">DraftTrail</a>, a writing-process recorder, <a href="https://clips.telarlabs.net">Telar Clips</a>, free motion backgrounds for videos, and <a href="https://tixward.telarlabs.net">Tixward</a>, event tickets and bookings for school events.</p>''')
+<p>The full details are in our <a href="/privacy/">privacy policy</a>.</p>
+
+<h2>Learn more</h2>
+<ul><li><a href="/how-it-works/">How QuizPolice works</a>: what counts as leaving, locking, timers and what it can’t see.</li>
+<li><a href="/supported-quizzes/">Supported quizzes</a>: the settings to check in Google Forms and Microsoft Forms.</li>
+<li><a href="https://telarlabs.net/guides/reduce-cheating-online-quizzes/">How to reduce cheating in online quizzes</a>: better questions, settings and supervision.</li></ul>
+
+<h2>Other {E(ST)} tools</h2><p><a href="https://pizarrapad.telarlabs.net">PizarraPad</a>, a free whiteboard for teachers, <a href="https://drafttrail.telarlabs.net">DraftTrail</a>, a writing-process recorder, <a href="https://clips.telarlabs.net">Telar Clips</a>, free motion backgrounds for videos, and <a href="https://tixward.telarlabs.net">Tixward</a>, event tickets and bookings for school events.</p>
+<p>Questions or ideas? <a href="/contact/">Contact us</a>.</p>""")
     prose('/privacy/', 'Privacy Policy', f'Privacy policy for {NAME}.', f'''
 <h1>Privacy policy</h1>
 <p class="lead">{E(NAME)} is run by {E(ST)}. We collect as little as possible and delete it quickly.</p>
@@ -194,9 +251,9 @@ def extras():
 if __name__ == '__main__':
     home(); pages(); extras(); print('Built QuizPolice pages')
 
-    # AdSense: no ad code on error or contact pages (screens without publisher content)
+    # AdSense: no ad code on error, contact and legal pages (no publisher content)
     import re as _re
-    for _p in ('404.html', 'contact/index.html'):
+    for _p in ('404.html', 'contact/index.html', 'privacy/index.html', 'terms/index.html'):
         _f = os.path.join(PUB, _p)
         if os.path.exists(_f):
             _s = open(_f).read()
