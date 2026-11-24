@@ -236,7 +236,9 @@ HUB_TEXT = '''<p class="lead">Free, quick practice games for students. No sign-u
 <div class="ptiles">
 <a href="/practice/math-sprint/"><b>Math Sprint</b>60 seconds of quick math: adding, subtracting, times tables and division. Beat your best score.</a>
 <a href="/practice/geography/"><b>Geography Practice</b>Countries and capital cities from every continent, 10 questions at a time.</a>
+<a href="/practice/percent-sprint/"><b>Percent &amp; Estimation Sprint</b>Percentages, discounts, tips, fractions and quick estimates. Everyday math for high school and college.</a>
 <a href="/practice/spot-the-fallacy/"><b>Spot the Fallacy</b>For college students: read short arguments and name the logical fallacy. Learn 12 common fallacies with examples.</a>
+<a href="https://drafttrail.telarlabs.net/practice/word-choice/"><b>Word Choice Check</b>Affect or effect? Fewer or less? Practice commonly confused words for essays. On our writing app, DraftTrail.</a>
 </div>
 <h2>Why short practice works</h2>
 <p>A few minutes of practice on most days beats a long session once a week. Each time you bring an answer back from memory, it gets easier to find the next time. These games are built for exactly that: short rounds, instant feedback, and a list of the answers to remember.</p>
@@ -503,3 +505,94 @@ def fallacy_text():
 PAGES.append(('/practice/spot-the-fallacy/', 'Spot the Fallacy: Logical Fallacies Quiz Game with Examples',
   'A free logical fallacies game for college students: read short arguments, spot the fallacy, and learn 12 common fallacies with examples.',
   'Spot the Fallacy', fallacy_game, fallacy_text()))
+
+# ---------------------------------------------------------------- Percent & Estimation Sprint
+PCT_GAME = '''<div class="game" id="ps">
+ <div id="psSetup">
+  <h2>Percent &amp; Estimation Sprint</h2><p class="gsub">Everyday math, fast. Tap the right answer. 60 seconds.</p>
+  <p class="glabel">Choose a level</p>
+  <div class="gchips" id="psLv"></div>
+  <button class="gbtn" id="psStart">Start</button>
+ </div>
+ <div id="psPlay" hidden>
+  <div class="gtop"><span id="psLvName"></span><span>Score: <b id="psScore">0</b></span></div>
+  <div class="gbar"><i id="psBar"></i></div>
+  <div class="gq2" id="psQ" style="min-height:64px"></div>
+  <div class="gopts" id="psOpts"></div>
+ </div>
+ <div id="psEnd" class="gres" hidden>
+  <p class="glabel">Time’s up!</p><div class="gbig" id="psFinal"></div><p id="psNote" class="muted"></p>
+  <ul class="gmiss" id="psMiss"></ul>
+  <div class="grow"><button class="gbtn" id="psAgain">Play again</button><button class="gbtn ghost" id="psBack">Change level</button></div>
+ </div>
+</div>
+<script>
+(()=>{const $=i=>document.getElementById(i),r=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pick=a=>a[Math.floor(Math.random()*a.length)];
+const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const num=v=>(Math.round(v*100)/100).toLocaleString('en-US',{maximumFractionDigits:2});
+const usd=v=>'$'+(Math.round(v*100)%100?(Math.round(v*100)/100).toFixed(2):Math.round(v).toLocaleString('en-US'));
+function mk(q,a,cands,f){f=f||num;const A=f(a),seen=new Set([A]),o=[];for(const c of cands){if(!(c>0))continue;const s=f(c);if(!seen.has(s)){seen.add(s);o.push(s)}if(o.length===3)break}
+ let k=1;while(o.length<3){const s=f(a*(1+k*0.2));if(!seen.has(s)){seen.add(s);o.push(s)}k++}return[q,A,sh([A,...o])]}
+const FR=[['1/2','0.5','50%'],['1/4','0.25','25%'],['3/4','0.75','75%'],['1/5','0.2','20%'],['2/5','0.4','40%'],['3/5','0.6','60%'],['4/5','0.8','80%'],['1/8','0.125','12.5%'],['3/8','0.375','37.5%'],['5/8','0.625','62.5%'],['7/8','0.875','87.5%'],['1/10','0.1','10%'],['3/10','0.3','30%'],['1/20','0.05','5%'],['3/20','0.15','15%'],['1/3','0.333…','33⅓%'],['2/3','0.666…','66⅔%'],['1/25','0.04','4%']];
+const LV={
+ pct:['Percent of a number',()=>{const p=pick([5,10,15,20,25,30,40,50,60,75]),n=20*r(1,20),a=p*n/100;return mk(p+'% of '+n+' = ?',a,sh([p*n/10,a+n/10,n-a,a*2,a/2]))}],
+ money:['Discounts & tips',()=>{if(Math.random()<.55){const pr=10*r(2,30),off=pick([10,20,25,30,40,50]),d=pr*off/100;
+   return mk('A '+usd(pr)+' item is '+off+'% off. What’s the sale price?',pr-d,sh([d,pr-off,pr+d,pr-d*2]),usd)}
+  const b=5*r(2,20),t=pick([10,15,20]),a=b*t/100;return mk('A '+t+'% tip on a '+usd(b)+' bill is…',a,sh([a*2,a/2,b*(t===15?.2:.15),b*t/1000*10+1]),usd)}],
+ frac:['Fractions, decimals, percents',()=>{const e=pick(FR),t=pick([[0,1],[0,2],[1,0],[2,0]]),o=sh(FR.filter(x=>x!==e)).slice(0,3).map(x=>x[t[1]]);
+   return[e[t[0]]+' = ?',e[t[1]],sh([e[t[1]],...o])]}],
+ est:['Estimation',()=>{const k=r(0,2);
+  if(k===0){const A=10*r(2,9),B=10*r(2,9),a=A+pick([-2,-1,1,2]),b=B+pick([-2,-1,1,2]),e=A*B;return['Which is closest to '+a+' × '+b+'?',num(e),sh([num(e),num(e*10),num(e/10),num(e*2)])]}
+  if(k===1){const T=5*r(4,16),p1=r(150,T*40)/100,p2=r(150,Math.max(160,(T-p1)*50))/100,p3=T-p1-p2+(r(-40,40)/100);if(p3<1)return LV.est[1]();
+   return['About how much is '+usd(p1)+' + '+usd(p2)+' + '+usd(p3)+'?',usd(T),sh([usd(T),usd(T+10),usd(Math.max(5,T-10)),usd(T+20)])]}
+  const P=pick([10,20,25,50]),B=100*r(2,9),p=P+pick([-1,1]),b=B+r(-4,4),e=P*B/100;return['About how much is '+p+'% of '+b+'?',num(e),sh([num(e),num(e*2),num(e/2),num(e*10)])]}],
+ mix:['Mix it up',()=>LV[pick(['pct','money','frac','est'])][1]()]};
+let lv='pct',score=0,miss=[],cur=null,t0=0,raf=0,on=false;const T=60;
+const get=k=>{try{return +localStorage.getItem(k)||0}catch(e){return 0}},put=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+Object.entries(LV).forEach(([k,[n]])=>{const b=document.createElement('button');b.textContent=n;if(k===lv)b.className='on';b.onclick=()=>{lv=k;document.querySelectorAll('#psLv button').forEach(x=>x.classList.toggle('on',x===b))};$('psLv').appendChild(b)});
+function next(){let q;do{q=LV[lv][1]()}while(cur&&q[0]===cur[0]);cur=q;$('psQ').textContent=q[0];$('psOpts').innerHTML='';
+ q[2].forEach(o=>{const b=document.createElement('button');b.textContent=o;b.onclick=()=>choose(b,o);$('psOpts').appendChild(b)})}
+function choose(b,o){if(!on)return;on=false;const ok=o===cur[1];document.querySelectorAll('#psOpts button').forEach(x=>{if(x.textContent===cur[1])x.classList.add('ok')});
+ if(ok){score++;$('psScore').textContent=score}else{b.classList.add('bad');miss.push([cur[0],cur[1],o])}
+ setTimeout(()=>{if(performance.now()-t0<T*1000){on=true;next()}},ok?260:900)}
+document.addEventListener('keydown',e=>{if($('psPlay').hidden)return;const bs=document.querySelectorAll('#psOpts button');if(/^[1-4]$/.test(e.key)&&bs[+e.key-1]){bs[+e.key-1].click();e.preventDefault()}});
+function tick(){const left=T-(performance.now()-t0)/1000;$('psBar').style.width=Math.max(0,left/T*100)+'%';if(left<=0)return end();raf=requestAnimationFrame(tick)}
+function start(){score=0;miss=[];cur=null;$('psScore').textContent=0;$('psLvName').textContent=LV[lv][0];$('psSetup').hidden=true;$('psEnd').hidden=true;$('psPlay').hidden=false;on=true;next();t0=performance.now();cancelAnimationFrame(raf);tick();$('ps').scrollIntoView({block:'nearest'})}
+function end(){on=false;$('psPlay').hidden=true;$('psEnd').hidden=false;const k='qp-ps-'+lv,best=get(k),tot=score+miss.length;
+ $('psFinal').textContent=score+' right';$('psNote').textContent=LV[lv][0]+(score>best?' · New best score!':' · Your best: '+best)+(tot?' · '+Math.round(score/tot*100)+'% correct':'');if(score>best)put(k,score);
+ $('psMiss').innerHTML=miss.length?'<li><b>Practice these:</b></li>'+miss.slice(0,8).map(m=>'<li>'+m[0]+' <b>'+m[1]+'</b> <span class="muted">(you chose '+m[2]+')</span></li>').join(''):'<li>No mistakes. Try a harder level or Mix it up.</li>'}
+$('psStart').onclick=start;$('psAgain').onclick=start;$('psBack').onclick=()=>{$('psEnd').hidden=true;$('psSetup').hidden=false};})();
+</script>'''
+
+PCT_TEXT = '''<h2>How to play</h2>
+<ol><li>Choose a level, or <b>Mix it up</b> for a bit of everything.</li>
+<li>Press <b>Start</b>. You have 60 seconds.</li>
+<li>Tap the right answer. A wrong answer shows the correct one for a moment, then the game moves on.</li>
+<li>At the end, review the ones you missed.</li></ol>
+
+<h2>The levels</h2>
+<ul><li><b>Percent of a number:</b> 15% of 240, 75% of 60, and so on.</li>
+<li><b>Discounts &amp; tips:</b> sale prices and tips, the percent math you actually use when you shop or eat out.</li>
+<li><b>Fractions, decimals, percents:</b> 3/8 = 0.375 = 37.5%. These come up constantly in statistics, science and finance.</li>
+<li><b>Estimation:</b> pick the closest answer without calculating exactly, like 49 × 31 or the total of three prices.</li></ul>
+
+<h2>Shortcuts that make percents easy</h2>
+<ul><li><b>10% is just moving the decimal point.</b> 10% of 240 is 24. Then 5% is half of that (12), and 15% is 24 + 12 = 36.</li>
+<li><b>Percents can be flipped.</b> 8% of 50 is the same as 50% of 8, which is 4.</li>
+<li><b>25% is a quarter, 50% is a half, 75% is three quarters.</b> 75% of 60 = 60 − 15 = 45.</li>
+<li><b>Sale price = price × what’s left.</b> 30% off means you pay 70%: 0.7 × $80 = $56.</li>
+<li><b>Know the eighths.</b> 1/8 = 12.5%, so 3/8 = 37.5%, 5/8 = 62.5% and 7/8 = 87.5%.</li></ul>
+
+<h2>Why estimation is a real skill</h2>
+<p>Estimating is how you catch mistakes. If a calculator says 49 × 31 = 15,190, a quick estimate (50 × 30 = 1,500) tells you a digit slipped. Good estimators round to easy numbers, calculate, and then ask whether the answer makes sense. It’s useful in exams, in lab work, in budgeting and when checking a bill.</p>
+<ul><li>Round each number to one or two easy digits before multiplying.</li>
+<li>For a total of prices, round each price to the nearest dollar.</li>
+<li>For “about 19% of 503”, think “20% of 500”, which is 100.</li></ul>
+
+<h2>Who it’s for</h2>
+<p>High school and college students preparing for exams in statistics, business, economics, nursing or science, and anyone who wants faster mental math for daily life. Teachers can use one round as a warm-up. It’s free, there’s no sign-up, and scores stay on your device.</p>
+<p>Prefer basic facts first? Try <a href="/practice/math-sprint/">Math Sprint</a> for adding, subtracting, times tables and division.</p>'''
+
+PAGES.append(('/practice/percent-sprint/', 'Percent & Estimation Sprint: Mental Math Practice Game',
+  'A free 60-second mental math game: percentages, discounts and tips, fractions to decimals, and estimation. For high school and college students.',
+  'Percent & Estimation Sprint', lambda: PCT_GAME, PCT_TEXT))
