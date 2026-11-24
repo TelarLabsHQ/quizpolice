@@ -270,7 +270,7 @@ def guides():
 from practice_content import GAME_CSS, PAGES as PRACTICE, HUB_TEXT, BEFORE
 def practice():
     prose(BEFORE[0], BEFORE[1], BEFORE[2], f'<p class="gmeta muted" style="font-size:14px;margin:0 0 6px">For students</p><h1>Before your quiz</h1>{BEFORE[3]}')
-    prose('/practice/', 'Practice Games for Students', 'Free practice games for students: Math Sprint and Geography Practice. No sign-up, works on phones and computers.',
+    prose('/practice/', 'Practice Games for Students', 'Free practice games for students: Math Sprint, Geography Practice and Spot the Fallacy. No sign-up, works on phones and computers.',
           f'{GAME_CSS}<h1>Practice games</h1>{HUB_TEXT}')
     for path, title, desc, short, game, text in PRACTICE:
         other = ''.join(f'<li><a href="{q[0]}">{E(q[3])}</a></li>' for q in PRACTICE if q[0] != path)

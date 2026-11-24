@@ -236,6 +236,7 @@ HUB_TEXT = '''<p class="lead">Free, quick practice games for students. No sign-u
 <div class="ptiles">
 <a href="/practice/math-sprint/"><b>Math Sprint</b>60 seconds of quick math: adding, subtracting, times tables and division. Beat your best score.</a>
 <a href="/practice/geography/"><b>Geography Practice</b>Countries and capital cities from every continent, 10 questions at a time.</a>
+<a href="/practice/spot-the-fallacy/"><b>Spot the Fallacy</b>For college students: read short arguments and name the logical fallacy. Learn 12 common fallacies with examples.</a>
 </div>
 <h2>Why short practice works</h2>
 <p>A few minutes of practice on most days beats a long session once a week. Each time you bring an answer back from memory, it gets easier to find the next time. These games are built for exactly that: short rounds, instant feedback, and a list of the answers to remember.</p>
@@ -293,3 +294,212 @@ BEFORE = ('/before-your-quiz/', 'Before Your Online Quiz: A Quick Checklist for 
 
 <h2>Good luck!</h2>
 <p>Take a slow breath, read every question to the end, and do your best. You’ve got this.</p>''')
+
+# ---------------------------------------------------------------- Spot the Fallacy (college level)
+FALLACIES = {
+ 'straw':  ('Straw man', 'Twisting someone’s point into a weaker or more extreme version, then attacking that instead.'),
+ 'dilemma':('False dilemma', 'Pretending there are only two options when there are more.'),
+ 'slope':  ('Slippery slope', 'Claiming one small step will lead to a chain of extreme results, without showing why.'),
+ 'hominem':('Ad hominem', 'Attacking the person making the argument instead of the argument itself.'),
+ 'auth':   ('Appeal to authority', 'Treating someone’s opinion as proof, especially when they aren’t an expert on the topic.'),
+ 'hasty':  ('Hasty generalization', 'Drawing a big conclusion from too few examples.'),
+ 'wagon':  ('Bandwagon', 'Saying something is true or good because many people believe or do it.'),
+ 'posthoc':('False cause', 'Assuming that because B happened after A, A must have caused B.'),
+ 'circle': ('Circular reasoning', 'Using the conclusion as the reason for the conclusion.'),
+ 'herring':('Red herring', 'Changing the subject to something that doesn’t answer the question.'),
+ 'tuq':    ('Tu quoque', 'Rejecting advice or criticism because the other person does the same thing (“you do it too”).'),
+ 'nature': ('Appeal to nature', 'Assuming something is good because it’s “natural”, or bad because it isn’t.'),
+}
+# pairs that overlap, so they are never offered together as answer choices
+FAL_CLASH = [('hominem', 'tuq'), ('posthoc', 'hasty')]
+FAL_Q = [
+ ('Mei: “We should spend a bit less on the sports budget this year.” Jason: “So Mei wants to get rid of sports and make everyone sit inside all day.”', 'straw',
+  'Mei only suggested spending less. Jason attacks a much more extreme position she never took.'),
+ ('Professor: “Please cite your sources more carefully.” Student: “So now we’re not allowed to use anyone else’s ideas at all? That’s ridiculous.”', 'straw',
+  'The professor asked for careful citing, not a ban on using sources. The student argues against a claim nobody made.'),
+ ('“You think the app needs a dark mode? So you’re saying the whole design is garbage and we wasted a year.”', 'straw',
+  'Asking for one feature isn’t the same as rejecting the whole design. The reply exaggerates the request to dismiss it.'),
+ ('“Either you pull an all-nighter tonight, or you’re going to fail the exam.”', 'dilemma',
+  'There are other options: studying in shorter sessions, focusing on key topics, or asking for help.'),
+ ('“You’re either with the club’s new plan, or you don’t care about the club.”', 'dilemma',
+  'Someone can care about the club and still disagree with this plan, or want changes to it.'),
+ ('“The college can either raise tuition or close the library. There’s no other way.”', 'dilemma',
+  'Budgets have many other options, like cutting other costs or finding new funding. Only two are presented.'),
+ ('“If we let students retake one quiz, soon they’ll expect to retake every exam, and grades will mean nothing.”', 'slope',
+  'One retake policy doesn’t automatically lead to unlimited retakes. The chain of events is assumed, not shown.'),
+ ('“If I skip the gym today, I’ll skip tomorrow too, and by next month I’ll have given up on my health completely.”', 'slope',
+  'Missing one day doesn’t force a chain of failures. Each step in the chain is just assumed.'),
+ ('“If the café lets people use laptops, they’ll stay all day, nobody will buy anything, and the café will go out of business.”', 'slope',
+  'Each step might happen, but none is shown to follow. Many cafés allow laptops and do fine.'),
+ ('“Why should we take Kevin’s budget plan seriously? He can’t even keep his own room clean.”', 'hominem',
+  'Kevin’s room says nothing about whether his budget plan is good. The reply attacks Kevin instead of the plan.'),
+ ('“Her analysis of the survey data doesn’t count. She’s only a first-year student.”', 'hominem',
+  'The analysis is right or wrong on its own merits. Being a first-year student doesn’t make the numbers wrong.'),
+ ('“Of course Lucas thinks the essay deadline is too short. He’s just lazy.”', 'hominem',
+  'Calling Lucas lazy doesn’t answer whether the deadline is reasonable. It attacks him, not his point.'),
+ ('“A famous actor says this supplement improves memory, so it must work.”', 'auth',
+  'Acting fame isn’t evidence about supplements. What matters is research on the supplement itself.'),
+ ('“My economics professor says this is the best movie ever made, so it is.”', 'auth',
+  'Being an expert in economics doesn’t make someone an authority on film, and taste isn’t proof anyway.'),
+ ('“A star football player recommends this new crypto coin, so it must be a safe investment.”', 'auth',
+  'A sports star isn’t an expert on investing, and an endorsement isn’t evidence that something is safe.'),
+ ('“I met two rude people from that city, so everyone there must be rude.”', 'hasty',
+  'Two people can’t represent a whole city. The sample is far too small for such a big conclusion.'),
+ ('“My first online class was boring, so online classes are a waste of time.”', 'hasty',
+  'One class is too small a sample to judge every online class.'),
+ ('“Three of my friends got A’s without studying, so studying doesn’t really matter.”', 'hasty',
+  'Three friends aren’t enough to draw a general rule, and they may be unusual in other ways.'),
+ ('“Everyone in our dorm is buying this laptop, so it must be the best one.”', 'wagon',
+  'Popularity in one dorm doesn’t prove quality. Specs, price and reviews would be better reasons.'),
+ ('“Millions of people use this diet app, so its advice must be right.”', 'wagon',
+  'A large number of users doesn’t make advice correct. That needs evidence about the advice itself.'),
+ ('“Nobody in our class reads the syllabus, so it can’t be important.”', 'wagon',
+  'What most people do isn’t proof of what matters. The syllabus might still contain key information.'),
+ ('“I wore my lucky hoodie and got an A. The hoodie works!”', 'posthoc',
+  'The A came after wearing the hoodie, but that doesn’t mean the hoodie caused it. Studying is a likelier cause.'),
+ ('“Sales went up the month after we changed the logo, so the new logo caused the increase.”', 'posthoc',
+  'Many things could explain the rise, like the season or a promotion. Timing alone doesn’t prove cause.'),
+ ('“I drank an energy drink right before the exam and did well, so energy drinks make you smarter.”', 'posthoc',
+  'Doing well after the drink doesn’t mean the drink caused it. The student also prepared for the exam.'),
+ ('“This is the best university in the country because it’s the top school in the nation.”', 'circle',
+  '“Best” and “top” mean the same thing here. The claim is used as its own reason.'),
+ ('“You can trust this website because it says it’s a trustworthy source.”', 'circle',
+  'The website’s trustworthiness is the thing in question, so its own claim can’t prove it.'),
+ ('“Professor Chen is always right because she never makes mistakes.”', 'circle',
+  '“Never makes mistakes” is just another way of saying “always right”. No real reason is given.'),
+ ('Teammate: “Why is the group report late?” Reply: “Well, did you see how much work I did on last semester’s project?”', 'herring',
+  'Last semester’s project has nothing to do with why this report is late. The reply changes the subject.'),
+ ('Reporter: “Will campus parking fees go up next year?” Manager: “Our campus has won three awards for its beautiful gardens.”', 'herring',
+  'The gardens don’t answer the question about parking fees. The topic is quietly switched.'),
+ ('When asked why the app keeps crashing, the developer talks about how many people downloaded it last year.', 'herring',
+  'Download numbers don’t explain the crashes. It’s a distraction from the real question.'),
+ ('“You told me to stop using my phone in class, but you were on your phone yesterday.”', 'tuq',
+  'Whether the advice is good doesn’t depend on whether the person giving it follows it.'),
+ ('“My roommate says I should eat healthier, but he eats instant noodles every night.”', 'tuq',
+  'The roommate’s own habits don’t make the advice wrong. Pointing out “you do it too” avoids the point.'),
+ ('Mom: “You should stop staying up so late before exams.” Leo: “You stay up late watching shows all the time!”', 'tuq',
+  'Mom’s own habits don’t make her advice wrong. Leo dodges the advice by saying “you do it too”.'),
+ ('“This herbal tea is natural, so it can’t have any side effects.”', 'nature',
+  'Many natural substances have side effects or are harmful. “Natural” doesn’t mean safe.'),
+ ('“This shampoo has only natural ingredients and no chemicals, so it must be better for your hair.”', 'nature',
+  'Everything, including natural ingredients, is made of chemicals. Being natural doesn’t make something better.'),
+ ('“Air conditioning isn’t natural, so it must be bad for you.”', 'nature',
+  'Something being man-made doesn’t make it harmful. Its effects need to be judged on evidence.'),
+]
+
+def fallacy_game():
+    import json
+    F = json.dumps({k: v[0] for k, v in FALLACIES.items()}, ensure_ascii=False)
+    Q = json.dumps(FAL_Q, ensure_ascii=False)
+    C = json.dumps(FAL_CLASH)
+    return '''<div class="game" id="fg">
+ <div id="fgSetup">
+  <h2>Spot the Fallacy</h2><p class="gsub">Read the argument. Which logical fallacy is it? 10 questions a round.</p>
+  <p class="glabel">How it works</p>
+  <p style="margin:4px 0 14px;font-size:16px">Each question shows a short argument and four fallacy names. After you answer, you’ll see why. The guide below explains all 12 fallacies.</p>
+  <button class="gbtn" id="fgStart">Start</button>
+ </div>
+ <div id="fgPlay" hidden>
+  <div class="gtop"><span id="fgNum"></span><span>Score: <b id="fgScore">0</b></span></div>
+  <div class="gbar"><i id="fgBar"></i></div>
+  <blockquote class="farg" id="fgQ"></blockquote>
+  <div class="gopts" id="fgOpts"></div>
+  <div class="gfb fexp" id="fgFb"></div>
+  <button class="gbtn" id="fgNext" hidden>Next</button>
+ </div>
+ <div id="fgEnd" class="gres" hidden>
+  <p class="glabel">Round complete</p><div class="gbig" id="fgFinal"></div><p id="fgNote" class="muted"></p>
+  <ul class="gmiss" id="fgMiss"></ul>
+  <div class="grow"><button class="gbtn" id="fgAgain">Play again</button><a class="gbtn ghost" href="#guide" style="text-align:center;text-decoration:none">Read the guide</a></div>
+ </div>
+</div>
+<style>.farg{margin:12px 0 4px;padding:14px 16px;background:var(--bg);border-left:4px solid var(--badge);border-radius:8px;font-size:18px;line-height:1.5}
+.fexp{text-align:left;font-weight:400;font-size:16px;line-height:1.5;margin:4px 0 12px}.fexp b{display:block}</style>
+<script>
+(()=>{const F=''' + F + ''',Q=''' + Q + ''',CL=''' + C + ''';
+const $=i=>document.getElementById(i),sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const get=k=>{try{return +localStorage.getItem(k)||0}catch(e){return 0}},put=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+const clash=(a,b)=>CL.some(p=>(p[0]===a&&p[1]===b)||(p[0]===b&&p[1]===a));
+let qs=[],n=0,score=0,miss=[],locked=false;
+function start(){qs=sh(Q).slice(0,10);n=0;score=0;miss=[];$('fgScore').textContent=0;$('fgSetup').hidden=true;$('fgEnd').hidden=true;$('fgPlay').hidden=false;ask();$('fg').scrollIntoView({block:'nearest'})}
+function ask(){const q=qs[n];locked=false;$('fgNum').textContent='Question '+(n+1)+' of '+qs.length;$('fgBar').style.width=(n/qs.length*100)+'%';$('fgQ').textContent=q[0];
+ const wrong=sh(Object.keys(F).filter(k=>k!==q[1]&&!clash(k,q[1]))).slice(0,3);const opts=sh([q[1],...wrong]);
+ $('fgOpts').innerHTML='';$('fgFb').innerHTML='';$('fgNext').hidden=true;
+ opts.forEach(k=>{const b=document.createElement('button');b.textContent=F[k];b.dataset.k=k;b.onclick=()=>choose(b,k===q[1]);$('fgOpts').appendChild(b)})}
+function choose(b,ok){if(locked)return;locked=true;const q=qs[n];
+ document.querySelectorAll('#fgOpts button').forEach(x=>{x.disabled=true;if(x.dataset.k===q[1])x.classList.add('ok')});
+ if(ok){score++;$('fgScore').textContent=score}else{b.classList.add('bad');miss.push(q)}
+ $('fgFb').innerHTML='<b style="color:'+(ok?'#2e9e5b':'#b23a3a')+'">'+(ok?'Correct! ':'Not quite. ')+'It’s '+F[q[1]].toLowerCase()+'.</b>'+q[2];
+ $('fgNext').textContent=n+1<qs.length?'Next':'See my score';$('fgNext').hidden=false}
+$('fgNext').onclick=()=>{n++;if(n<qs.length)ask();else end()};
+document.addEventListener('keydown',e=>{if($('fgPlay').hidden)return;const bs=document.querySelectorAll('#fgOpts button');
+ if(!locked&&/^[1-4]$/.test(e.key)&&bs[+e.key-1]){bs[+e.key-1].click();e.preventDefault()}else if(locked&&e.key==='Enter'){$('fgNext').click();e.preventDefault()}});
+function end(){$('fgBar').style.width='100%';$('fgPlay').hidden=true;$('fgEnd').hidden=false;const best=get('qp-fal');
+ $('fgFinal').textContent=score+' / '+qs.length;$('fgNote').textContent=score===10?'Perfect round. Sharp thinking!':score>best?'New best score!':'Your best: '+best+' / 10';if(score>best)put('qp-fal',score);
+ $('fgMiss').innerHTML=miss.length?'<li><b>Review these:</b></li>'+miss.map(q=>'<li><b>'+F[q[1]]+':</b> '+q[0]+'</li>').join(''):'<li>No misses. Play again for new questions.</li>'}
+$('fgStart').onclick=start;$('fgAgain').onclick=start;})();
+</script>'''
+
+FAL_EX = {
+ 'straw': '“You want fewer cars downtown? So you want to ban cars completely?”',
+ 'dilemma': '“Either we cancel the trip or everyone gets soaked.” (You could bring umbrellas or change the plan.)',
+ 'slope': '“If we allow one late submission, nobody will ever submit on time again.”',
+ 'hominem': '“Don’t listen to his idea about the schedule. He’s always late himself.”',
+ 'auth': '“A famous singer says this phone is the most secure, so it is.”',
+ 'hasty': '“The first two restaurants on this street were bad, so the whole street is bad.”',
+ 'wagon': '“Everyone’s taking this elective, so it must be the most useful one.”',
+ 'posthoc': '“I started using a new pen and my grades went up, so the pen helped.”',
+ 'circle': '“This source is reliable because it’s a source you can rely on.”',
+ 'herring': 'Asked about a rent increase, the landlord talks about the new lobby paint.',
+ 'tuq': '“You can’t tell me to save money. You bought a new phone last month.”',
+ 'nature': '“It’s natural, so it’s healthy.”',
+}
+FAL_TIP = {
+ 'straw': 'Restate their real point first: “I think you’re saying X. Is that right?”',
+ 'dilemma': 'Ask: “Are these really the only two options?” and name a third.',
+ 'slope': 'Ask for evidence that each step actually leads to the next.',
+ 'hominem': 'Separate the person from the claim: would the argument be wrong if someone else made it?',
+ 'auth': 'Check whether the person is an expert in this topic, and what the evidence says.',
+ 'hasty': 'Ask how many examples there are, and whether they represent the whole group.',
+ 'wagon': 'Ask why it’s popular, and whether popularity says anything about whether it’s true.',
+ 'posthoc': 'Look for other explanations and for evidence beyond timing.',
+ 'circle': 'Ask: “What’s the reason, apart from the claim itself?”',
+ 'herring': 'Bring it back: “That’s interesting, but it doesn’t answer the question.”',
+ 'tuq': 'Ask whether the advice is good, regardless of who gives it.',
+ 'nature': 'Judge the thing by its effects, not by whether it’s natural or man-made.',
+}
+
+def fallacy_text():
+    items = ''.join(f'<h3>{i}. {n}</h3><p>{d}</p><p><i>Example:</i> {FAL_EX[k]}</p><p><i>How to respond:</i> {FAL_TIP[k]}</p>'
+                    for i, (k, (n, d)) in enumerate(FALLACIES.items(), 1))
+    return f'''<h2 id="guide">What is a logical fallacy?</h2>
+<p>A logical fallacy is a mistake in reasoning: an argument that sounds convincing but doesn’t actually support its conclusion. Fallacies show up everywhere, from group chats and ads to debates, news comments and even research papers. Learning to spot them helps you write stronger essays, argue more fairly, and avoid being fooled.</p>
+<p>One important point: an argument with a fallacy can still have a true conclusion. The fallacy only means <i>that argument</i> doesn’t prove it. Saying “your argument has a fallacy, so you’re wrong” is a fallacy too.</p>
+
+<h2>12 common fallacies, with examples</h2>
+{items}
+
+<h2>Why this matters in college</h2>
+<ul><li><b>Essays and research papers:</b> professors look for arguments supported by evidence. Fallacies are one of the most common reasons a strong-sounding paragraph loses marks.</li>
+<li><b>Debates, seminars and group projects:</b> naming a fallacy calmly (“that feels like a false dilemma, are there other options?”) moves a discussion forward without attacking anyone.</li>
+<li><b>Everyday life:</b> ads, viral posts and sales pitches often rely on bandwagon, false cause and appeals to authority. Spotting them is a practical defense.</li></ul>
+
+<h2>Tips for avoiding fallacies in your own writing</h2>
+<ul><li>For each claim, ask: what’s my evidence, and is it enough?</li>
+<li>Describe opposing views fairly before you answer them.</li>
+<li>Be careful with words like <i>always</i>, <i>never</i>, <i>everyone</i> and <i>only</i>.</li>
+<li>Look for other explanations before claiming one thing caused another.</li>
+<li>Read your argument as if you were your toughest critic.</li></ul>
+<p>Writing an essay in class? Teachers can use <a href="https://drafttrail.telarlabs.net/">DraftTrail</a> to see how a piece of writing was built, step by step.</p>
+
+<h2>For teachers</h2>
+<p>Spot the Fallacy works as a warm-up for critical thinking, philosophy, English, debate or media literacy classes. Ask students to play a round, then pick the example they found hardest and explain it to a partner, or write their own example of each fallacy. It’s free, needs no accounts and works on phones. Scores stay on the student’s device.</p>
+
+<h2>Questions</h2>
+<p><b>Can one argument have more than one fallacy?</b> Yes. Some overlap, like ad hominem and tu quoque. In the game, the answer choices never include two fallacies that would both be correct.</p>
+<p><b>Are there more than 12 fallacies?</b> Many more. These 12 are among the most common and the most useful to recognize first.</p>
+<p><b>Is it free?</b> Yes, completely, with no sign-up.</p>'''
+
+PAGES.append(('/practice/spot-the-fallacy/', 'Spot the Fallacy: Logical Fallacies Quiz Game with Examples',
+  'A free logical fallacies game for college students: read short arguments, spot the fallacy, and learn 12 common fallacies with examples.',
+  'Spot the Fallacy', fallacy_game, fallacy_text()))
