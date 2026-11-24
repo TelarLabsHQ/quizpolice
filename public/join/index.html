@@ -171,7 +171,8 @@ function start(d){
   tick(); setInterval(tick,1000);
   if(d.status==='lock') showWarn();
   if(d.status==='time') showTimeUp();
-  poller=setInterval(check,15000);
+  // status check every 30 s (exits are still sent the moment they happen); keeps QuizPolice well inside Cloudflare's daily request limit
+  poller=setInterval(check,30000);
 }
 // ---- DraftTrail writing task (inside the frame) ----
 let DT=false, DTO='', lastProg=0, progQ=null, snapT=0;
@@ -240,7 +241,7 @@ function showWarn(){
   $('#wMsg').textContent=locked?`You left ${me.exits} times. Ask your teacher to unlock your quiz. This page will continue by itself once you're unlocked.`
     :`This was reported to your teacher.${quiz&&quiz.strict?` Your quiz locks after ${quiz.max_exits} exits.`:''}`;
   $('#wOk').hidden=locked; $('#frame').hidden=locked; $('#warnOv').hidden=false;
-  if(locked){ clearInterval(poller); poller=setInterval(check,4000) }
+  if(locked){ clearInterval(poller); poller=setInterval(check,6000) }
 }
 $('#wOk').onclick=()=>{ $('#warnOv').hidden=true; $('#frame').focus() };
 let finishing=false;

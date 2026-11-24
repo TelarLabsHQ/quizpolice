@@ -320,13 +320,15 @@ function openDash(q){
   $('#qr').innerHTML=''; try{ new QRCode($('#qr'),{text:joinLink(q.code),width:150,height:150,correctLevel:QRCode.CorrectLevel.M}) }catch(e){ $('#qr').hidden=true }
   poll();
 }
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&cur&&!$('#vDash').hidden){ clearTimeout(timer); poll() } });
 async function poll(){
   stopPoll(); if(!cur) return;
   try{ const d=await api(`sessions/${cur.code}/dashboard?since=${lastId}`,{headers:{'x-teacher-key':cur.key}});
     data=d; for(const ev of d.events.slice().reverse()){ if(ev.id>lastId){events.unshift(ev); lastId=ev.id} } events=events.slice(0,500);
     render(); $('#dLive').textContent='Live · updated '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit',second:'2-digit'});
   }catch(e){ $('#dLive').textContent=(!e.status||e.status>=500)?'Connection problem · retrying…':e.message }
-  if(!$('#vDash').hidden) timer=setTimeout(poll, document.hidden?10000:3000);
+  // every 5 s while the dashboard is on screen, every 30 s in a background tab
+  if(!$('#vDash').hidden) timer=setTimeout(poll, document.hidden?30000:5000);
 }
 const lab={time:['p-time',"Time's up"],ans:['p-ans','Answering'],away:['p-away','Left the quiz'],lock:['p-lock','Locked'],done:['p-done','Submitted'],gone:['p-gone','Offline?']};
 function statusOf(p){ if(p.status==='ans'&&data.server_time-p.last_seen>90000) return 'gone'; return p.status }
