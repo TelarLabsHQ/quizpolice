@@ -331,7 +331,7 @@ async function poll(){
   if(!$('#vDash').hidden) timer=setTimeout(poll, document.hidden?30000:5000);
 }
 const lab={time:['p-time',"Time's up"],ans:['p-ans','Answering'],away:['p-away','Left the quiz'],lock:['p-lock','Locked'],done:['p-done','Submitted'],gone:['p-gone','Offline?']};
-function statusOf(p){ if(p.status==='ans'&&data.server_time-p.last_seen>90000) return 'gone'; return p.status }
+function statusOf(p){ if(p.status==='ans'&&data.server_time-p.last_seen>120000) return 'gone'; return p.status }
 function render(){
   const s=data.session, ps=data.participants;
   $('#dStrict').checked=!!s.strict; $('#dMax').value=String(s.max_exits);

@@ -279,7 +279,9 @@ export async function onRequest(ctx) {
       if (!s) return bad('This quiz was deleted.', 404);
       p = await timeup(db, s, p);
       if (method === 'GET') {
-        await db.prepare('UPDATE participants SET last_seen = ? WHERE id = ?').bind(now(), p.id).run();
+        // 'last seen' only needs to be fresh to within a minute (the dashboard flags a student after 2 minutes without contact);
+        // skipping the write otherwise keeps database writes low (D1 free plan: 100,000 rows written a day)
+        if (now() - (p.last_seen || 0) > 50000) await db.prepare('UPDATE participants SET last_seen = ? WHERE id = ?').bind(now(), p.id).run();
         return json(stuPayload(s, p));
       }
       if (method === 'POST' && parts[1] === 'event') {
