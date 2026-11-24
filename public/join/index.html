@@ -15,6 +15,8 @@
 .lobby .count{font-family:var(--f-head);font-weight:800;font-size:56px;line-height:1}
 .toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:30;padding:12px 18px;border-radius:12px;background:var(--warn-bg);color:var(--warn);font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.2)}
 .donetip{margin-top:14px}.donetip a{font-weight:700}
+.early{text-align:center;margin:0}.early a,.lcheck a{font-weight:700}
+.lcheck{text-align:left;background:var(--bg,#F3F5F9);border:1px solid var(--line,#DCE1EA);border-radius:12px;padding:12px 14px;margin-top:6px;max-width:460px;width:100%}.lcheck ul{margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:15px}
 </style>
 </head>
 <body>
@@ -26,6 +28,7 @@
     <label class="field"><span>Quiz code from your teacher</span><input id="code" inputmode="numeric" autocomplete="off" maxlength="7" placeholder="123 456" required></label>
     <button class="btn pri" style="height:50px">Next</button>
     <div id="codeErr" class="msg bad" hidden></div>
+    <p class="note early">Early? Read the <a href="/before-your-quiz/" target="_blank" rel="noopener">quick student checklist</a> or warm up with <a href="/practice/" target="_blank" rel="noopener">a practice game</a>.</p>
   </form>
 
   <form class="panel pad" id="joinForm" hidden style="display:flex;flex-direction:column;gap:14px">
@@ -40,9 +43,15 @@
 
   <div class="panel pad lobby" id="lobby" hidden>
     <h1 style="font-size:24px" id="lTitle"></h1>
-    <p class="note" style="margin:0">The exam starts for everyone at <b id="lAt"></b>. Stay on this page.</p>
+    <p class="note" style="margin:0">The exam starts for everyone at <b id="lAt"></b>. Be back on this page before then.</p>
     <div class="count" id="lCount">–</div>
     <p class="note" style="margin:0" id="lLen"></p>
+    <div class="lcheck"><b>While you wait</b>
+      <ul><li>Turn on <b>Do Not Disturb</b> so notifications don’t pull you out of the quiz.</li>
+      <li>Close other apps, and plug in your charger if your battery is low.</li>
+      <li>When you finish, press <b>Submit</b> on the quiz, then <b>I’ve submitted</b> here.</li></ul>
+      <p class="note" id="lPlay" style="margin:6px 0 0">Early? Warm up with <a href="/practice/math-sprint/" target="_blank" rel="noopener">Math Sprint</a> or <a href="/practice/geography/" target="_blank" rel="noopener">Geography Practice</a> (opens in a new tab). Come back before the countdown ends.</p>
+    </div>
   </div>
   <div id="quiz" hidden style="display:flex;flex-direction:column;gap:10px">
     <div class="panel stubar"><b id="sWho"></b><span class="tbadge" id="sTime" hidden></span><span class="note">Exits: <b id="sExits">0</b><span id="sMax"></span></span><button class="btn pri" id="doneBtn">I've submitted</button></div>
@@ -180,11 +189,14 @@ addEventListener('message',async e=>{ if(!DT||e.origin!==DTO||!e.data||e.data.sr
     finishing=false; } });
 setInterval(()=>{ if(DT&&token&&me.status!=='done'&&!$('#quiz').hidden) toDT({type:'snapshot'}) },60000);
 function setTiming(d){ if(d.server_time) skew=d.server_time-Date.now(); T={timing:d.timing,start_at:d.start_at,limit_min:d.limit_min,deadline:d.deadline,grace_s:d.grace_s}; }
+let baseTitle='';document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&baseTitle){ document.title=baseTitle; baseTitle=''; } });
 function inLobby(){ return T&&T.timing==='scheduled'&&T.start_at&&tnow()<T.start_at }
 function tick(){
   if(!T||me.status==='done') return;
   if(inLobby()){ $('#quiz').hidden=true; $('#lobby').hidden=false; $('#lAt').textContent=hm(T.start_at);
-    $('#lCount').textContent=dur(T.start_at-tnow()); $('#lLen').textContent=`The exam lasts ${mins(T.limit_min)}.`; return; }
+    $('#lCount').textContent=dur(T.start_at-tnow()); $('#lLen').textContent=`The exam lasts ${mins(T.limit_min)}.`;
+    $('#lPlay').hidden=T.start_at-tnow()<180000; return; }
+  if(!$('#lobby').hidden){ if(document.hidden){ baseTitle=baseTitle||document.title; document.title='⏰ Your exam has started!'; } }
   if(!$('#lobby').hidden||$('#quiz').hidden){ $('#lobby').hidden=true; $('#quiz').hidden=false; }
   if(frameSrc&&!$('#frame').src) $('#frame').src=frameSrc;
   const b=$('#sTime');

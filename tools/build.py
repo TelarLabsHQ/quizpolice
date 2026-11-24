@@ -243,7 +243,7 @@ def pages():
 
 def extras():
     open(os.path.join(PUB, 'favicon.svg'), 'w').write(LOGO.replace('class="logo-mark" ', 'xmlns="http://www.w3.org/2000/svg" '))
-    urls = ['/', '/how-it-works/', '/supported-quizzes/', '/faq/', '/guides/'] + [f'/guides/{g["slug"]}/' for g in GUIDES] + ['/practice/'] + [x[0] for x in PRACTICE] + ['/about/', '/privacy/', '/terms/', '/contact/']
+    urls = ['/', '/how-it-works/', '/supported-quizzes/', '/faq/', '/guides/'] + [f'/guides/{g["slug"]}/' for g in GUIDES] + ['/practice/', BEFORE[0]] + [x[0] for x in PRACTICE] + ['/about/', '/privacy/', '/terms/', '/contact/']
     open(os.path.join(PUB, 'sitemap.xml'), 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'<url><loc>{URL}{u}</loc></url>\n' for u in urls) + '</urlset>\n')
     open(os.path.join(PUB, 'robots.txt'), 'w').write(f'User-agent: *\nDisallow: /api/\nDisallow: /teacher/\nDisallow: /join/\nDisallow: /cdn-cgi/\n\nUser-agent: Mediapartners-Google\nAllow: /\n\nSitemap: {URL}/sitemap.xml\n')
     if CFG['adsense_client']:
@@ -267,8 +267,9 @@ def guides():
               f'<h2>More guides</h2><ul>{more}<li><a href="https://telarlabs.net/guides/">Telar Labs guides for teachers and organizers</a></li></ul>')
 
 # ---------------------------------------------------------------- practice games for students
-from practice_content import GAME_CSS, PAGES as PRACTICE, HUB_TEXT
+from practice_content import GAME_CSS, PAGES as PRACTICE, HUB_TEXT, BEFORE
 def practice():
+    prose(BEFORE[0], BEFORE[1], BEFORE[2], f'<p class="gmeta muted" style="font-size:14px;margin:0 0 6px">For students</p><h1>Before your quiz</h1>{BEFORE[3]}')
     prose('/practice/', 'Practice Games for Students', 'Free practice games for students: Math Sprint and Geography Practice. No sign-up, works on phones and computers.',
           f'{GAME_CSS}<h1>Practice games</h1>{HUB_TEXT}')
     for path, title, desc, short, game, text in PRACTICE:

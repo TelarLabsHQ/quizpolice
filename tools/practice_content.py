@@ -251,3 +251,45 @@ PAGES = [
   'A free geography game for students: name the capital or the country, by region or for the whole world. 10 questions a round, no sign-up.',
   'Geography Practice', geo_game, GEO_TEXT),
 ]
+
+BEFORE = ('/before-your-quiz/', 'Before Your Online Quiz: A Quick Checklist for Students',
+ 'What to do before an online quiz on your phone or laptop: a quick checklist, what QuizPolice can and can’t see, and what to do if something goes wrong.',
+'''<p class="lead">Got a few minutes before your quiz starts? Read this quick checklist so nothing surprises you, then warm up with a practice game.</p>
+
+<h2>The 2-minute checklist</h2>
+<ul><li><b>Battery:</b> at least half charged, or plug in your charger now.</li>
+<li><b>Internet:</b> sit where your Wi-Fi or mobile signal is strong. Don’t start a big download.</li>
+<li><b>Other apps:</b> close games, videos and chat apps. Turn on <b>Do Not Disturb</b> so messages and calls don’t pop up.</li>
+<li><b>Your name:</b> type your full name exactly the way your teacher knows you, and choose the right section.</li>
+<li><b>Paper and pencil:</b> if your teacher allows scratch paper, have it ready so you don’t need another app.</li>
+<li><b>Ask now:</b> if you’re allowed to use a calculator or notes, check with your teacher <i>before</i> you start.</li></ul>
+
+<h2>What QuizPolice can see, and what it can’t</h2>
+<p>Many teachers use QuizPolice to keep online quizzes fair. It’s good to know exactly what it does:</p>
+<ul><li>It <b>can</b> see when you leave the quiz page on the device you joined with: switching to another app or tab, going to your home screen, or clicking outside the quiz window. Your teacher sees when it happened and how long you were away.</li>
+<li>It <b>can’t</b> see your screen, your photos, your messages, other devices, or what you search. Nothing outside the quiz page is monitored.</li></ul>
+<p>Your teacher may set a number of exits allowed. If you leave too many times, the quiz locks and you’ll need to ask your teacher to unlock it.</p>
+
+<h2>Things that can count as leaving, even by accident</h2>
+<ul><li>Tapping a notification that pops up at the top of the screen.</li>
+<li>Answering a call, or opening the calculator or camera app.</li>
+<li>Swiping up to the home screen or switching apps with a gesture.</li>
+<li>On a computer, clicking on another window or the taskbar.</li></ul>
+<p>That’s why Do Not Disturb matters. If something happens by accident, don’t panic: just come straight back and tell your teacher what happened.</p>
+
+<h2>During the quiz</h2>
+<ul><li><b>Watch the timer</b> if your quiz has one. You’ll see reminders when time is almost up.</li>
+<li><b>If the quiz doesn’t load,</b> stay on the page and tell your teacher. Don’t open the quiz in another tab, because that counts as leaving.</li>
+<li><b>If your internet drops,</b> reconnect and open the quiz page again. If it asks, join with the same name. Then tell your teacher.</li></ul>
+
+<h2>When you finish</h2>
+<ol><li>Press <b>Submit</b> on the quiz itself (in Google Forms, Microsoft Forms or Wayground) and wait for the confirmation message.</li>
+<li>Then press <b>I’ve submitted</b> in QuizPolice, so your teacher sees that you’re done.</li></ol>
+<p>For a writing task, press <b>Hand in my writing</b> when you’re finished.</p>
+
+<h2>Early? Warm up</h2>
+<p>A short warm-up gets your brain going. Try a 60-second <a href="/practice/math-sprint/">Math Sprint</a> or a round of <a href="/practice/geography/">Geography Practice</a>. Just make sure you’re back on the quiz page before it starts.</p>
+<p>Want to do better on your next quiz? Read <a href="/guides/how-to-study-for-a-quiz/">How to Study for a Quiz: 7 Tips That Actually Work</a>.</p>
+
+<h2>Good luck!</h2>
+<p>Take a slow breath, read every question to the end, and do your best. You’ve got this.</p>''')
