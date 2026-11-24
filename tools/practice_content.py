@@ -237,6 +237,7 @@ HUB_TEXT = '''<p class="lead">Free, quick practice games for students. No sign-u
 <a href="/practice/math-sprint/"><b>Math Sprint</b>60 seconds of quick math: adding, subtracting, times tables and division. Beat your best score.</a>
 <a href="/practice/geography/"><b>Geography Practice</b>Countries and capital cities from every continent, 10 questions at a time.</a>
 <a href="/practice/percent-sprint/"><b>Percent &amp; Estimation Sprint</b>Percentages, discounts, tips, fractions and quick estimates. Everyday math for high school and college.</a>
+<a href="/practice/world-history/"><b>World History Timeline</b>Which came first? Pick the year? About 60 key events from every continent, from the pyramids to the Moon landing.</a>
 <a href="/practice/spot-the-fallacy/"><b>Spot the Fallacy</b>For college students: read short arguments and name the logical fallacy. Learn 12 common fallacies with examples.</a>
 <a href="https://drafttrail.telarlabs.net/practice/word-choice/"><b>Word Choice Check</b>Affect or effect? Fewer or less? Practice commonly confused words for essays. On our writing app, DraftTrail.</a>
 </div>
@@ -596,3 +597,167 @@ PCT_TEXT = '''<h2>How to play</h2>
 PAGES.append(('/practice/percent-sprint/', 'Percent & Estimation Sprint: Mental Math Practice Game',
   'A free 60-second mental math game: percentages, discounts and tips, fractions to decimals, and estimation. For high school and college students.',
   'Percent & Estimation Sprint', lambda: PCT_GAME, PCT_TEXT))
+
+# ---------------------------------------------------------------- World History Timeline
+# (year, event, era, approx?)  negative years = BCE. Only well-documented dates; approximate ones are used in "Which came first?" only.
+HIST = [
+ (-2560, 'The Great Pyramid of Giza is completed in Egypt', 'Ancient', True),
+ (-1754, 'Hammurabi’s Code of laws is written in Babylon', 'Ancient', True),
+ (-776, 'The first recorded Olympic Games are held in Greece', 'Ancient', False),
+ (-323, 'Alexander the Great dies in Babylon', 'Ancient', False),
+ (-221, 'Qin Shi Huang unites China and becomes its first emperor', 'Ancient', False),
+ (-44, 'Julius Caesar is killed in Rome', 'Ancient', False),
+ (79, 'Mount Vesuvius erupts and buries Pompeii', 'Ancient', False),
+ (80, 'The Colosseum opens in Rome', 'Ancient', False),
+ (105, 'Cai Lun improves papermaking in Han China', 'Ancient', True),
+ (476, 'The Western Roman Empire falls', 'Ancient', False),
+ (622, 'The Prophet Muhammad migrates from Mecca to Medina (the Hijra)', 'Middle Ages', False),
+ (800, 'Charlemagne is crowned emperor in Rome', 'Middle Ages', False),
+ (1206, 'Genghis Khan founds the Mongol Empire', 'Middle Ages', False),
+ (1215, 'King John of England agrees to the Magna Carta', 'Middle Ages', False),
+ (1324, 'Mansa Musa of Mali makes his famous pilgrimage to Mecca', 'Middle Ages', False),
+ (1347, 'The Black Death reaches Europe', 'Middle Ages', False),
+ (1368, 'The Ming dynasty begins in China', 'Middle Ages', False),
+ (1405, 'Zheng He sets out on the first of his great treasure voyages', 'Middle Ages', False),
+ (1453, 'Constantinople falls to the Ottoman Empire', 'Middle Ages', False),
+ (1455, 'Gutenberg prints his Bible with movable metal type', 'Middle Ages', True),
+ (1492, 'Christopher Columbus reaches the Americas', 'Middle Ages', False),
+ (1498, 'Vasco da Gama reaches India by sea', 'Middle Ages', False),
+ (1517, 'Martin Luther posts his Ninety-five Theses', 'Early modern', False),
+ (1521, 'Magellan’s expedition reaches the Philippines', 'Early modern', False),
+ (1522, 'The first voyage around the world is completed', 'Early modern', False),
+ (1603, 'The Tokugawa shogunate begins in Japan', 'Early modern', False),
+ (1610, 'Galileo sees the moons of Jupiter through his telescope', 'Early modern', False),
+ (1616, 'William Shakespeare dies', 'Early modern', False),
+ (1620, 'The Mayflower arrives in North America', 'Early modern', False),
+ (1644, 'The Qing dynasty takes Beijing', 'Early modern', False),
+ (1687, 'Isaac Newton publishes his laws of motion and gravity', 'Early modern', False),
+ (1770, 'James Cook reaches the east coast of Australia', 'Early modern', False),
+ (1776, 'The United States declares independence', 'Early modern', False),
+ (1789, 'The French Revolution begins with the storming of the Bastille', 'Early modern', False),
+ (1804, 'Haiti becomes independent', 'Modern', False),
+ (1815, 'Napoleon is defeated at Waterloo', 'Modern', False),
+ (1822, 'Brazil declares independence from Portugal', 'Modern', False),
+ (1825, 'The first public steam railway opens in England', 'Modern', False),
+ (1859, 'Charles Darwin publishes On the Origin of Species', 'Modern', False),
+ (1865, 'The American Civil War ends', 'Modern', False),
+ (1869, 'The Suez Canal opens', 'Modern', False),
+ (1876, 'Alexander Graham Bell patents the telephone', 'Modern', False),
+ (1893, 'New Zealand becomes the first country where women can vote in national elections', 'Modern', False),
+ (1898, 'The Philippines declares independence from Spain', 'Modern', False),
+ (1903, 'The Wright brothers make the first powered airplane flight', 'Modern', False),
+ (1914, 'World War I begins', 'Modern', False),
+ (1917, 'The Russian Revolution takes place', 'Modern', False),
+ (1928, 'Alexander Fleming discovers penicillin', 'Modern', False),
+ (1945, 'World War II ends and the United Nations is founded', 'Modern', False),
+ (1947, 'India and Pakistan become independent', 'Modern', False),
+ (1949, 'The People’s Republic of China is founded', 'Modern', False),
+ (1957, 'Ghana becomes independent', 'Modern', False),
+ (1961, 'Yuri Gagarin becomes the first person in space', 'Modern', False),
+ (1969, 'Apollo 11 astronauts walk on the Moon', 'Modern', False),
+ (1989, 'The Berlin Wall falls', 'Modern', False),
+ (1991, 'The World Wide Web becomes available to the public', 'Modern', False),
+ (1994, 'Nelson Mandela becomes president of South Africa', 'Modern', False),
+ (2002, 'Euro coins and banknotes come into use', 'Modern', False),
+ (2003, 'The Human Genome Project is completed', 'Modern', False),
+]
+
+def hist_game():
+    import json
+    D = json.dumps(HIST, ensure_ascii=False)
+    return '''<div class="game" id="hg">
+ <div id="hgSetup">
+  <h2>World History Timeline</h2><p class="gsub">How well do you know when things happened? 10 questions a round.</p>
+  <p class="glabel">Question type</p>
+  <div class="gchips" id="hgMode"><button class="on" data-m="first">Which came first?</button><button data-m="year">Pick the year</button></div>
+  <p class="glabel">Era</p>
+  <div class="gchips" id="hgEra"></div>
+  <button class="gbtn" id="hgStart">Start</button>
+ </div>
+ <div id="hgPlay" hidden>
+  <div class="gtop"><span id="hgNum"></span><span>Score: <b id="hgScore">0</b></span></div>
+  <div class="gbar"><i id="hgBar"></i></div>
+  <div class="gq2" id="hgQ"></div>
+  <div class="gopts" id="hgOpts"></div>
+  <div class="gfb fexp" id="hgFb"></div>
+  <button class="gbtn" id="hgNext" hidden>Next</button>
+ </div>
+ <div id="hgEnd" class="gres" hidden>
+  <p class="glabel">Round complete</p><div class="gbig" id="hgFinal"></div><p id="hgNote" class="muted"></p>
+  <ul class="gmiss" id="hgMiss"></ul>
+  <div class="grow"><button class="gbtn" id="hgAgain">Play again</button><button class="gbtn ghost" id="hgBack">Change settings</button></div>
+ </div>
+</div>
+<style>.fexp{text-align:left;font-weight:400;font-size:16px;line-height:1.5;margin:4px 0 12px}.fexp>b:first-child{display:block}
+#hgOpts.two{grid-template-columns:1fr}#hgOpts.two button{min-height:70px;font-size:16px;line-height:1.35}</style>
+<script>
+(()=>{const D=''' + D + ''';
+const $=i=>document.getElementById(i),sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const Y=(y,ap)=>(ap?'about ':'')+(y<0?(-y)+' BCE':y+(y<1000?' CE':''));
+const get=k=>{try{return +localStorage.getItem(k)||0}catch(e){return 0}},put=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let mode='first',era='All eras',qs=[],n=0,score=0,miss=[],locked=false;
+['All eras','Ancient','Middle Ages','Early modern','Modern'].forEach(r=>{const b=document.createElement('button');b.textContent=r;if(r===era)b.className='on';b.onclick=()=>{era=r;document.querySelectorAll('#hgEra button').forEach(x=>x.classList.toggle('on',x===b))};$('hgEra').appendChild(b)});
+document.querySelectorAll('#hgMode button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;document.querySelectorAll('#hgMode button').forEach(x=>x.classList.toggle('on',x===b))});
+const gap=y=>y>=1800?4:y>=1500?10:y>=500?25:60;
+function mkFirst(pool){for(let t=0;t<200;t++){const[a,b]=sh(pool).slice(0,2);if(Math.abs(a[0]-b[0])>=Math.max(gap(a[0]),gap(b[0])))return{t:'first',e:[a,b]}}}
+function yearOpts(y){const s=y>=1800?[3,7,12,20,30,45]:y>=1500?[10,20,30,50,80]:y>=500?[25,50,80,120,200]:[50,100,150,250,400];const o=new Set([y]);
+ for(const d of sh(s.flatMap(v=>[v,-v]))){if(o.size>=4)break;const v=y+d;if(v===0||v>2026)continue;o.add(v)}return sh([...o])}
+function start(){const pool=D.filter(d=>era==='All eras'||d[2]===era);qs=[];
+ if(mode==='first'){const used=new Set();for(let i=0;i<40&&qs.length<10;i++){const q=mkFirst(pool);const k=q.e.map(x=>x[1]).sort().join('|');if(!used.has(k)){used.add(k);qs.push(q)}}}
+ else qs=sh(pool.filter(d=>!d[3])).slice(0,10).map(e=>({t:'year',e:[e],o:yearOpts(e[0])}));
+ n=0;score=0;miss=[];$('hgScore').textContent=0;$('hgSetup').hidden=true;$('hgEnd').hidden=true;$('hgPlay').hidden=false;ask();$('hg').scrollIntoView({block:'nearest'})}
+function ask(){const q=qs[n];locked=false;$('hgNum').textContent='Question '+(n+1)+' of '+qs.length;$('hgBar').style.width=(n/qs.length*100)+'%';
+ $('hgOpts').innerHTML='';$('hgFb').innerHTML='';$('hgNext').hidden=true;
+ if(q.t==='first'){$('hgQ').textContent='Which happened first?';$('hgOpts').className='gopts two';
+  sh(q.e).forEach(e=>{const b=document.createElement('button');b.textContent=e[1];b.onclick=()=>choose(b,e===(q.e[0][0]<q.e[1][0]?q.e[0]:q.e[1]));$('hgOpts').appendChild(b)})}
+ else{const e=q.e[0];$('hgQ').textContent=e[1]+'. When?';$('hgOpts').className='gopts';
+  q.o.forEach(y=>{const b=document.createElement('button');b.textContent=Y(y);b.dataset.y=y;b.onclick=()=>choose(b,y===e[0]);$('hgOpts').appendChild(b)})}}
+function choose(b,ok){if(locked)return;locked=true;const q=qs[n];
+ const bs=[...document.querySelectorAll('#hgOpts button')];bs.forEach(x=>x.disabled=true);
+ if(q.t==='first'){const early=q.e[0][0]<q.e[1][0]?q.e[0]:q.e[1];bs.forEach(x=>{if(x.textContent===early[1])x.classList.add('ok')});
+  const s=q.e.slice().sort((a,c)=>a[0]-c[0]);$('hgFb').innerHTML='<b style="color:'+(ok?'#2e9e5b':'#b23a3a')+'">'+(ok?'Correct!':'Not quite.')+'</b>'+s.map(e=>'<b style="display:inline">'+Y(e[0],e[3])+':</b> '+e[1]+'.').join('<br>')}
+ else{const e=q.e[0];bs.forEach(x=>{if(+x.dataset.y===e[0])x.classList.add('ok')});$('hgFb').innerHTML='<b style="color:'+(ok?'#2e9e5b':'#b23a3a')+'">'+(ok?'Correct!':'Not quite.')+'</b>'+e[1]+' in '+Y(e[0])+'.'}
+ if(ok){score++;$('hgScore').textContent=score}else{b.classList.add('bad');miss.push(q)}
+ $('hgNext').textContent=n+1<qs.length?'Next':'See my score';$('hgNext').hidden=false}
+$('hgNext').onclick=()=>{n++;if(n<qs.length)ask();else end()};
+document.addEventListener('keydown',e=>{if($('hgPlay').hidden)return;const bs=document.querySelectorAll('#hgOpts button');
+ if(!locked&&/^[1-4]$/.test(e.key)&&bs[+e.key-1]){bs[+e.key-1].click();e.preventDefault()}else if(locked&&e.key==='Enter'){$('hgNext').click();e.preventDefault()}});
+function end(){$('hgBar').style.width='100%';$('hgPlay').hidden=true;$('hgEnd').hidden=false;const k='qp-hist-'+mode+'-'+era,best=get(k);
+ $('hgFinal').textContent=score+' / '+qs.length;$('hgNote').textContent=era+' · '+(mode==='first'?'Which came first?':'Pick the year')+(score>best?' · New best score!':' · Your best: '+best+' / 10');if(score>best)put(k,score);
+ const L=[];miss.forEach(q=>q.e.forEach(e=>L.push(e)));
+ $('hgMiss').innerHTML=miss.length?'<li><b>Remember these:</b></li>'+L.sort((a,c)=>a[0]-c[0]).map(e=>'<li><b>'+Y(e[0],e[3])+'</b> · '+e[1]+'</li>').join(''):'<li>Perfect round! Try another era or the other question type.</li>'}
+$('hgStart').onclick=start;$('hgAgain').onclick=start;$('hgBack').onclick=()=>{$('hgEnd').hidden=true;$('hgSetup').hidden=false};})();
+</script>'''
+
+def hist_text():
+    def yr(y, ap): return ('about ' if ap else '') + (f'{-y} BCE' if y < 0 else f'{y}' + (' CE' if y < 1000 else ''))
+    eras = ''
+    for era, sub in [('Ancient', 'up to 500 CE'), ('Middle Ages', '500 to 1500'), ('Early modern', '1500 to 1800'), ('Modern', '1800 to today')]:
+        eras += f'<h3>{era} <span class="muted" style="font-weight:400">({sub})</span></h3><ul>' + ''.join(f'<li><b>{yr(y, ap)}</b>: {t}</li>' for y, t, e, ap in HIST if e == era) + '</ul>'
+    return f'''<h2>How to play</h2>
+<ol><li>Choose a question type. <b>Which came first?</b> shows two events and you tap the earlier one. <b>Pick the year</b> shows one event and four possible years.</li>
+<li>Choose an era, or <b>All eras</b> for the full sweep of history.</li>
+<li>After each answer you’ll see the dates, so every question teaches something.</li>
+<li>At the end, review the events you missed, in time order.</li></ol>
+
+<h2>Why it helps to know when things happened</h2>
+<p>History makes much more sense when you can place events on a timeline. Knowing that the printing press came before the Reformation, or that Haiti became independent before most of South America, helps you see cause and effect, and how events in different parts of the world were connected. You don’t need to memorize every date: a few strong “anchor dates” make everything else easier to place.</p>
+
+<h2>Tips for remembering dates</h2>
+<ul><li><b>Learn anchor dates first.</b> Pick one event per century that you know well, and place other events before or after it.</li>
+<li><b>Know how centuries work.</b> The 1400s are the 15th century, and the 1900s are the 20th century. The century number is always one more than the first digits.</li>
+<li><b>BCE counts backwards.</b> 776 BCE is earlier than 323 BCE. The bigger the BCE number, the longer ago it was.</li>
+<li><b>Connect events across the world.</b> Zheng He’s voyages (1405) came almost a century before Columbus (1492) and Vasco da Gama (1498).</li>
+<li><b>Practice both ways.</b> “Which came first?” builds a sense of order. “Pick the year” builds precise recall.</li></ul>
+
+<h2>The timeline</h2>
+<p>Every event in the game, in order. Dates marked “about” are approximate, because historians estimate them from the evidence available.</p>
+{eras}
+
+<h2>For teachers</h2>
+<p>Use a round as a lesson starter, ask students to explain why one event came before another, or have them add an event from your own country’s history to the timeline. The game is free, needs no sign-up and works on phones. Scores stay on the student’s device.</p>
+<p>Found a date you think is wrong? Please <a href="/contact/">let us know</a>.</p>'''
+
+PAGES.append(('/practice/world-history/', 'World History Timeline: Which Came First? History Quiz Game',
+  'A free world history game: which came first, and pick the year. About 60 key events from every continent, from the pyramids to the Moon landing.',
+  'World History Timeline', hist_game, hist_text()))
