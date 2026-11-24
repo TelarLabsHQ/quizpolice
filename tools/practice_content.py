@@ -31,6 +31,8 @@ GAME_CSS = '''<style>
 .ptiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:18px 0}
 .ptiles a{display:block;border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--card);text-decoration:none;color:var(--fg)}
 .ptiles b{display:block;font-size:20px;color:var(--brand);margin-bottom:4px}
+.ptable{width:100%;border-collapse:collapse;font-size:15px;margin:10px 0 18px}.ptable th,.ptable td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}.ptable th{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+@media(max-width:560px){.ptable th:nth-child(4),.ptable td:nth-child(4){display:none}}
 @media(max-width:480px){.game{padding:16px 14px}.gq{font-size:38px}.gopts{grid-template-columns:1fr}}
 </style>'''
 
@@ -241,11 +243,54 @@ HUB_TEXT = '''<p class="lead">Free, quick practice games for students. No sign-u
 <a href="/practice/spot-the-fallacy/"><b>Spot the Fallacy</b>For college students: read short arguments and name the logical fallacy. Learn 12 common fallacies with examples.</a>
 <a href="https://drafttrail.telarlabs.net/practice/word-choice/"><b>Word Choice Check</b>Affect or effect? Fewer or less? Practice commonly confused words for essays. On our writing app, DraftTrail.</a>
 </div>
+<h2>Which game is right for you?</h2>
+<table class="ptable"><thead><tr><th>Game</th><th>Best for</th><th>Subject</th><th>Round</th></tr></thead><tbody>
+<tr><td><a href="/practice/math-sprint/">Math Sprint</a></td><td>Ages 6 to 14</td><td>Number facts: +, −, ×, ÷</td><td>60 seconds</td></tr>
+<tr><td><a href="/practice/percent-sprint/">Percent &amp; Estimation Sprint</a></td><td>High school, college, adults</td><td>Percentages, fractions, estimation</td><td>60 seconds</td></tr>
+<tr><td><a href="/practice/geography/">Geography Practice</a></td><td>Ages 9 and up</td><td>Countries and capitals</td><td>10 questions</td></tr>
+<tr><td><a href="/practice/world-history/">World History Timeline</a></td><td>Ages 11 and up</td><td>History and chronology</td><td>10 questions</td></tr>
+<tr><td><a href="/practice/spot-the-fallacy/">Spot the Fallacy</a></td><td>High school and college</td><td>Critical thinking, debate</td><td>10 questions</td></tr>
+<tr><td><a href="https://drafttrail.telarlabs.net/practice/word-choice/">Word Choice Check</a></td><td>Ages 10 and up, ESL learners</td><td>Writing and grammar</td><td>10 sentences</td></tr>
+</tbody></table>
+
 <h2>Why short practice works</h2>
-<p>A few minutes of practice on most days beats a long session once a week. Each time you bring an answer back from memory, it gets easier to find the next time. These games are built for exactly that: short rounds, instant feedback, and a list of the answers to remember.</p>
-<p>For more tips, read <a href="/guides/how-to-study-for-a-quiz/">How to Study for a Quiz: 7 Tips That Actually Work</a>.</p>
+<p>A few minutes of practice on most days beats a long session once a week. These games are built on four ideas that learning researchers have studied for decades, explained here in plain words:</p>
+<ul><li><b>Pulling answers out of memory.</b> Each time you bring an answer back from memory, instead of just reading it, it becomes easier to find the next time. This is called <i>retrieval practice</i>, and it’s why every game asks you to answer, not just look.</li>
+<li><b>Spacing it out.</b> Coming back to the same facts after a day or two is more effective than repeating them many times in one sitting. That’s why the rounds are short: they’re meant to be played again tomorrow.</li>
+<li><b>Mixing it up.</b> Practicing different kinds of questions together makes you think about <i>which</i> method to use, which is exactly what a real test asks of you. Try the <i>Mix it up</i> levels and the <i>All eras</i> and <i>World</i> options.</li>
+<li><b>Feedback right away.</b> Every game shows the right answer immediately and lists what you missed at the end, so mistakes get fixed before they stick.</li></ul>
+<p>For more on studying this way, read <a href="/guides/how-to-study-for-a-quiz/">How to Study for a Quiz: 7 Tips That Actually Work</a>.</p>
+
+<h2>A simple 5-day practice plan</h2>
+<ol><li><b>Day 1:</b> play one round and write down your score and the answers you missed.</li>
+<li><b>Day 2:</b> play the same level again. Before you start, try to recall yesterday’s missed answers without looking.</li>
+<li><b>Day 3:</b> move to a mixed level or a new region or era.</li>
+<li><b>Day 4:</b> go back to your first level. Most people beat their Day 1 score by now.</li>
+<li><b>Day 5:</b> teach someone else one thing you learned this week. Explaining it is the best test of whether you really know it.</li></ol>
+
 <h2>For teachers</h2>
-<p>Share a game link with your class as a warm-up or homework. Students don’t need accounts, and their scores are saved only on their own device. When it’s time for a real quiz, <a href="/teacher/">QuizPolice</a> lets you monitor Google Forms, Microsoft Forms and Wayground quizzes for free.</p>'''
+<p>Share a game link with your class as a warm-up or homework. Students don’t need accounts, and their scores are saved only on their own device. Some ways teachers use the games:</p>
+<ul><li><b>Lesson starter:</b> project a game on the board and let the class answer together for the first five minutes.</li>
+<li><b>Homework with a target:</b> “Play three rounds this week and write down your best score.” It takes little time and students can see their own progress.</li>
+<li><b>Stations:</b> during group work, one station plays a round on a shared tablet while others work on paper.</li>
+<li><b>Discussion:</b> after Spot the Fallacy or World History Timeline, ask students to explain one answer to a partner, or to write a new question of their own.</li>
+<li><b>Early finishers:</b> students who finish a task early can practice quietly instead of waiting.</li></ul>
+<p>Before a real online quiz, share the <a href="/before-your-quiz/">student checklist</a> so students know how to prepare their device. When it’s time for the quiz itself, <a href="/teacher/">QuizPolice</a> lets you monitor Google Forms, Microsoft Forms and Wayground quizzes for free.</p>
+
+<h2>For parents</h2>
+<ul><li><b>Keep it short.</b> Two or three rounds a day is plenty. Stop while it’s still fun.</li>
+<li><b>Praise effort and progress,</b> not just high scores: “You beat yesterday’s score” works better than “You’re so smart”.</li>
+<li><b>Play together.</b> Take turns on Geography Practice or World History Timeline and talk about the answers. You’ll both learn something.</li>
+<li><b>Look at the missed answers.</b> The list at the end of each round tells you exactly what to practice next.</li></ul>
+
+<h2>Privacy</h2>
+<p>The games don’t need an account, and they don’t ask for names or email addresses. Best scores are saved only in the browser on the device you play on, and you can clear them at any time by clearing your browser data. See our <a href="/privacy/">privacy policy</a> for details.</p>
+
+<h2>Questions</h2>
+<p><b>Are the games free?</b> Yes, all of them, with no sign-up and no in-app purchases.</p>
+<p><b>Do they work offline?</b> Once a game page has loaded, the game itself keeps working even if the connection drops, because everything runs in your browser.</p>
+<p><b>Do they work on phones?</b> Yes. Every game is designed for phones first, with big buttons, and works just as well on tablets and computers.</p>
+<p><b>Can I suggest a new game or report a mistake?</b> Please do. <a href="/contact/">Contact us</a> with your idea or the question you think is wrong.</p>'''
 
 PAGES = [
  ('/practice/math-sprint/', 'Math Sprint: Free 60-Second Math Practice Game',
