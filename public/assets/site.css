@@ -49,3 +49,5 @@ p{margin:0 0 1em}.wrap{width:100%;max-width:1160px;margin:0 auto;padding:0 16px}
 .app-quizpolice b,.family>a.app-quizpolice{color:#2556C8}.family-links a.app-quizpolice{border-left:4px solid #2556C8}
 .app-drafttrail b,.family>a.app-drafttrail{color:#7B3FC4}.family-links a.app-drafttrail{border-left:4px solid #7B3FC4}
 .app-tixward b,.family>a.app-tixward{color:#C2410C}.family-links a.app-tixward{border-left:4px solid #C2410C}
+.nav a{white-space:nowrap}@media(max-width:1120px){.nav a{padding:8px 7px;font-size:14.5px}}
+@media(max-width:1000px){.nav{display:none}}

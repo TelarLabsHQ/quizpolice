@@ -168,6 +168,7 @@ dict(slug='how-to-study-for-a-quiz', updated='2026-11-24',
 <li>Cover the answers in your notes or flashcards and say them out loud.</li>
 <li>Answer the questions at the end of the chapter, or old quizzes your teacher gave you.</li></ul>
 <p>Learning scientists call this <b>retrieval practice</b>. Each time you pull an answer out of your memory, it becomes easier to find again during the quiz.</p>
+<p><b>Try it now:</b> our free <a href="/practice/math-sprint/">Math Sprint</a> and <a href="/practice/geography/">Geography Practice</a> games are quick self-tests you can play on any phone.</p>
 
 <h2>2. Study a little on several days</h2>
 <p>Three short sessions on three different days beat one long session the night before. If your quiz is on Friday, try 20 minutes on Tuesday, 20 on Wednesday and a quick review on Thursday. Your brain keeps things longer when you come back to them after a break. This is called <b>spaced practice</b>.</p>

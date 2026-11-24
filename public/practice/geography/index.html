@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Geography Practice: Countries and Capitals Quiz Game | QuizPolice</title>
+<meta name="description" content="A free geography game for students: name the capital or the country, by region or for the whole world. 10 questions a round, no sign-up.">
+<link rel="canonical" href="https://quizpolice.telarlabs.net/practice/geography/">
+<meta property="og:title" content="Geography Practice: Countries and Capitals Quiz Game | QuizPolice"><meta property="og:description" content="A free geography game for students: name the capital or the country, by region or for the whole world. 10 questions a round, no sign-up."><meta property="og:url" content="https://quizpolice.telarlabs.net/practice/geography/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"><meta name="theme-color" content="#1C2F5E">
+<link rel="preload" href="/assets/fonts/source-sans-3-400.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/assets/fonts/fonts.css">
+<link rel="stylesheet" href="/assets/site.css?v=88462d5e">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4326677240395780" crossorigin="anonymous"></script>
+</head>
+<body>
+<header class="top"><div class="wrap top-in">
+  <span class="tl-wrap"><a class="logo" href="/"><svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l14 5v10c0 9-6 16-14 19C12 34 6 27 6 18V8z" fill="#1C2F5E"/><path d="M20 11l2.6 5.3 5.8.8-4.2 4.1 1 5.8L20 24.3 14.8 27l1-5.8-4.2-4.1 5.8-.8z" fill="#E8A317"/></svg><span>QuizPolice</span></a><a class="tl-by" href="https://telarlabs.net" title="Telar Labs home"><span>by </span>Telar Labs</a><style>.tl-wrap{display:flex;align-items:center;min-width:0}.tl-by{margin-left:10px;font-size:13px;font-weight:500;line-height:1;color:inherit;opacity:.65;text-decoration:none;white-space:nowrap;flex:none}.tl-by:hover{opacity:1;text-decoration:underline}@media(max-width:560px){.tl-wrap{flex-direction:column;align-items:flex-start}.tl-by{margin:3px 0 0;font-size:11.5px}}</style></span>
+  <nav class="nav"><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/guides/">Guides</a><a href="/practice/">Practice</a><a href="/faq/">FAQ</a></nav>
+  <a class="btn btn-ghost btn-sm" href="/join/">I'm a student</a><a class="btn btn-sm" href="/teacher/">Teacher dashboard</a>
+</div></header>
+<main>
+<article class="wrap prose"><style>
+.game{max-width:620px;margin:8px auto 34px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 10px 30px rgba(20,27,43,.08)}
+.game h2{margin:0 0 4px;font-size:22px}.game .gsub{margin:0 0 14px;color:var(--muted);font-size:15px}
+.gchips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
+.gchips button{border:2px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font:inherit;font-size:15px;font-weight:700;color:var(--fg);cursor:pointer}
+.gchips button.on{border-color:var(--brand);background:var(--brand);color:#fff}
+.glabel{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:4px 0 0}
+.gbtn{display:block;width:100%;background:var(--brand);color:#fff;border:0;border-radius:12px;padding:14px;font:inherit;font-size:18px;font-weight:800;cursor:pointer}
+.gbtn.ghost{background:transparent;color:var(--brand);border:2px solid var(--brand)}
+.gbar{height:8px;background:#E6EAF2;border-radius:99px;overflow:hidden;margin-bottom:12px}.gbar i{display:block;height:100%;background:var(--badge);width:100%}
+.gtop{display:flex;justify-content:space-between;font-weight:700;color:var(--muted);font-size:15px;margin-bottom:6px}
+.gq{font-family:var(--head);font-weight:800;font-size:44px;text-align:center;margin:6px 0 4px;color:var(--fg)}
+.gin{font-family:var(--head);font-weight:800;font-size:36px;text-align:center;min-height:54px;border:2px solid var(--line);border-radius:12px;margin:0 auto 12px;max-width:220px;background:var(--bg)}
+.gin.ok{border-color:#2e9e5b;background:#e5f6ec}.gin.bad{border-color:#d64545;background:#fdeaea}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:320px;margin:0 auto}
+.pad button{font:inherit;font-size:24px;font-weight:800;padding:12px 0;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--fg);cursor:pointer;touch-action:manipulation}
+.pad button:active{background:#E6EAF2}.pad .go{background:var(--brand);color:#fff;border-color:var(--brand)}
+.gopts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.gopts button{font:inherit;font-size:17px;font-weight:700;padding:14px 10px;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--fg);cursor:pointer;min-height:62px;touch-action:manipulation}
+.gopts button.ok{border-color:#2e9e5b;background:#e5f6ec}.gopts button.bad{border-color:#d64545;background:#fdeaea}
+.gopts button:disabled{cursor:default;opacity:1}
+.gq2{font-family:var(--head);font-weight:800;font-size:24px;text-align:center;margin:8px 0 0;line-height:1.3}
+.gres{text-align:center}.gbig{font-family:var(--head);font-weight:800;font-size:56px;color:var(--brand);line-height:1.1;margin:6px 0}
+.gmiss{text-align:left;margin:14px 0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.gmiss li{padding:8px 4px;border-bottom:1px solid var(--line);font-size:16px}
+.grow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.gfb{text-align:center;min-height:26px;font-weight:700;margin-top:2px}
+.ptiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:18px 0}
+.ptiles a{display:block;border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--card);text-decoration:none;color:var(--fg)}
+.ptiles b{display:block;font-size:20px;color:var(--brand);margin-bottom:4px}
+@media(max-width:480px){.game{padding:16px 14px}.gq{font-size:38px}.gopts{grid-template-columns:1fr}}
+</style><p class="gmeta muted" style="font-size:14px;margin:0 0 6px"><a href="/practice/">Practice games</a></p><h1>Geography Practice</h1><div class="game" id="gg">
+ <div id="ggSetup">
+  <h2>Geography Practice</h2><p class="gsub">10 questions about countries and their capital cities.</p>
+  <p class="glabel">Question type</p>
+  <div class="gchips" id="ggMode"><button class="on" data-m="cap">Name the capital</button><button data-m="cty">Name the country</button></div>
+  <p class="glabel">Region</p>
+  <div class="gchips" id="ggReg"></div>
+  <button class="gbtn" id="ggStart">Start</button>
+ </div>
+ <div id="ggPlay" hidden>
+  <div class="gtop"><span id="ggNum"></span><span>Score: <b id="ggScore">0</b></span></div>
+  <div class="gbar"><i id="ggBar"></i></div>
+  <div class="gq2" id="ggQ"></div>
+  <div class="gopts" id="ggOpts"></div>
+  <div class="gfb" id="ggFb"></div>
+  <button class="gbtn" id="ggNext" hidden>Next</button>
+ </div>
+ <div id="ggEnd" class="gres" hidden>
+  <p class="glabel">Round complete</p><div class="gbig" id="ggFinal"></div><p id="ggNote" class="muted"></p>
+  <ul class="gmiss" id="ggMiss"></ul>
+  <div class="grow"><button class="gbtn" id="ggAgain">Play again</button><button class="gbtn ghost" id="ggBack">Change settings</button></div>
+ </div>
+</div>
+<script>
+(()=>{const D=[["Afghanistan", "Kabul", "Asia"], ["Bahrain", "Manama", "Asia"], ["Bangladesh", "Dhaka", "Asia"], ["Bhutan", "Thimphu", "Asia"], ["Brunei", "Bandar Seri Begawan", "Asia"], ["Cambodia", "Phnom Penh", "Asia"], ["China", "Beijing", "Asia"], ["India", "New Delhi", "Asia"], ["Iran", "Tehran", "Asia"], ["Iraq", "Baghdad", "Asia"], ["Japan", "Tokyo", "Asia"], ["Jordan", "Amman", "Asia"], ["Kazakhstan", "Astana", "Asia"], ["Kuwait", "Kuwait City", "Asia"], ["Kyrgyzstan", "Bishkek", "Asia"], ["Laos", "Vientiane", "Asia"], ["Lebanon", "Beirut", "Asia"], ["Malaysia", "Kuala Lumpur", "Asia"], ["Maldives", "Malé", "Asia"], ["Mongolia", "Ulaanbaatar", "Asia"], ["Myanmar", "Naypyidaw", "Asia"], ["Nepal", "Kathmandu", "Asia"], ["North Korea", "Pyongyang", "Asia"], ["Oman", "Muscat", "Asia"], ["Pakistan", "Islamabad", "Asia"], ["Philippines", "Manila", "Asia"], ["Qatar", "Doha", "Asia"], ["Saudi Arabia", "Riyadh", "Asia"], ["South Korea", "Seoul", "Asia"], ["Syria", "Damascus", "Asia"], ["Tajikistan", "Dushanbe", "Asia"], ["Thailand", "Bangkok", "Asia"], ["Timor-Leste", "Dili", "Asia"], ["Turkmenistan", "Ashgabat", "Asia"], ["United Arab Emirates", "Abu Dhabi", "Asia"], ["Uzbekistan", "Tashkent", "Asia"], ["Vietnam", "Hanoi", "Asia"], ["Albania", "Tirana", "Europe"], ["Austria", "Vienna", "Europe"], ["Belarus", "Minsk", "Europe"], ["Belgium", "Brussels", "Europe"], ["Bosnia and Herzegovina", "Sarajevo", "Europe"], ["Bulgaria", "Sofia", "Europe"], ["Croatia", "Zagreb", "Europe"], ["Czechia", "Prague", "Europe"], ["Denmark", "Copenhagen", "Europe"], ["Estonia", "Tallinn", "Europe"], ["Finland", "Helsinki", "Europe"], ["France", "Paris", "Europe"], ["Germany", "Berlin", "Europe"], ["Greece", "Athens", "Europe"], ["Hungary", "Budapest", "Europe"], ["Iceland", "Reykjavík", "Europe"], ["Ireland", "Dublin", "Europe"], ["Italy", "Rome", "Europe"], ["Latvia", "Riga", "Europe"], ["Lithuania", "Vilnius", "Europe"], ["Malta", "Valletta", "Europe"], ["Moldova", "Chișinău", "Europe"], ["Montenegro", "Podgorica", "Europe"], ["Netherlands", "Amsterdam", "Europe"], ["North Macedonia", "Skopje", "Europe"], ["Norway", "Oslo", "Europe"], ["Poland", "Warsaw", "Europe"], ["Portugal", "Lisbon", "Europe"], ["Romania", "Bucharest", "Europe"], ["Russia", "Moscow", "Europe"], ["Serbia", "Belgrade", "Europe"], ["Slovakia", "Bratislava", "Europe"], ["Slovenia", "Ljubljana", "Europe"], ["Spain", "Madrid", "Europe"], ["Sweden", "Stockholm", "Europe"], ["Switzerland", "Bern", "Europe"], ["Ukraine", "Kyiv", "Europe"], ["United Kingdom", "London", "Europe"], ["Algeria", "Algiers", "Africa"], ["Angola", "Luanda", "Africa"], ["Botswana", "Gaborone", "Africa"], ["Burkina Faso", "Ouagadougou", "Africa"], ["Cameroon", "Yaoundé", "Africa"], ["Chad", "N’Djamena", "Africa"], ["DR Congo", "Kinshasa", "Africa"], ["Egypt", "Cairo", "Africa"], ["Eritrea", "Asmara", "Africa"], ["Ethiopia", "Addis Ababa", "Africa"], ["Gabon", "Libreville", "Africa"], ["Ghana", "Accra", "Africa"], ["Guinea", "Conakry", "Africa"], ["Kenya", "Nairobi", "Africa"], ["Liberia", "Monrovia", "Africa"], ["Libya", "Tripoli", "Africa"], ["Madagascar", "Antananarivo", "Africa"], ["Malawi", "Lilongwe", "Africa"], ["Mali", "Bamako", "Africa"], ["Mauritania", "Nouakchott", "Africa"], ["Morocco", "Rabat", "Africa"], ["Mozambique", "Maputo", "Africa"], ["Namibia", "Windhoek", "Africa"], ["Niger", "Niamey", "Africa"], ["Nigeria", "Abuja", "Africa"], ["Rwanda", "Kigali", "Africa"], ["Senegal", "Dakar", "Africa"], ["Sierra Leone", "Freetown", "Africa"], ["Somalia", "Mogadishu", "Africa"], ["South Sudan", "Juba", "Africa"], ["Sudan", "Khartoum", "Africa"], ["Tunisia", "Tunis", "Africa"], ["Uganda", "Kampala", "Africa"], ["Zambia", "Lusaka", "Africa"], ["Zimbabwe", "Harare", "Africa"], ["Argentina", "Buenos Aires", "Americas"], ["Bahamas", "Nassau", "Americas"], ["Belize", "Belmopan", "Americas"], ["Brazil", "Brasília", "Americas"], ["Canada", "Ottawa", "Americas"], ["Chile", "Santiago", "Americas"], ["Colombia", "Bogotá", "Americas"], ["Costa Rica", "San José", "Americas"], ["Cuba", "Havana", "Americas"], ["Dominican Republic", "Santo Domingo", "Americas"], ["Ecuador", "Quito", "Americas"], ["El Salvador", "San Salvador", "Americas"], ["Guatemala", "Guatemala City", "Americas"], ["Guyana", "Georgetown", "Americas"], ["Haiti", "Port-au-Prince", "Americas"], ["Honduras", "Tegucigalpa", "Americas"], ["Jamaica", "Kingston", "Americas"], ["Mexico", "Mexico City", "Americas"], ["Nicaragua", "Managua", "Americas"], ["Panama", "Panama City", "Americas"], ["Paraguay", "Asunción", "Americas"], ["Peru", "Lima", "Americas"], ["Suriname", "Paramaribo", "Americas"], ["Trinidad and Tobago", "Port of Spain", "Americas"], ["United States", "Washington, D.C.", "Americas"], ["Uruguay", "Montevideo", "Americas"], ["Venezuela", "Caracas", "Americas"], ["Australia", "Canberra", "Oceania"], ["Fiji", "Suva", "Oceania"], ["Marshall Islands", "Majuro", "Oceania"], ["Micronesia", "Palikir", "Oceania"], ["New Zealand", "Wellington", "Oceania"], ["Papua New Guinea", "Port Moresby", "Oceania"], ["Samoa", "Apia", "Oceania"], ["Solomon Islands", "Honiara", "Oceania"], ["Tonga", "Nukuʻalofa", "Oceania"], ["Tuvalu", "Funafuti", "Oceania"], ["Vanuatu", "Port Vila", "Oceania"]];
+const $=i=>document.getElementById(i),sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const get=k=>{try{return +localStorage.getItem(k)||0}catch(e){return 0}},put=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let mode='cap',reg='World',qs=[],n=0,score=0,miss=[],locked=false;
+['World','Asia','Europe','Africa','Americas','Oceania'].forEach(r=>{const b=document.createElement('button');b.textContent=r;if(r===reg)b.className='on';b.onclick=()=>{reg=r;document.querySelectorAll('#ggReg button').forEach(x=>x.classList.toggle('on',x===b))};$('ggReg').appendChild(b)});
+document.querySelectorAll('#ggMode button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;document.querySelectorAll('#ggMode button').forEach(x=>x.classList.toggle('on',x===b))});
+function start(){const pool=D.filter(d=>reg==='World'||d[2]===reg);qs=sh(pool).slice(0,10);n=0;score=0;miss=[];$('ggScore').textContent=0;
+ $('ggSetup').hidden=true;$('ggEnd').hidden=true;$('ggPlay').hidden=false;ask();$('gg').scrollIntoView({block:'nearest'})}
+function ask(){const d=qs[n];locked=false;$('ggNum').textContent='Question '+(n+1)+' of '+qs.length;$('ggBar').style.width=(n/qs.length*100)+'%';
+ const a=mode==='cap'?1:0;$('ggQ').textContent=mode==='cap'?'What is the capital of '+d[0]+'?':d[1]+' is the capital of which country?';
+ const others=sh(D.filter(x=>x[2]===d[2]&&x!==d)).slice(0,3).map(x=>x[a]);const opts=sh([d[a],...others]);
+ $('ggOpts').innerHTML='';$('ggFb').textContent='';$('ggNext').hidden=true;
+ opts.forEach(o=>{const b=document.createElement('button');b.textContent=o;b.onclick=()=>choose(b,o===d[a]);$('ggOpts').appendChild(b)})}
+function choose(b,ok){if(locked)return;locked=true;const d=qs[n],a=mode==='cap'?1:0;
+ document.querySelectorAll('#ggOpts button').forEach(x=>{x.disabled=true;if(x.textContent===d[a])x.classList.add('ok')});
+ if(ok){score++;$('ggScore').textContent=score;$('ggFb').textContent='Correct!';$('ggFb').style.color='#2e9e5b'}
+ else{b.classList.add('bad');miss.push(d);$('ggFb').textContent=mode==='cap'?'The capital of '+d[0]+' is '+d[1]+'.':d[1]+' is the capital of '+d[0]+'.';$('ggFb').style.color='#b23a3a'}
+ $('ggNext').textContent=n+1<qs.length?'Next':'See my score';$('ggNext').hidden=false}
+$('ggNext').onclick=()=>{n++;if(n<qs.length)ask();else end()};
+document.addEventListener('keydown',e=>{if($('ggPlay').hidden)return;const bs=document.querySelectorAll('#ggOpts button');
+ if(!locked&&/^[1-4]$/.test(e.key)&&bs[+e.key-1]){bs[+e.key-1].click();e.preventDefault()}else if(locked&&e.key==='Enter'){$('ggNext').click();e.preventDefault()}});
+function end(){$('ggBar').style.width='100%';$('ggPlay').hidden=true;$('ggEnd').hidden=false;const k='qp-geo-'+mode+'-'+reg,best=get(k);
+ $('ggFinal').textContent=score+' / '+qs.length;$('ggNote').textContent=reg+' · '+(mode==='cap'?'Name the capital':'Name the country')+(score>best?' · New best score!':' · Your best: '+best+' / 10');if(score>best)put(k,score);
+ $('ggMiss').innerHTML=miss.length?'<li><b>Remember these:</b></li>'+miss.map(d=>'<li>'+d[0]+' → <b>'+d[1]+'</b></li>').join(''):'<li>Perfect round! Try another region.</li>'}
+$('ggStart').onclick=start;$('ggAgain').onclick=start;$('ggBack').onclick=()=>{$('ggEnd').hidden=true;$('ggSetup').hidden=false};})();
+</script><h2>How to play</h2>
+<ol><li>Choose a question type. <b>Name the capital</b> shows a country and asks for its capital. <b>Name the country</b> works the other way around.</li>
+<li>Choose a region, or <b>World</b> for questions from everywhere.</li>
+<li>Press <b>Start</b> and pick one of four answers. If you get it wrong, you’ll see the right answer straight away.</li>
+<li>After 10 questions you’ll see your score and a list of the ones to remember.</li></ol>
+<p>On a computer you can also press the keys <b>1</b> to <b>4</b> to answer and <b>Enter</b> for the next question.</p>
+
+<h2>What’s included</h2>
+<p>The game includes about 150 countries from Asia, Europe, Africa, the Americas and Oceania. The wrong answers always come from the same region as the right one, so you can’t guess just by knowing the continent.</p>
+<p>A few countries are left out on purpose because their capital is complicated: some have more than one official capital (like South Africa and Bolivia), and some are moving their government to a new city. Those make great questions for a class discussion, but not for a quick quiz.</p>
+
+<h2>Tips for remembering capitals</h2>
+<ul><li><b>Practice one region at a time.</b> Master Asia, then add Europe. It’s easier than learning the whole world at once.</li>
+<li><b>Play both ways.</b> Knowing that Canberra is the capital of Australia is different from being asked which country Canberra belongs to. Doing both makes the memory stronger.</li>
+<li><b>Look for clues in the names.</b> Kuwait City, Mexico City, Guatemala City and Panama City share their country’s name. Others are famous traps: the capital of Australia is Canberra, not Sydney, and the capital of Canada is Ottawa, not Toronto.</li>
+<li><b>Make a story.</b> Linking a capital to a picture or a silly sentence helps it stick.</li>
+<li><b>Come back tomorrow.</b> Replaying the ones you missed after a day or two is one of the most effective ways to remember them.</li></ul>
+
+<h2>For teachers and parents</h2>
+<p>Geography Practice is free and works on phones, tablets and computers, with no sign-up. Use one round as a lesson warm-up, set “score 10/10 in your region” as homework, or let students compete for the best score in class. Scores stay on the device. Nothing is sent to us.</p>
+<p>For more ways to help students remember, see <a href="/guides/how-to-study-for-a-quiz/">How to Study for a Quiz: 7 Tips That Actually Work</a>. When it’s time for a real quiz online, <a href="/">QuizPolice</a> helps teachers keep it fair.</p>
+
+<h2>Questions</h2>
+<p><b>Is it free?</b> Yes, completely.</p>
+<p><b>Does it save my score?</b> Your best score for each region and question type is saved in this browser only.</p>
+<p><b>I think an answer is wrong.</b> Please <a href="/contact/">tell us</a>. Capitals sometimes change, and we’ll update the list.</p><h2>More practice</h2><ul><li><a href="/practice/math-sprint/">Math Sprint</a></li><li><a href="/guides/how-to-study-for-a-quiz/">How to study for a quiz</a></li></ul></article>
+</main>
+<footer class="foot"><div class="wrap foot-in">
+  <div><a class="logo" href="/"><svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l14 5v10c0 9-6 16-14 19C12 34 6 27 6 18V8z" fill="#1C2F5E"/><path d="M20 11l2.6 5.3 5.8.8-4.2 4.1 1 5.8L20 24.3 14.8 27l1-5.8-4.2-4.1 5.8-.8z" fill="#E8A317"/></svg><span>QuizPolice</span></a><p class="muted">Free quiz monitoring for Google Forms, Microsoft Forms and Wayground. Part of the Telar Labs teacher tools.</p></div>
+  <div class="foot-cols">
+    <div><h4>Use it</h4><a href="/teacher/">Teacher dashboard</a><a href="/join/">Join a quiz</a><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/guides/">Guides</a><a href="/practice/">Practice games</a><a href="/faq/">FAQ</a></div>
+    <div><h4><a href="https://telarlabs.net" style="color:inherit;margin:0">Telar Labs</a></h4><a href="https://telarlabs.net">Telar Labs home</a><a href="https://telarlabs.net/guides/">Telar Labs guides</a><a href="/about/">About</a><a href="/privacy/">Privacy policy</a><a href="/terms/">Terms of use</a><a href="/contact/">Contact</a></div>
+  </div>
+</div><div class="wrap family"><span class="family-h"><a href="https://telarlabs.net">More from Telar Labs</a>:</span><a class="app-telarclips" href="https://clips.telarlabs.net" title="Free motion backgrounds and illustrated scenes for class videos, greetings and school programs.">Telar Clips</a><a class="app-pizarrapad" href="https://pizarrapad.telarlabs.net" title="Free online whiteboard, blackboard and greenboard for the classroom projector.">PizarraPad</a><a class="app-drafttrail" href="https://drafttrail.telarlabs.net" title="Free writing recorder that replays how an essay was written, step by step.">DraftTrail</a><a class="app-tixward" href="https://tixward.telarlabs.net" title="Event tickets and free bookings for courts and rooms, paid directly to organizers. Free for most events.">Tixward</a></div><div class="wrap fine">&copy; 2026 Telar Labs.</div></footer>
+</body>
+</html>
