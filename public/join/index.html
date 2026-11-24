@@ -14,6 +14,7 @@
 .lobby{text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
 .lobby .count{font-family:var(--f-head);font-weight:800;font-size:56px;line-height:1}
 .toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:30;padding:12px 18px;border-radius:12px;background:var(--warn-bg);color:var(--warn);font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.donetip{margin-top:14px}.donetip a{font-weight:700}
 </style>
 </head>
 <body>
@@ -50,7 +51,7 @@
     <p class="note">Can't see the quiz? Tell your teacher. Don't open it in another tab, because that counts as leaving.</p>
   </div>
 
-  <div class="panel pad" id="doneBox" hidden style="text-align:center"><h1 style="font-size:24px">All done</h1><p class="note">Your teacher can see that you finished. You may close this page.</p></div>
+  <div class="panel pad" id="doneBox" hidden style="text-align:center"><h1 style="font-size:24px">All done</h1><p class="note">Your teacher can see that you finished. You may close this page.</p><p class="note donetip">📚 Next quiz coming up? <a href="/guides/how-to-study-for-a-quiz/" target="_blank" rel="noopener">7 study tips that actually work →</a></p></div>
 </div>
 
 <div class="overlay" id="doneOv" hidden>
@@ -175,7 +176,7 @@ addEventListener('message',async e=>{ if(!DT||e.origin!==DTO||!e.data||e.data.sr
   if(m.type==='snapshot'&&me.status!=='done') sendEssay(m.rec,false,false);
   if(m.type==='submit'){ finishing=true; const r=await sendEssay(m.rec,true,m.auto); me.status='done';
     if(m.auto){ showAutoDone(); }
-    else { clearInterval(poller); $('#quiz').hidden=true; $('#doneBox').hidden=false; $('#doneBox h1').textContent='Handed in'; $('#doneBox .note').textContent='Your teacher received your writing. You may close this page.'; finishLater(); }
+    else { clearInterval(poller); $('#quiz').hidden=true; $('#doneBox').hidden=false; $('#doneBox h1').textContent='Handed in'; $('#doneBox .note:not(.donetip)').textContent='Your teacher received your writing. You may close this page.'; finishLater(); }
     finishing=false; } });
 setInterval(()=>{ if(DT&&token&&me.status!=='done'&&!$('#quiz').hidden) toDT({type:'snapshot'}) },60000);
 function setTiming(d){ if(d.server_time) skew=d.server_time-Date.now(); T={timing:d.timing,start_at:d.start_at,limit_min:d.limit_min,deadline:d.deadline,grace_s:d.grace_s}; }

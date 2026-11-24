@@ -156,4 +156,55 @@ dict(slug='online-exam-on-students-phones', updated='2026-11-23',
 <h2>Making it fair for everyone</h2>
 <p>Not every student has the same phone or the same data plan. Keep a few school devices or paper copies ready, avoid questions that need fast internet, and don’t let a technical problem lower a student’s score. When students see that the exam is fair to everyone, they are also less tempted to cheat.</p>
 <p>See also: <a href="/guides/stop-tab-switching-google-forms/">how to stop students from switching tabs in Google Forms</a>.</p>'''),
+dict(slug='how-to-study-for-a-quiz', updated='2026-11-24',
+     title='How to Study for a Quiz: 7 Tips That Actually Work',
+     short='How to study for a quiz',
+     desc='Simple study tips for students: practice remembering, spread out your study time, mix topics, sleep well, and what to do during an online quiz.',
+     body='''<p class="lead">Reading your notes again and again feels like studying, but it isn’t the best way to remember. These seven tips work for any subject and any age, and most of them take less time, not more.</p>
+
+<h2>1. Test yourself instead of rereading</h2>
+<p>When you read your notes, everything looks familiar, so it feels like you know it. The real test is whether you can bring it back <b>without looking</b>. Close your notebook and try:</p>
+<ul><li>Write down everything you remember about the topic on a blank page, then check what you missed.</li>
+<li>Cover the answers in your notes or flashcards and say them out loud.</li>
+<li>Answer the questions at the end of the chapter, or old quizzes your teacher gave you.</li></ul>
+<p>Learning scientists call this <b>retrieval practice</b>. Each time you pull an answer out of your memory, it becomes easier to find again during the quiz.</p>
+
+<h2>2. Study a little on several days</h2>
+<p>Three short sessions on three different days beat one long session the night before. If your quiz is on Friday, try 20 minutes on Tuesday, 20 on Wednesday and a quick review on Thursday. Your brain keeps things longer when you come back to them after a break. This is called <b>spaced practice</b>.</p>
+
+<h2>3. Mix different kinds of questions</h2>
+<p>If you practice ten questions of the same type in a row, you stop thinking about <i>which</i> method to use. In a real quiz, the questions come mixed. So in math, for example, mix fraction, decimal and percent problems in one practice set. It feels harder, and that’s exactly why it works.</p>
+
+<h2>4. Explain it in your own words</h2>
+<p>Try to explain the topic to a friend, a parent, or even to an empty chair, as if you were the teacher. Ask yourself <i>why</i> and <i>how</i>: why does this happen, and how is it connected to what we learned last week? The parts where you get stuck are the parts to study again.</p>
+
+<h2>5. Find your mistakes before the quiz does</h2>
+<p>Look at your old quizzes and homework. Which questions did you get wrong, and why? Was it a fact you didn’t know, a step you skipped, or a question you read too fast? Write your three most common mistakes on a sticky note and look at it before the quiz.</p>
+
+<h2>6. Sleep, eat and move</h2>
+<p>Your brain saves what you learned while you sleep. Staying up late to cram often makes you remember <b>less</b>. Get a normal night’s sleep, eat something before the quiz, and if you feel nervous, take a few slow breaths: in for four counts, out for six.</p>
+
+<h2>7. Have a plan for the quiz itself</h2>
+<ul><li><b>Read every question to the end.</b> Small words like <i>not</i>, <i>always</i> or <i>except</i> change the answer.</li>
+<li><b>Do the easy ones first.</b> If you’re stuck, skip it and come back later.</li>
+<li><b>Watch the time.</b> Glance at the clock halfway through so you’re not rushing at the end.</li>
+<li><b>Check before you submit.</b> Make sure you answered every question.</li></ul>
+
+<h2>Taking a quiz online, on a phone or laptop</h2>
+<p>Online quizzes have a few extra things to get right:</p>
+<ul><li><b>Charge your device</b> the night before, and bring a charger if you can.</li>
+<li><b>Close other apps and tabs</b> before you start, and turn on Do Not Disturb so messages don’t pop up.</li>
+<li><b>Stay on the quiz page.</b> Many teachers use a monitor, like <a href="/">QuizPolice</a>, that shows when you leave the quiz. Opening another app, even by accident, can count as leaving.</li>
+<li><b>Know what to do if the internet drops.</b> Don’t panic. Reconnect, open the same link and tell your teacher what happened.</li>
+<li><b>Press Submit on the quiz itself</b> before you leave. Then make sure you see the confirmation message.</li></ul>
+
+<h2>After the quiz</h2>
+<p>When you get your score back, don’t just look at the number. Go through every mistake and find the right answer. That’s free retrieval practice for the next quiz, and the next test will often ask about the same ideas.</p>
+
+<h2>A quick study plan you can copy</h2>
+<ol><li><b>3 days before:</b> make flashcards or a list of questions from your notes. Test yourself once.</li>
+<li><b>2 days before:</b> test yourself again, mixed order. Study only the ones you missed.</li>
+<li><b>1 day before:</b> explain the main ideas out loud. Look at your mistake list. Sleep on time.</li>
+<li><b>Quiz day:</b> eat, breathe, read every question to the end, and check before you submit.</li></ol>
+<p><i>For teachers:</i> you can share this page with your class before a quiz. See also our guide on <a href="/guides/online-exam-on-students-phones/">giving an online exam on students’ phones</a>.</p>'''),
 ]
