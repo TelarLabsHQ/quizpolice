@@ -55,7 +55,17 @@ if(window.indexedDB&&indexedDB.databases){indexedDB.databases().then(function(d)
 .ptable{width:100%;border-collapse:collapse;font-size:15px;margin:10px 0 18px}.ptable th,.ptable td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}.ptable th{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
 @media(max-width:560px){.ptable th:nth-child(4),.ptable td:nth-child(4){display:none}}
 @media(max-width:480px){.game{padding:16px 14px}.gq{font-size:38px}.gopts{grid-template-columns:1fr}}
-</style><p class="gmeta muted" style="font-size:14px;margin:0 0 6px"><a href="/practice/">Practice games</a></p><h1>Geography Practice</h1><div class="game" id="gg">
+
+.chal{margin-top:10px;background:var(--badge,#C3303A)}
+</style><script>
+function qpChallenge(b){const g=b.closest('.game'),name=(g.querySelector('h2')||{}).textContent||document.title,score=((g.querySelector('.gbig')||{}).textContent||'').trim(),
+ note=((g.querySelector('.gres .muted')||{}).textContent||'').split(' · ')[0].trim(),lvl=note&&!/best|perfect|sharp/i.test(note)?' ('+note+')':'',
+ url=location.origin+location.pathname,msg='I got '+score+' on '+name+lvl+'. Can you beat me? 🎯';
+ const done=t=>{const o=b.textContent;b.textContent=t;setTimeout(()=>b.textContent=o,2200)};
+ if(navigator.share){navigator.share({title:name,text:msg,url}).catch(()=>{})}
+ else if(navigator.clipboard){navigator.clipboard.writeText(msg+' '+url).then(()=>done('✓ Copied! Paste it to a friend'),()=>done(msg+' '+url))}
+ else done(msg+' '+url)}
+</script><p class="gmeta muted" style="font-size:14px;margin:0 0 6px"><a href="/practice/">Practice games</a></p><h1>Geography Practice</h1><div class="game" id="gg">
  <div id="ggSetup">
   <h2>Geography Practice</h2><p class="gsub">10 questions about countries and their capital cities.</p>
   <p class="glabel">Question type</p>
@@ -76,6 +86,7 @@ if(window.indexedDB&&indexedDB.databases){indexedDB.databases().then(function(d)
   <p class="glabel">Round complete</p><div class="gbig" id="ggFinal"></div><p id="ggNote" class="muted"></p>
   <ul class="gmiss" id="ggMiss"></ul>
   <div class="grow"><button class="gbtn" id="ggAgain">Play again</button><button class="gbtn ghost" id="ggBack">Change settings</button></div>
+  <button class="gbtn chal" type="button" onclick="qpChallenge(this)">🎯 Challenge a friend</button>
  </div>
 </div>
 <script>
