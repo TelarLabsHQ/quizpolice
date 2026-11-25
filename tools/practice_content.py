@@ -70,7 +70,7 @@ MATH_GAME = '''<div class="game" id="ms">
   <p class="glabel">Time’s up!</p><div class="gbig" id="msFinal"></div><p id="msNote" class="muted"></p>
   <ul class="gmiss" id="msMiss"></ul>
   <div class="grow"><button class="gbtn" id="msAgain">Play again</button><button class="gbtn ghost" id="msBack">Change level</button></div>
-  <button class="gbtn chal" type="button" onclick="qpChallenge(this)">🎯 Challenge a friend</button>
+  <button class="gbtn chal" type="button" onclick="qpChallenge(this)">🎯 Challenge a friend</button><button class="gshare" type="button" onclick="qpShare(this)">↗ Share this game</button>
  </div>
 </div>
 <script>
@@ -194,7 +194,7 @@ def geo_game():
   <p class="glabel">Round complete</p><div class="gbig" id="ggFinal"></div><p id="ggNote" class="muted"></p>
   <ul class="gmiss" id="ggMiss"></ul>
   <div class="grow"><button class="gbtn" id="ggAgain">Play again</button><button class="gbtn ghost" id="ggBack">Change settings</button></div>
-  <button class="gbtn chal" type="button" onclick="qpChallenge(this)">🎯 Challenge a friend</button>
+  <button class="gbtn chal" type="button" onclick="qpChallenge(this)">🎯 Challenge a friend</button><button class="gshare" type="button" onclick="qpShare(this)">↗ Share this game</button>
  </div>
 </div>
 <script>
@@ -477,7 +477,7 @@ def fallacy_game():
   <p class="glabel">Round complete</p><div class="gbig" id="fgFinal"></div><p id="fgNote" class="muted"></p>
   <ul class="gmiss" id="fgMiss"></ul>
   <div class="grow"><button class="gbtn" id="fgAgain">Play again</button><a class="gbtn ghost" href="#guide" style="text-align:center;text-decoration:none">Read the guide</a></div>
-  <button class="gbtn chal" type="button" onclick="qpChallenge(this)">🎯 Challenge a friend</button>
+  <button class="gbtn chal" type="button" onclick="qpChallenge(this)">🎯 Challenge a friend</button><button class="gshare" type="button" onclick="qpShare(this)">↗ Share this game</button>
  </div>
 </div>
 <style>.farg{margin:12px 0 4px;padding:14px 16px;background:var(--bg);border-left:4px solid var(--badge);border-radius:8px;font-size:18px;line-height:1.5}
@@ -589,7 +589,7 @@ PCT_GAME = '''<div class="game" id="ps">
   <p class="glabel">Time’s up!</p><div class="gbig" id="psFinal"></div><p id="psNote" class="muted"></p>
   <ul class="gmiss" id="psMiss"></ul>
   <div class="grow"><button class="gbtn" id="psAgain">Play again</button><button class="gbtn ghost" id="psBack">Change level</button></div>
-  <button class="gbtn chal" type="button" onclick="qpChallenge(this)">🎯 Challenge a friend</button>
+  <button class="gbtn chal" type="button" onclick="qpChallenge(this)">🎯 Challenge a friend</button><button class="gshare" type="button" onclick="qpShare(this)">↗ Share this game</button>
  </div>
 </div>
 <script>
@@ -751,7 +751,7 @@ def hist_game():
   <p class="glabel">Round complete</p><div class="gbig" id="hgFinal"></div><p id="hgNote" class="muted"></p>
   <ul class="gmiss" id="hgMiss"></ul>
   <div class="grow"><button class="gbtn" id="hgAgain">Play again</button><button class="gbtn ghost" id="hgBack">Change settings</button></div>
-  <button class="gbtn chal" type="button" onclick="qpChallenge(this)">🎯 Challenge a friend</button>
+  <button class="gbtn chal" type="button" onclick="qpChallenge(this)">🎯 Challenge a friend</button><button class="gshare" type="button" onclick="qpShare(this)">↗ Share this game</button>
  </div>
 </div>
 <style>.fexp{text-align:left;font-weight:400;font-size:16px;line-height:1.5;margin:4px 0 12px}.fexp>b:first-child{display:block}
