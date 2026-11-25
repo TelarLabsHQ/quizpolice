@@ -290,3 +290,6 @@ if __name__ == '__main__':
             _s = _re.sub(r'<script async src="https://pagead2\.googlesyndication\.com[^>]*></script>', '', _s)
             _s = _re.sub(r'<div class="ad">.*?</ins>(<script>.*?</script>)?</div>', '', _s, flags=_re.S)
             open(_f, 'w').write(_s)
+
+    # old *.pages.dev address: send fresh visitors to the real domain (tools/home_domain.py)
+    import home_domain as _hd; _hd.inject(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'public'))
