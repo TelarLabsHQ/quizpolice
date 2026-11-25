@@ -35,8 +35,14 @@ GAME_CSS = '''<style>
 @media(max-width:560px){.ptable th:nth-child(4),.ptable td:nth-child(4){display:none}}
 @media(max-width:480px){.game{padding:16px 14px}.gq{font-size:38px}.gopts{grid-template-columns:1fr}}
 
+.gshare{display:block;margin:12px auto 0;background:none;border:0;color:var(--brand);font:inherit;font-weight:700;font-size:15px;cursor:pointer;text-decoration:underline}
 .chal{margin-top:10px;background:var(--badge,#C3303A)}
 </style><script>
+function qpShare(b){const g=b.closest('.game'),name=(g.querySelector('h2')||{}).textContent||document.title,url=location.origin+location.pathname,msg='Try this free '+name+' game, no sign-up needed 🎯';
+ const done=t=>{const o=b.textContent;b.textContent=t;setTimeout(()=>b.textContent=o,2200)};
+ if(navigator.share){navigator.share({title:name,text:msg,url}).catch(()=>{})}
+ else if(navigator.clipboard){navigator.clipboard.writeText(msg+' '+url).then(()=>done('✓ Link copied'),()=>done(url))}
+ else done(url)}
 function qpChallenge(b){const g=b.closest('.game'),name=(g.querySelector('h2')||{}).textContent||document.title,score=((g.querySelector('.gbig')||{}).textContent||'').trim(),
  note=((g.querySelector('.gres .muted')||{}).textContent||'').split(' · ')[0].trim(),lvl=note&&!/best|perfect|sharp/i.test(note)?' ('+note+')':'',
  url=location.origin+location.pathname,msg='I got '+score+' on '+name+lvl+'. Can you beat me? 🎯';
@@ -51,7 +57,7 @@ MATH_GAME = '''<div class="game" id="ms">
   <h2>Math Sprint</h2><p class="gsub">Answer as many as you can in 60 seconds.</p>
   <p class="glabel">Choose a level</p>
   <div class="gchips" id="msLv"></div>
-  <button class="gbtn" id="msStart">Start</button>
+  <button class="gbtn" id="msStart">Start</button><button class="gshare" type="button" onclick="qpShare(this)">↗ Share this game</button>
  </div>
  <div id="msPlay" hidden>
   <div class="gtop"><span id="msLvName"></span><span>Score: <b id="msScore">0</b></span></div>
@@ -174,7 +180,7 @@ def geo_game():
   <div class="gchips" id="ggMode"><button class="on" data-m="cap">Name the capital</button><button data-m="cty">Name the country</button></div>
   <p class="glabel">Region</p>
   <div class="gchips" id="ggReg"></div>
-  <button class="gbtn" id="ggStart">Start</button>
+  <button class="gbtn" id="ggStart">Start</button><button class="gshare" type="button" onclick="qpShare(this)">↗ Share this game</button>
  </div>
  <div id="ggPlay" hidden>
   <div class="gtop"><span id="ggNum"></span><span>Score: <b id="ggScore">0</b></span></div>
@@ -457,7 +463,7 @@ def fallacy_game():
   <h2>Spot the Fallacy</h2><p class="gsub">Read the argument. Which logical fallacy is it? 10 questions a round.</p>
   <p class="glabel">How it works</p>
   <p style="margin:4px 0 14px;font-size:16px">Each question shows a short argument and four fallacy names. After you answer, you’ll see why. The guide below explains all 12 fallacies.</p>
-  <button class="gbtn" id="fgStart">Start</button>
+  <button class="gbtn" id="fgStart">Start</button><button class="gshare" type="button" onclick="qpShare(this)">↗ Share this game</button>
  </div>
  <div id="fgPlay" hidden>
   <div class="gtop"><span id="fgNum"></span><span>Score: <b id="fgScore">0</b></span></div>
@@ -571,7 +577,7 @@ PCT_GAME = '''<div class="game" id="ps">
   <h2>Percent &amp; Estimation Sprint</h2><p class="gsub">Everyday math, fast. Tap the right answer. 60 seconds.</p>
   <p class="glabel">Choose a level</p>
   <div class="gchips" id="psLv"></div>
-  <button class="gbtn" id="psStart">Start</button>
+  <button class="gbtn" id="psStart">Start</button><button class="gshare" type="button" onclick="qpShare(this)">↗ Share this game</button>
  </div>
  <div id="psPlay" hidden>
   <div class="gtop"><span id="psLvName"></span><span>Score: <b id="psScore">0</b></span></div>
@@ -731,7 +737,7 @@ def hist_game():
   <div class="gchips" id="hgMode"><button class="on" data-m="first">Which came first?</button><button data-m="year">Pick the year</button></div>
   <p class="glabel">Era</p>
   <div class="gchips" id="hgEra"></div>
-  <button class="gbtn" id="hgStart">Start</button>
+  <button class="gbtn" id="hgStart">Start</button><button class="gshare" type="button" onclick="qpShare(this)">↗ Share this game</button>
  </div>
  <div id="hgPlay" hidden>
   <div class="gtop"><span id="hgNum"></span><span>Score: <b id="hgScore">0</b></span></div>

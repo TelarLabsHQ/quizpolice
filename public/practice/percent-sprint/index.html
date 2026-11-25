@@ -56,8 +56,14 @@ if(window.indexedDB&&indexedDB.databases){indexedDB.databases().then(function(d)
 @media(max-width:560px){.ptable th:nth-child(4),.ptable td:nth-child(4){display:none}}
 @media(max-width:480px){.game{padding:16px 14px}.gq{font-size:38px}.gopts{grid-template-columns:1fr}}
 
+.gshare{display:block;margin:12px auto 0;background:none;border:0;color:var(--brand);font:inherit;font-weight:700;font-size:15px;cursor:pointer;text-decoration:underline}
 .chal{margin-top:10px;background:var(--badge,#C3303A)}
 </style><script>
+function qpShare(b){const g=b.closest('.game'),name=(g.querySelector('h2')||{}).textContent||document.title,url=location.origin+location.pathname,msg='Try this free '+name+' game, no sign-up needed 🎯';
+ const done=t=>{const o=b.textContent;b.textContent=t;setTimeout(()=>b.textContent=o,2200)};
+ if(navigator.share){navigator.share({title:name,text:msg,url}).catch(()=>{})}
+ else if(navigator.clipboard){navigator.clipboard.writeText(msg+' '+url).then(()=>done('✓ Link copied'),()=>done(url))}
+ else done(url)}
 function qpChallenge(b){const g=b.closest('.game'),name=(g.querySelector('h2')||{}).textContent||document.title,score=((g.querySelector('.gbig')||{}).textContent||'').trim(),
  note=((g.querySelector('.gres .muted')||{}).textContent||'').split(' · ')[0].trim(),lvl=note&&!/best|perfect|sharp/i.test(note)?' ('+note+')':'',
  url=location.origin+location.pathname,msg='I got '+score+' on '+name+lvl+'. Can you beat me? 🎯';
@@ -70,7 +76,7 @@ function qpChallenge(b){const g=b.closest('.game'),name=(g.querySelector('h2')||
   <h2>Percent &amp; Estimation Sprint</h2><p class="gsub">Everyday math, fast. Tap the right answer. 60 seconds.</p>
   <p class="glabel">Choose a level</p>
   <div class="gchips" id="psLv"></div>
-  <button class="gbtn" id="psStart">Start</button>
+  <button class="gbtn" id="psStart">Start</button><button class="gshare" type="button" onclick="qpShare(this)">↗ Share this game</button>
  </div>
  <div id="psPlay" hidden>
   <div class="gtop"><span id="psLvName"></span><span>Score: <b id="psScore">0</b></span></div>
