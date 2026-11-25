@@ -17,7 +17,7 @@ if(window.indexedDB&&indexedDB.databases){indexedDB.databases().then(function(d)
 .lobby{text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
 .lobby .count{font-family:var(--f-head);font-weight:800;font-size:56px;line-height:1}
 .toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:30;padding:12px 18px;border-radius:12px;background:var(--warn-bg);color:var(--warn);font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.2)}
-.waitcard{margin-top:18px;text-align:left;border-top:1px solid var(--line);padding-top:16px}.waitcard>b{display:block;margin-bottom:10px;font-size:16px}.wgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.wgrid a{display:block;border:1px solid var(--line);border-radius:12px;padding:12px;text-decoration:none;color:var(--fg);font-weight:700;font-size:15px;background:var(--bg,#F3F5F9)}.wgrid span{display:block;font-size:22px;margin-bottom:4px}.wgrid small{display:block;font-weight:400;color:var(--muted);font-size:13px;margin-top:2px}.wtips{display:block;margin-top:12px;font-weight:700}
+.waitcard{margin-top:18px;text-align:left;border-top:1px solid var(--line);padding-top:16px}.waitcard>b{display:block;margin-bottom:10px;font-size:16px}.wgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.wgrid a{display:block;border:1px solid var(--line);border-radius:12px;padding:12px;text-decoration:none;color:var(--fg);font-weight:700;font-size:15px;background:var(--bg,#F3F5F9)}.wgrid span{display:block;font-size:22px;margin-bottom:4px}.wgrid small{display:block;font-weight:400;color:var(--muted);font-size:13px;margin-top:2px}.wtips{display:block;margin-top:12px;font-weight:700}.wsub{font-size:14px;color:var(--muted);margin:-4px 0 12px}
 .early{text-align:center;margin:0}.early a,.lcheck a{font-weight:700}
 .lcheck{text-align:left;background:var(--bg,#F3F5F9);border:1px solid var(--line,#DCE1EA);border-radius:12px;padding:12px 14px;margin-top:6px;max-width:460px;width:100%}.lcheck ul{margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:15px}
 </style>
@@ -63,14 +63,14 @@ if(window.indexedDB&&indexedDB.databases){indexedDB.databases().then(function(d)
     <p class="note">Can't see the quiz? Tell your teacher. Don't open it in another tab, because that counts as leaving.</p>
   </div>
 
-  <div class="panel pad" id="doneBox" hidden style="text-align:center"><h1 style="font-size:24px">All done</h1><p class="note">Your teacher can see that you finished. You may close this page.</p><div class="waitcard"><b>While you wait for your classmates</b>
+  <div class="panel pad" id="doneBox" hidden style="text-align:center"><h1 style="font-size:24px">All done</h1><p class="note">Your teacher can see that you finished. You may close this page.</p><div class="waitcard"><b>Before you go 👋</b><p class="wsub">Finished early, or heading to your next class? Try a 1-minute challenge now, or come back to it later.</p>
       <div class="wgrid">
         <a href="/practice/math-sprint/" target="_blank" rel="noopener"><span>➕</span>Math Sprint<small>60 seconds of quick math</small></a>
         <a href="/practice/geography/" target="_blank" rel="noopener"><span>🌍</span>Geography<small>Countries and capitals</small></a>
         <a href="/practice/world-history/" target="_blank" rel="noopener"><span>🏛️</span>World History<small>Which came first?</small></a>
         <a href="/practice/spot-the-fallacy/" target="_blank" rel="noopener"><span>🧠</span>Spot the Fallacy<small>For older students</small></a>
       </div>
-      <a class="wtips" href="/guides/how-to-study-for-a-quiz/" target="_blank" rel="noopener">📚 7 study tips for your next quiz →</a></div></div>
+      <a class="wtips" href="/guides/how-to-study-for-a-quiz/" target="_blank" rel="noopener">📚 7 study tips for your next quiz →</a><p class="wsub" style="margin:10px 0 0">Free anytime, no sign-up: <b>quizpolice.telarlabs.net/practice</b></p></div></div>
 </div>
 
 <div class="overlay" id="doneOv" hidden>
