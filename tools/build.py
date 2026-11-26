@@ -69,7 +69,7 @@ def page(path, title, desc, body):
 <footer class="foot"><div class="wrap foot-in">
   <div><a class="logo" href="/">{LOGO}<span>{E(NAME)}</span></a><p class="muted">Free quiz monitoring for Google Forms, Microsoft Forms and Wayground. Part of the {E(ST)} teacher tools.</p></div>
   <div class="foot-cols">
-    <div><h4>Use it</h4><a href="/teacher/">Teacher dashboard</a><a href="/join/">Join a quiz</a><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/guides/">Guides</a><a href="/practice/">Practice games</a><a href="/faq/">FAQ</a></div>
+    <div><h4>Use it</h4><a href="/teacher/">Teacher dashboard</a><a href="/join/">Join a quiz</a><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/guides/">Guides</a><a href="/practice/">Practice games</a><a href="/tools/deped-grade-calculator/">DepEd grade calculator</a><a href="/tools/">Grade tools</a><a href="/faq/">FAQ</a></div>
     <div><h4><a href="https://telarlabs.net" style="color:inherit;margin:0">{E(ST)}</a></h4><a href="https://telarlabs.net">Telar Labs home</a><a href="https://telarlabs.net/guides/">Telar Labs guides</a><a href="/about/">About</a><a href="/privacy/">Privacy policy</a><a href="/terms/">Terms of use</a><a href="/contact/">Contact</a></div>
   </div>
 </div>{family_row()}<div class="wrap fine">&copy; {date.today().year} {E(ST)}.</div></footer>
@@ -109,7 +109,8 @@ def home():
 <li><h3>Watch and act</h3><p>See exits and time left as they happen, unlock students or give extra time, and download the results when the quiz is done.</p></li></ol></section>
 <section class="wrap section"><div class="callout"><h2>Honest about what it can and can't see</h2><p>QuizPolice only knows when a student leaves the quiz page on the same device. It can't see other phones, the student's screen, or what they search. It's a strong reminder and a record, not mind-reading, and we tell students exactly what is monitored before they start.</p><a class="btn" href="/how-it-works/">Read how it works</a></div></section>'''
     body += ('<section class="wrap section"><h2>Guides for teachers</h2><ul class="glist" style="list-style:none;padding:0;display:grid;gap:12px">' + ''.join(f'<li style="border:1px solid var(--line);border-radius:12px;padding:14px 16px"><a href="/guides/{g["slug"]}/" style="font-weight:700">{E(g["title"])}</a></li>' for g in GUIDES) + '</ul><p><a href="/guides/">All guides →</a></p></section>'
-             + '<section class="wrap section"><h2>Practice games for students</h2><p>Free, quick games for warm-ups and homework: <a href="/practice/math-sprint/" style="font-weight:700">Math Sprint</a> and <a href="/practice/geography/" style="font-weight:700">Geography Practice</a>. No sign-up needed.</p></section>')
+             + '<section class="wrap section"><h2>Practice games for students</h2><p>Free, quick games for warm-ups and homework: <a href="/practice/math-sprint/" style="font-weight:700">Math Sprint</a> and <a href="/practice/geography/" style="font-weight:700">Geography Practice</a>. No sign-up needed.</p></section>'
+             + '<section class="wrap section"><h2>Grade tools</h2><p>Compute term and final grades with the <a href="/tools/deped-grade-calculator/" style="font-weight:700">DepEd grade calculator</a> (DO 015, s. 2026), look up the <a href="/tools/transmutation-table/" style="font-weight:700">transmutation table</a>, or use the <a href="/tools/weighted-grade-calculator/" style="font-weight:700">weighted grade calculator</a>.</p></section>')
     body += family_promo('More free tools for teachers')
     page('/', f'{NAME} – Free Quiz Monitor for Google Forms, Microsoft Forms & Wayground',
          'Free online quiz monitoring for teachers. See when students leave a Google Forms, Microsoft Forms or Wayground quiz, lock after too many exits, and download results.', body)
@@ -243,7 +244,7 @@ def pages():
 
 def extras():
     open(os.path.join(PUB, 'favicon.svg'), 'w').write(LOGO.replace('class="logo-mark" ', 'xmlns="http://www.w3.org/2000/svg" '))
-    urls = ['/', '/how-it-works/', '/supported-quizzes/', '/faq/', '/guides/'] + [f'/guides/{g["slug"]}/' for g in GUIDES] + ['/practice/', BEFORE[0]] + [x[0] for x in PRACTICE] + ['/about/', '/privacy/', '/terms/', '/contact/']
+    urls = ['/', '/how-it-works/', '/supported-quizzes/', '/faq/', '/guides/'] + [f'/guides/{g["slug"]}/' for g in GUIDES] + ['/practice/', BEFORE[0]] + [x[0] for x in PRACTICE] + ['/tools/'] + [t[0] for t in GRADE_TOOLS] + ['/about/', '/privacy/', '/terms/', '/contact/']
     open(os.path.join(PUB, 'sitemap.xml'), 'w').write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(f'<url><loc>{URL}{u}</loc></url>\n' for u in urls) + '</urlset>\n')
     open(os.path.join(PUB, 'robots.txt'), 'w').write(f'User-agent: *\nDisallow: /api/\nDisallow: /teacher/\nDisallow: /join/\nDisallow: /cdn-cgi/\n\nUser-agent: Mediapartners-Google\nAllow: /\n\nSitemap: {URL}/sitemap.xml\n')
     if CFG['adsense_client']:
@@ -268,6 +269,7 @@ def guides():
 
 # ---------------------------------------------------------------- practice games for students
 from practice_content import GAME_CSS, PAGES as PRACTICE, HUB_TEXT, BEFORE
+from grades_content import TOOLS as GRADE_TOOLS, CSS as GRADE_CSS
 def practice():
     prose(BEFORE[0], BEFORE[1], BEFORE[2], f'<p class="gmeta muted" style="font-size:14px;margin:0 0 6px">For students</p><h1>Before your quiz</h1>{BEFORE[3]}')
     prose('/practice/', 'Practice Games for Students', 'Free practice games for students: Math Sprint, Percent & Estimation Sprint, Geography Practice, World History Timeline and Spot the Fallacy. No sign-up, works on phones and computers.',
@@ -278,8 +280,18 @@ def practice():
               f'{GAME_CSS}<p class="gmeta muted" style="font-size:14px;margin:0 0 6px"><a href="/practice/">Practice games</a></p><h1>{E(short)}</h1>'
               f'{game()}{text}<h2>More practice</h2><ul>{other}<li><a href="/guides/how-to-study-for-a-quiz/">How to study for a quiz</a></li></ul>')
 
+def grade_tools():
+    cards = ''.join(f'<a href="{t[0]}"><b>{E(t[3])}</b><span>{E(t[6])}</span></a>' for t in GRADE_TOOLS)
+    prose('/tools/', 'Free Grade Tools for Teachers and Students', 'Free grade tools: DepEd grade calculator for DO 015, s. 2026, the DepEd transmutation table, and a weighted grade calculator with a final exam calculator.',
+          f'{GRADE_CSS}<h1>Grade tools</h1><p class="lead">Free calculators for teachers and students. They work in your browser, on phones and computers, with no sign-up.</p><div class="gtools">{cards}</div>'
+          '<h2>More for students</h2><p>Warm up with the free <a href="/practice/">practice games</a>, and read <a href="/guides/how-to-study-for-a-quiz/">how to study for a quiz</a>.</p>')
+    for path, title, desc, short, tool, text, blurb in GRADE_TOOLS:
+        other = ''.join(f'<li><a href="{q[0]}">{E(q[3])}</a></li>' for q in GRADE_TOOLS if q[0] != path)
+        prose(path, title, desc, f'<p class="gmeta muted" style="font-size:14px;margin:0 0 6px"><a href="/tools/">Grade tools</a></p><h1>{E(short)}</h1>{tool()}{text}'
+              f'<h2>More free tools</h2><ul>{other}<li><a href="/practice/">Practice games for students</a></li><li><a href="https://pizarrapad.telarlabs.net/tools/">Classroom timer, name picker and more</a></li></ul>')
+
 if __name__ == '__main__':
-    home(); pages(); guides(); practice(); extras(); print('Built QuizPolice pages')
+    home(); pages(); guides(); practice(); grade_tools(); extras(); print('Built QuizPolice pages')
 
     # AdSense: no ad code on error, contact and legal pages (no publisher content)
     import re as _re
