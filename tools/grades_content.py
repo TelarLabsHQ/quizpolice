@@ -1,4 +1,4 @@
-"""Grade tools on QuizPolice: DepEd grade calculator (DO 015 s. 2026, three terms), transmutation tables, weighted grade calculator.
+"""Grade tools on QuizPolice: grade calculator (DO 015 s. 2026, three terms), transmutation tables, weighted grade calculator.
 Everything runs in the browser; nothing is stored on a server (only in the visitor's own browser, to keep their numbers)."""
 
 # DepEd Order No. 015, s. 2026: adjusted transmutation table for SY 2026-2027 (lowest initial grade of each band -> grade)
@@ -160,7 +160,7 @@ DEPED_TEXT = '''
 <table class="ttab"><thead><tr><th>Grade</th><th>Descriptor</th></tr></thead><tbody><tr><td>90–100</td><td>Advancing (Namumukod-tangi)</td></tr><tr><td>80–89</td><td>Benchmarking (Napamamalas)</td></tr><tr><td>75–79</td><td>Connecting (Natutungo)</td></tr><tr><td>65–74</td><td>Developing (Napauunlad)</td></tr><tr><td>Below 65</td><td>Emerging (Nagsisimula)</td></tr></tbody></table>
 <p>The passing grade is <b>75</b>. Kindergarten to Grade 1 use descriptive ratings instead of numbers this school year, with Grades 2 and 3 following in the next two school years.</p>
 <h2>Questions</h2>
-<h3>Is this the official DepEd computation?</h3><p>It follows DepEd Order No. 015, s. 2026 as published, including the SY 2026–2027 adjusted transmutation table. Small differences can come from how your school rounds percentage scores. Always confirm with your school’s official e-Class Record.</p>
+<h3>Is this an official computation?</h3><p>QuizPolice is an independent tool and is not affiliated with the Department of Education. It follows DepEd Order No. 015, s. 2026 as published, including the SY 2026–2027 adjusted transmutation table. Small differences can come from how your school rounds percentage scores. Always confirm with your school’s official e-Class Record.</p>
 <h3>Can I still use the old table?</h3><p>Yes. Choose “Old table (DO 8, s. 2015)” and the old weights, for example for Grade 12 learners who are not yet on the strengthened SHS curriculum, or for schools that still use it.</p>
 <h3>Are my scores saved?</h3><p>Only in your own browser, so they’re still here when you come back. Nothing is sent to QuizPolice.</p>
 <p class="note2">Sources: DepEd Order No. 015, s. 2026 (Revised Classroom Assessment and Grading Guidelines) and DepEd Order No. 8, s. 2015.</p>'''
@@ -182,7 +182,7 @@ TRANS_TEXT = '''
 <p>DepEd says the change is meant to make grades reflect what learners actually know, not to make passing harder. Teachers can plan support earlier when grades are more accurate.</p>
 <h2>How to use the table</h2>
 <ol><li>Compute the initial grade: the sum of the weighted scores of Written Work, Performance Tasks and Exams.</li><li>Find the band it falls in, and read the transmuted grade.</li></ol>
-<p>Easier: the <a href="/tools/deped-grade-calculator/">DepEd grade calculator</a> does all the steps for you, from raw scores to the term and final grade.</p>
+<p>Easier: the <a href="/tools/grade-calculator/">K to 12 grade calculator</a> does all the steps for you, from raw scores to the term and final grade.</p>
 <p class="note2">Sources: DepEd Order No. 015, s. 2026 and DepEd Order No. 8, s. 2015. Always confirm with your school’s official e-Class Record.</p>'''
 
 def weighted_calc():
@@ -215,14 +215,14 @@ WEIGHTED_TEXT = '''
 <p>Required final score = (the grade you want − current grade × (1 − final weight)) ÷ final weight. For example, to finish with 90% when you have 86% and the final counts for 30%, you need (90 − 86 × 0.7) ÷ 0.3 = <b>99.3%</b>.</p>
 <h2>Tips</h2>
 <ul><li>Check your syllabus for the exact weights; categories don’t always add up to 100%.</li><li>Leave a score empty for work that isn’t graded yet. The calculator shows your grade so far from what’s done.</li><li>Studying for that final? See <a href="/guides/how-to-study-for-a-quiz/">how to study for a quiz</a>, and warm up with the free <a href="/practice/">practice games</a>.</li></ul>
-<p>In the Philippines? Use the <a href="/tools/deped-grade-calculator/">DepEd grade calculator</a> for the DO 015, s. 2026 computation.</p>'''
+<p>In the Philippines? Use the <a href="/tools/grade-calculator/">K to 12 grade calculator</a> for the DO 015, s. 2026 computation.</p>'''
 
 TOOLS = [
- ('/tools/deped-grade-calculator/', 'DepEd Grade Calculator 2026: DO 015, s. 2026 Three-Term Grading with Transmutation',
-  'Free DepEd grade calculator for SY 2026–2027: Written Work, Performance Tasks and Exams with the new weights, the adjusted transmutation table, three terms, final grade and descriptors. Also works with the old DO 8 table.',
-  'DepEd grade calculator', deped_calc, DEPED_TEXT, 'Compute term and final grades with the new DO 015, s. 2026 rules.'),
- ('/tools/transmutation-table/', 'DepEd Transmutation Table 2026–2027 (DO 015, s. 2026) and the Old DO 8 Table',
-  'The DepEd transmutation table for SY 2026–2027 under DO 015, s. 2026, next to the old DO 8, s. 2015 table, with an instant lookup. See what changed and when transmutation ends.',
+ ('/tools/grade-calculator/', 'Grade Calculator 2026: Three-Term Grading with Transmutation (DO 015, s. 2026)',
+  'Free K to 12 grade calculator for SY 2026–2027: Written Work, Performance Tasks and Exams with the new weights, the adjusted transmutation table, three terms, final grade and descriptors. Also works with the old DO 8 table.',
+  'K to 12 grade calculator', deped_calc, DEPED_TEXT, 'Compute term and final grades with the new DO 015, s. 2026 rules.'),
+ ('/tools/transmutation-table/', 'Transmutation Table 2026–2027 (DO 015, s. 2026) and the Old DO 8 Table',
+  'The transmutation table for SY 2026–2027 under DO 015, s. 2026, next to the old DO 8, s. 2015 table, with an instant lookup. See what changed and when transmutation ends.',
   'Transmutation table', trans_page, TRANS_TEXT, 'The SY 2026–2027 adjusted table and the old table, with a quick lookup.'),
  ('/tools/weighted-grade-calculator/', 'Weighted Grade Calculator and Final Exam Grade Calculator',
   'Free weighted grade calculator: add categories with weights and scores to get your course grade and letter grade, then find the score you need on your final exam.',
