@@ -6,10 +6,10 @@ function go(){location.replace("https://"+to+location.pathname+location.search+l
 try{if(localStorage.length||sessionStorage.length)return}catch(e){return}
 if(window.indexedDB&&indexedDB.databases){indexedDB.databases().then(function(d){if(!d.length)go()},function(){})}else go()})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Grade Calculator 2026: Three-Term Grading with Transmutation | QuizPolice</title>
-<meta name="description" content="Free K to 12 grade calculator for SY 2026–2027: Written Work, Performance Tasks and Exams with the new weights, the adjusted transmutation table, three terms, final grade and descriptors. Also works with the old 2015 table.">
+<title>Grade Calculator: Weighted Categories, Your Own Grade Scale and Terms | QuizPolice</title>
+<meta name="description" content="Free grade calculator for teachers and students. Set your own categories, weights, grade scale and pass mark, or start from a ready setup. Find what you need on the rest, add terms for a final grade, and share your setup as a link.">
 <link rel="canonical" href="https://quizpolice.telarlabs.net/tools/grade-calculator/">
-<meta property="og:title" content="Grade Calculator 2026: Three-Term Grading with Transmutation | QuizPolice"><meta property="og:description" content="Free K to 12 grade calculator for SY 2026–2027: Written Work, Performance Tasks and Exams with the new weights, the adjusted transmutation table, three terms, final grade and descriptors. Also works with the old 2015 table."><meta property="og:url" content="https://quizpolice.telarlabs.net/tools/grade-calculator/">
+<meta property="og:title" content="Grade Calculator: Weighted Categories, Your Own Grade Scale and Terms | QuizPolice"><meta property="og:description" content="Free grade calculator for teachers and students. Set your own categories, weights, grade scale and pass mark, or start from a ready setup. Find what you need on the rest, add terms for a final grade, and share your setup as a link."><meta property="og:url" content="https://quizpolice.telarlabs.net/tools/grade-calculator/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"><meta name="theme-color" content="#1C2F5E">
 <link rel="preload" href="/assets/fonts/source-sans-3-400.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/assets/fonts/fonts.css">
 <link rel="stylesheet" href="/assets/site.css?v=88462d5e">
@@ -22,7 +22,7 @@ if(window.indexedDB&&indexedDB.databases){indexedDB.databases().then(function(d)
   <a class="btn btn-ghost btn-sm" href="/join/">I'm a student</a><a class="btn btn-sm" href="/teacher/">Teacher dashboard</a>
 </div></header>
 <main>
-<article class="wrap prose"><p class="gmeta muted" style="font-size:14px;margin:0 0 6px"><a href="/tools/">Grade tools</a></p><h1>K to 12 grade calculator</h1><style>
+<article class="wrap prose"><p class="gmeta muted" style="font-size:14px;margin:0 0 6px"><a href="/tools/">Teacher tools</a></p><h1>Grade calculator</h1><style>
 .gc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;margin:16px 0 24px}
 .gc label{display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:15px}.gc select,.gc input{font:inherit;font-size:16px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--fg);min-width:0}
 .gc [hidden]{display:none!important}.gc select{width:100%;max-width:100%;text-overflow:ellipsis}.gc label{min-width:0}
@@ -37,99 +37,202 @@ if(window.indexedDB&&indexedDB.databases){indexedDB.databases().then(function(d)
 .tts{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}@media(max-width:700px){.tts{grid-template-columns:1fr}}
 .note2{font-size:14px;color:var(--muted)}
 .gtools{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.gtools a{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;text-decoration:none;color:var(--fg)}.gtools a b{display:block}.gtools a span{color:var(--muted);font-size:14px}
-</style><script>
-var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
-function num(v){var n=parseFloat(String(v).replace(',','.'));return isNaN(n)?null:n}
-function keep(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
-</script>
+</style><style>
+.gc-top{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.gc-top select{flex:1 1 260px}
+.gc-btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;color:var(--fg)}
+.gc-shared{background:var(--ok-bg);color:var(--ok);border-radius:10px;padding:8px 12px;font-size:15px;margin:0}
+details.gc-setup{border:1px solid var(--line);border-radius:12px;padding:0 12px}details.gc-setup>summary{cursor:pointer;font-weight:800;padding:12px 0}details.gc-setup[open]{padding-bottom:12px}
+.gc-setup h4{margin:16px 0 6px;font-size:15px}.gc .sc-row{grid-template-columns:minmax(0,1fr) 72px auto auto}.gc .sc-band{grid-template-columns:auto 72px minmax(0,1fr) auto}
+.sc-cat{display:flex;flex-direction:column;gap:6px;padding:8px 0;border-bottom:1px dashed var(--line)}.sc-parts{margin-left:18px;display:flex;flex-direction:column;gap:6px}.gc .sc-split{font-size:13px;padding:3px 10px}
+.gc textarea{font:inherit;font-size:15px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;width:100%;min-height:120px;box-sizing:border-box}
+.pf{border-radius:99px;padding:4px 12px;font-weight:700;font-size:15px}.pf.ok{background:var(--ok-bg);color:var(--ok)}.pf.bad{background:var(--bad-bg);color:var(--bad)}
+.gc .chk{flex-direction:row;align-items:center;font-weight:600}.gc .chk input{width:20px;height:20px}
+@media print{header.top,footer.foot,.gc-top,details.gc-setup,.addit,.x,.gmeta,.calc-text,h2.more,ul.more{display:none!important}.gc{border:0;padding:0}}
+</style>
 <div class="gc" id="gc">
-  <div class="row2">
-    <label>Grading rules<select id="mode"><option value="new">SY 2026–2027: adjusted table</option><option value="none">SY 2027–2028 on: no transmutation</option><option value="old">Old table (2015)</option></select></label>
-    <label>Subject and weights (WW / PT / Exam)<select id="grp"><optgroup label="Grades 4–10"><option value="g4a">English, Filipino, Math, Science, AP, GMRC / Values Education (20/50/30)</option><option value="g4b">EPP / TLE, MAPEH (20/60/20)</option></optgroup><optgroup label="Grades 2–3"><option value="g2a">Makabansa and other graded subjects (20/50/30)</option></optgroup><optgroup label="Senior High School, strengthened curriculum"><option value="s1">Core subjects and other academic electives (20/50/30)</option><option value="s2">Field Exposure, Arts Apprenticeship, Creative Production and Innovation (15/70/15)</option><option value="s3">Arts, Sports, Health and Wellness electives (20/60/20)</option><option value="s4">Research electives, Design and Innovation (40/60/0)</option><option value="s5">TechPro electives (15/65/20)</option><option value="s6">Work Immersion (20/80/0)</option></optgroup><optgroup label="Old weights (2015), e.g. Grade 12 not yet on the strengthened curriculum"><option value="o1">Grades 1–10: Languages, AP, EsP (30/50/20)</option><option value="o2">Grades 1–10: Science, Math (40/40/20)</option><option value="o3">Grades 1–10: MAPEH, EPP / TLE (20/60/20)</option><option value="o4">SHS: Core subjects (25/50/25)</option><option value="o5">SHS Academic track: all other subjects (25/45/30)</option><option value="o6">SHS Academic track: Work Immersion, Research, Business Enterprise Simulation, Exhibit, Performance (35/40/25)</option><option value="o7">SHS TVL, Sports, Arts and Design tracks: all subjects (20/60/20)</option></optgroup><optgroup label="Other"><option value="cu">Custom weights (30/50/20)</option></optgroup></select></label>
-  </div>
-  <div class="row2" id="cw" hidden><label>Written Work %<input id="cww" inputmode="decimal" value="30"></label><label>Performance Tasks %<input id="cpt" inputmode="decimal" value="50"></label><label>Exam %<input id="cex" inputmode="decimal" value="20"></label></div>
-  <div class="comp" data-c="ww"><h3>Written Work <span id="lww"></span></h3><div class="items"></div><button class="addit" type="button">+ Add a score</button></div>
-  <div class="comp" data-c="pt"><h3>Performance Tasks <span id="lpt"></span></h3><div class="items"></div><button class="addit" type="button">+ Add a score</button></div>
-  <div class="comp" id="exbox"><h3><span style="color:var(--fg);font-family:var(--head);font-weight:800;font-size:17px" id="exh">Exams</span> <span id="lex"></span></h3>
-    <div class="exrow" id="exrows"></div></div>
-  <div class="res" id="res"></div>
-  <p class="note2">Your scores stay on this device. Always check against your school’s official e-Class Record.</p>
+  <p class="gc-shared" id="gcShared" hidden>Using a shared setup: <b></b>. Your scores stay on this device.</p>
+  <div class="gc-top"><select id="gcPreset" aria-label="Ready setups"></select><button class="gc-btn" type="button" id="gcLink">🔗 Copy setup link</button></div>
+  <details class="gc-setup" id="gcSetup"><summary>Grading setup: categories, weights and scale</summary>
+    <label>Setup name<input id="gcName" maxlength="80"></label>
+    <h4>Categories and weights</h4><div id="gcCats"></div><button class="addit" type="button" id="gcAddCat">+ Add a category</button><p class="note2" id="gcTot" style="margin:4px 0 0"></p>
+    <h4>Grade scale</h4><div class="row2"><label>Labels<select id="gcScale"><option value="letter">Letters A to F</option><option value="gpa">Letters with 4.0 GPA points</option><option value="desc">K to 12 descriptors (2026)</option><option value="desc15">K to 12 descriptors (2015)</option><option value="pct">Numbers only, no labels</option><option value="custom">Custom labels</option></select></label><label>Pass mark (optional)<input id="gcPass" inputmode="decimal" placeholder="e.g. 60 or 75"></label></div>
+    <div id="gcBands" class="items" style="margin-top:8px"></div><button class="addit" type="button" id="gcAddBand" style="margin-top:6px">+ Add a label</button>
+    <h4>Conversion table (transmutation)</h4><div class="row2"><label>Convert the grade<select id="gcConv"><option value="none">No conversion</option><option value="2026">K to 12 adjusted table (2026–2027)</option><option value="2015">K to 12 table (2015)</option><option value="custom">My own table</option></select></label>
+    <label>Round the grade to<select id="gcDec"><option value="0">Whole number</option><option value="1">1 decimal</option><option value="2">2 decimals</option></select></label></div>
+    <div id="gcCtabBox" hidden><label>Your table: one line per band, the lowest initial grade then the converted grade<textarea id="gcCtab" placeholder="70 75&#10;71.18 76"></textarea></label></div>
+    <h4>Terms</h4><div class="row2"><label>Number of terms<select id="gcTerms"><option value="1">1 (just this grade)</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></label>
+    <label>Call them<select id="gcTname"><option>Term</option><option>Quarter</option><option>Semester</option><option>Trimester</option><option>Grading period</option></select></label></div>
+    <div id="gcTwBox"><label class="chk"><input type="checkbox" id="gcTwEq"> All terms count the same</label><div class="row2" id="gcTw"></div></div>
+  </details>
+  <div id="gcScores" style="display:flex;flex-direction:column;gap:12px"></div>
+  <div class="res" id="gcRes"></div>
+  <div class="res" id="gcNeed" hidden><b>What do I need on the rest?</b><span class="note2">Still to come: <span id="gcNeedWhat"></span></span><label style="font-weight:700">Grade I want<input id="gcTarget" inputmode="decimal" placeholder="e.g. 90" style="max-width:160px"></label><div id="gcNeedRes"></div></div>
+  <div class="gc-top"><button class="gc-btn" type="button" id="gcClear">Clear scores</button><button class="gc-btn" type="button" onclick="window.print()">🖨 Print</button></div>
+  <p class="note2" style="margin:0">Your setup and scores stay on this device. The setup link shares the setup only, never the scores.</p>
 </div>
-<h2>Final grade and general average</h2>
-<div class="gc">
-  <p class="note2" style="margin:0" id="fgnote">Type the term grades for one subject to get its final grade.</p>
-  <div class="row2" id="terms"></div>
-  <div class="res" id="fgres"></div>
-</div>
-<script>
-var NEW=[[99.5, 100], [98.32, 99], [97.14, 98], [95.96, 97], [94.78, 96], [93.6, 95], [92.42, 94], [91.24, 93], [90.06, 92], [88.88, 91], [87.7, 90], [86.52, 89], [85.34, 88], [84.16, 87], [82.98, 86], [81.8, 85], [80.62, 84], [79.44, 83], [78.26, 82], [77.08, 81], [75.9, 80], [74.72, 79], [73.54, 78], [72.36, 77], [71.18, 76], [70.0, 75], [65.34, 74], [60.67, 73], [56.01, 72], [51.34, 71], [46.67, 70], [42.01, 69], [37.34, 68], [32.68, 67], [28.01, 66], [23.35, 65], [18.68, 64], [14.01, 63], [9.35, 62], [4.68, 61], [0.0, 60]],OLD=[[100.0, 100], [98.4, 99], [96.8, 98], [95.2, 97], [93.6, 96], [92.0, 95], [90.4, 94], [88.8, 93], [87.2, 92], [85.6, 91], [84.0, 90], [82.4, 89], [80.8, 88], [79.2, 87], [77.6, 86], [76.0, 85], [74.4, 84], [72.8, 83], [71.2, 82], [69.6, 81], [68.0, 80], [66.4, 79], [64.8, 78], [63.2, 77], [61.6, 76], [60.0, 75], [56.0, 74], [52.0, 73], [48.0, 72], [44.0, 71], [40.0, 70], [36.0, 69], [32.0, 68], [28.0, 67], [24.0, 66], [20.0, 65], [16.0, 64], [12.0, 63], [8.0, 62], [4.0, 61], [0.0, 60]],G={"g4a": [20, 50, 30, "split"], "g4b": [20, 60, 20, "split"], "g2a": [20, 50, 30, "split"], "s1": [20, 50, 30, "split"], "s2": [15, 70, 15, "te"], "s3": [20, 60, 20, "split"], "s4": [40, 60, 0, "split"], "s5": [15, 65, 20, "split"], "s6": [20, 80, 0, "split"], "o1": [30, 50, 20, "qa"], "o2": [40, 40, 20, "qa"], "o3": [20, 60, 20, "qa"], "o4": [25, 50, 25, "qa"], "o5": [25, 45, 30, "qa"], "o6": [35, 40, 25, "qa"], "o7": [20, 60, 20, "qa"], "cu": [30, 50, 20, "qa"]};
-var DESC_NEW=[[90,'Advancing (Namumukod-tangi)'],[80,'Benchmarking (Napamamalas)'],[75,'Connecting (Natutungo)'],[65,'Developing (Napauunlad)'],[0,'Emerging (Nagsisimula)']];
-var DESC_OLD=[[90,'Outstanding'],[85,'Very Satisfactory'],[80,'Satisfactory'],[75,'Fairly Satisfactory'],[0,'Did Not Meet Expectations']];
-var S=keep('qp-grades')||{mode:'new',grp:'g4a',ww:[['',''],['',''],['','']],pt:[['',''],['','']],ex:{st1:['',''],st2:['',''],te:['',''],qa:['','']},cw:[30,50,20],terms:['','','','']};
-$('#mode').value=S.mode;$('#grp').value=S.grp;
-function itemRow(v,i,c){return '<div class="it"><input inputmode="decimal" placeholder="Score" value="'+(v[0]||'')+'" data-k="'+c+'" data-i="'+i+'" data-j="0" aria-label="Score"><span>out of</span><input inputmode="decimal" placeholder="Highest" value="'+(v[1]||'')+'" data-k="'+c+'" data-i="'+i+'" data-j="1" aria-label="Highest possible score"><button class="x" type="button" data-del="'+c+'" data-i="'+i+'" aria-label="Remove">✕</button></div>'}
-function exRow(k,lab,v){return '<div class="it"><input inputmode="decimal" placeholder="'+lab+'" value="'+(v[0]||'')+'" data-e="'+k+'" data-j="0" aria-label="'+lab+' score"><span>out of</span><input inputmode="decimal" placeholder="Highest" value="'+(v[1]||'')+'" data-e="'+k+'" data-j="1" aria-label="'+lab+' highest possible"><span></span></div>'}
-function trans(ig){var t=S.mode==='old'?OLD:NEW;for(var i=0;i<t.length;i++)if(ig>=t[i][0]-1e-9)return t[i][1];return 60}
-function desc(g){var d=S.mode==='old'?DESC_OLD:DESC_NEW;for(var i=0;i<d.length;i++)if(g>=d[i][0])return d[i][1]}
-function wts(){if(S.grp==='cu')return [num(S.cw[0])||0,num(S.cw[1])||0,num(S.cw[2])||0,'qa'];var g=G[S.grp];return g}
-function ps(list){var s=0,h=0,n=0;list.forEach(function(r){var a=num(r[0]),b=num(r[1]);if(a!==null&&b){s+=a;h+=b;n++}});return n?{ps:s/h*100,s:s,h:h}:null}
-function draw(){var w=wts(),m=w[3];
-  $('#cw').hidden=S.grp!=='cu';$('#lww').textContent=w[0]+'%';$('#lpt').textContent=w[1]+'%';$('#lex').textContent=w[2]+'%';$('#exbox').hidden=!w[2];
-  ['ww','pt'].forEach(function(c){var b=$('.comp[data-c='+c+'] .items');b.innerHTML=S[c].map(function(v,i){return itemRow(v,i,c)}).join('')});
-  $('#exh').textContent=m==='qa'?'Quarterly Assessment':m==='te'?'Term Exam':'Exams';
-  $('#exrows').innerHTML=m==='split'?'<p class="note2" style="margin:0">Summative Test 1 (30%), Summative Test 2 (30%), Term Exam (40%)</p>'+exRow('st1','Summative Test 1',S.ex.st1)+exRow('st2','Summative Test 2',S.ex.st2)+exRow('te','Term Exam',S.ex.te):m==='te'?exRow('te','Term Exam',S.ex.te):exRow('qa','Quarterly Assessment',S.ex.qa);
-  var nT=S.mode==='old'?4:3;$('#terms').innerHTML=Array.from({length:nT},function(_,i){return '<label>'+(S.mode==='old'?'Quarter ':'Term ')+(i+1)+'<input inputmode="decimal" data-t="'+i+'" value="'+(S.terms[i]||'')+'"></label>'}).join('');
-  wire();calc()}
-function calc(){var w=wts(),m=w[3],r=$('#res');
-  var a=ps(S.ww),b=ps(S.pt),ex=null;
-  if(m==='split'){var t1=ps([S.ex.st1]),t2=ps([S.ex.st2]),te=ps([S.ex.te]);if(t1&&t2&&te)ex={ps:t1.ps*.3+t2.ps*.3+te.ps*.4}}else ex=ps([m==='te'?S.ex.te:S.ex.qa]);
-  var need=[a,b].concat(w[2]?[ex]:[]);
-  var rows='<table><tr><th>Component</th><th>Percentage score</th><th>Weight</th><th>Weighted score</th></tr>'+[['Written Work',a,w[0]],['Performance Tasks',b,w[1]]].concat(w[2]?[[m==='qa'?'Quarterly Assessment':'Exams',ex,w[2]]]:[]).map(function(x){return '<tr><td>'+x[0]+'</td><td>'+(x[1]?x[1].ps.toFixed(2):'–')+'</td><td>'+x[2]+'%</td><td>'+(x[1]?(x[1].ps*x[2]/100).toFixed(2):'–')+'</td></tr>'}).join('')+'</table>';
-  var tw=w[0]+w[1]+w[2];
-  if(need.some(function(x){return !x})){r.innerHTML=rows+'<p class="note2" style="margin:4px 0 0">Enter at least one score and its highest possible score in each part.</p>';return}
-  var ig=Math.round((a.ps*w[0]+b.ps*w[1]+(w[2]?ex.ps*w[2]:0))/100*100)/100;
-  var tg=S.mode==='none'?Math.round(ig):trans(ig);
-  r.innerHTML=rows+(Math.abs(tw-100)>0.01?'<p class="note2" style="color:var(--bad)">The weights add up to '+tw+'%, not 100%.</p>':'')+'<div class="big"><span>Initial grade <b style="font-size:26px">'+ig.toFixed(2)+'</b></span><span>'+(S.mode==='old'?'Quarterly':'Term')+' grade <b>'+tg+'</b></span><span class="tag">'+desc(tg)+'</span></div>'+
-   '<p class="note2" style="margin:0">'+(S.mode==='none'?'No transmutation: the initial grade, rounded, is the term grade.':'Transmuted with the '+(S.mode==='old'?'2015':'SY 2026–2027 adjusted')+' table. '+(tg>=75?'Passing.':'Below the passing grade of 75.'))+'</p>';
-  keep('qp-grades',S)}
-function calcFG(){var nT=S.mode==='old'?4:3,v=[];for(var i=0;i<nT;i++){var x=num(S.terms[i]);if(x!==null)v.push(x)}
-  var r=$('#fgres');if(v.length<nT){r.innerHTML='<span class="note2">Final grade = the average of the '+nT+' '+(S.mode==='old'?'quarterly':'term')+' grades, rounded to a whole number.</span>';return}
-  var fg=Math.round(v.reduce(function(s,x){return s+x},0)/nT);r.innerHTML='<div class="big"><span>Final grade <b>'+fg+'</b></span><span class="tag">'+desc(fg)+'</span></div><span class="note2">'+(fg>=75?'Passed: meets the minimum standard of 75.':'Below 75.')+' The general average is the average of all final grades.</span>';keep('qp-grades',S)}
-function wire(){
-  $$('#gc .items input').forEach(function(x){x.oninput=function(){S[x.dataset.k][+x.dataset.i][+x.dataset.j]=x.value;calc()}});
-  $$('[data-del]').forEach(function(b){b.onclick=function(){var c=b.dataset.del;if(S[c].length>1){S[c].splice(+b.dataset.i,1);draw()}}});
-  $$('#exrows input').forEach(function(x){x.oninput=function(){S.ex[x.dataset.e][+x.dataset.j]=x.value;calc()}});
-  $$('#terms input').forEach(function(x){x.oninput=function(){S.terms[+x.dataset.t]=x.value;calcFG()}});calcFG()}
-$$('.addit').forEach(function(b){b.onclick=function(){var c=b.parentNode.dataset.c;S[c].push(['','']);draw();var l=$$('.comp[data-c='+c+'] .items input');l[l.length-2].focus()}});
-$('#mode').onchange=function(){S.mode=this.value;draw()};$('#grp').onchange=function(){S.grp=this.value;draw()};
-['cww','cpt','cex'].forEach(function(k,i){$('#'+k).value=S.cw[i];$('#'+k).oninput=function(){S.cw[i]=this.value;var w=wts();$('#lww').textContent=w[0]+'%';$('#lpt').textContent=w[1]+'%';$('#lex').textContent=w[2]+'%';$('#exbox').hidden=!w[2];calc()}});
-draw();
-</script>
-<h2>How grades are computed under the 2026 rules</h2>
-<p>Starting School Year 2026–2027, public schools follow <b>new grading guidelines</b> that replace the 2015 rules. The school year has <b>three terms</b>, only summative work counts toward grades (daily formative quizzes don’t), and transmutation is being phased out.</p>
+<div class="gc" id="gcFinal" hidden><h2 style="margin:0">Final grade</h2><p class="note2" style="margin:0">Type each <span id="gcTermName">term</span> grade, or add the grade from above.</p>
+  <div class="row2" id="gcTermIn"></div><div class="gc-top"><button class="gc-btn" type="button" id="gcUse">⬇ Add the grade from above</button></div><div class="res" id="gcFRes"></div></div>
+<script>(function(){
+// Customizable grade calculator. Setup (categories, scale, conversion, terms) + scores live in this browser only;
+// "Copy setup link" puts the setup (never the scores) in the link's #s= part, so nothing is sent to a server.
+var P=[{"id": "simple", "group": "General", "label": "Weighted: Homework, Quizzes, Projects, Final exam", "name": "Homework, quizzes, projects and final", "cats": [{"n": "Homework", "w": 20, "parts": null}, {"n": "Quizzes", "w": 30, "parts": null}, {"n": "Projects", "w": 20, "parts": null}, {"n": "Final exam", "w": 30, "parts": null}], "scale": "letter", "pass": 60, "conv": "none", "dec": 1, "terms": 1, "tname": "Term"}, {"id": "midfinal", "group": "General", "label": "Coursework 50%, Exams 50% (Midterm and Final)", "name": "Coursework and exams", "cats": [{"n": "Coursework", "w": 50, "parts": null}, {"n": "Exams", "w": 50, "parts": [{"n": "Midterm", "w": 40}, {"n": "Final", "w": 60}]}], "scale": "letter", "pass": 60, "conv": "none", "dec": 1, "terms": 1, "tname": "Term"}, {"id": "points", "group": "General", "label": "Total points (all work counts the same)", "name": "Total points", "cats": [{"n": "All work", "w": 100, "parts": null}], "scale": "letter", "pass": 60, "conv": "none", "dec": 1, "terms": 1, "tname": "Term"}, {"id": "custom", "group": "General", "label": "Start from scratch", "name": "My grading setup", "cats": [{"n": "Category 1", "w": 50, "parts": null}, {"n": "Category 2", "w": 50, "parts": null}], "scale": "pct", "pass": null, "conv": "none", "dec": 1, "terms": 1, "tname": "Term"}, {"id": "g4a", "group": "K to 12 three-term grading (2026)", "label": "English, Filipino, Math, Science, AP, GMRC / Values Education (20/50/30)", "name": "K to 12 2026: English, Filipino, Math, Science, AP, GMRC / Values Education", "cats": [{"n": "Written Works", "w": 20, "parts": null}, {"n": "Performance Tasks", "w": 50, "parts": null}, {"n": "Exams", "w": 30, "parts": [{"n": "Summative Test 1", "w": 30}, {"n": "Summative Test 2", "w": 30}, {"n": "Term Exam", "w": 40}]}], "scale": "desc", "pass": 75, "conv": "2026", "dec": 0, "terms": 3, "tname": "Term"}, {"id": "g4b", "group": "K to 12 three-term grading (2026)", "label": "EPP / TLE, MAPEH (20/60/20)", "name": "K to 12 2026: EPP / TLE, MAPEH", "cats": [{"n": "Written Works", "w": 20, "parts": null}, {"n": "Performance Tasks", "w": 60, "parts": null}, {"n": "Exams", "w": 20, "parts": [{"n": "Summative Test 1", "w": 30}, {"n": "Summative Test 2", "w": 30}, {"n": "Term Exam", "w": 40}]}], "scale": "desc", "pass": 75, "conv": "2026", "dec": 0, "terms": 3, "tname": "Term"}, {"id": "g2a", "group": "K to 12 three-term grading (2026)", "label": "Grades 2–3: Makabansa and other graded subjects (20/50/30)", "name": "K to 12 2026: Makabansa and other graded subjects", "cats": [{"n": "Written Works", "w": 20, "parts": null}, {"n": "Performance Tasks", "w": 50, "parts": null}, {"n": "Exams", "w": 30, "parts": [{"n": "Summative Test 1", "w": 30}, {"n": "Summative Test 2", "w": 30}, {"n": "Term Exam", "w": 40}]}], "scale": "desc", "pass": 75, "conv": "2026", "dec": 0, "terms": 3, "tname": "Term"}, {"id": "s1", "group": "K to 12 three-term grading (2026)", "label": "SHS: Core subjects and other academic electives (20/50/30)", "name": "K to 12 2026: Core subjects and other academic electives", "cats": [{"n": "Written Works", "w": 20, "parts": null}, {"n": "Performance Tasks", "w": 50, "parts": null}, {"n": "Exams", "w": 30, "parts": [{"n": "Summative Test 1", "w": 30}, {"n": "Summative Test 2", "w": 30}, {"n": "Term Exam", "w": 40}]}], "scale": "desc", "pass": 75, "conv": "2026", "dec": 0, "terms": 3, "tname": "Term"}, {"id": "s2", "group": "K to 12 three-term grading (2026)", "label": "SHS: Field Exposure, Arts Apprenticeship, Creative Production and Innovation (15/70/15)", "name": "K to 12 2026: Field Exposure, Arts Apprenticeship, Creative Production and Innovation", "cats": [{"n": "Written Works", "w": 15, "parts": null}, {"n": "Performance Tasks", "w": 70, "parts": null}, {"n": "Term Exam", "w": 15, "parts": null}], "scale": "desc", "pass": 75, "conv": "2026", "dec": 0, "terms": 3, "tname": "Term"}, {"id": "s3", "group": "K to 12 three-term grading (2026)", "label": "SHS: Arts, Sports, Health and Wellness electives (20/60/20)", "name": "K to 12 2026: Arts, Sports, Health and Wellness electives", "cats": [{"n": "Written Works", "w": 20, "parts": null}, {"n": "Performance Tasks", "w": 60, "parts": null}, {"n": "Exams", "w": 20, "parts": [{"n": "Summative Test 1", "w": 30}, {"n": "Summative Test 2", "w": 30}, {"n": "Term Exam", "w": 40}]}], "scale": "desc", "pass": 75, "conv": "2026", "dec": 0, "terms": 3, "tname": "Term"}, {"id": "s4", "group": "K to 12 three-term grading (2026)", "label": "SHS: Research electives, Design and Innovation (40/60/0)", "name": "K to 12 2026: Research electives, Design and Innovation", "cats": [{"n": "Written Works", "w": 40, "parts": null}, {"n": "Performance Tasks", "w": 60, "parts": null}], "scale": "desc", "pass": 75, "conv": "2026", "dec": 0, "terms": 3, "tname": "Term"}, {"id": "s5", "group": "K to 12 three-term grading (2026)", "label": "SHS: TechPro electives (15/65/20)", "name": "K to 12 2026: TechPro electives", "cats": [{"n": "Written Works", "w": 15, "parts": null}, {"n": "Performance Tasks", "w": 65, "parts": null}, {"n": "Exams", "w": 20, "parts": [{"n": "Summative Test 1", "w": 30}, {"n": "Summative Test 2", "w": 30}, {"n": "Term Exam", "w": 40}]}], "scale": "desc", "pass": 75, "conv": "2026", "dec": 0, "terms": 3, "tname": "Term"}, {"id": "s6", "group": "K to 12 three-term grading (2026)", "label": "SHS: Work Immersion (20/80/0)", "name": "K to 12 2026: Work Immersion", "cats": [{"n": "Written Works", "w": 20, "parts": null}, {"n": "Performance Tasks", "w": 80, "parts": null}], "scale": "desc", "pass": 75, "conv": "2026", "dec": 0, "terms": 3, "tname": "Term"}, {"id": "o1", "group": "K to 12, old table (2015)", "label": "Grades 1–10: Languages, AP, EsP (30/50/20)", "name": "K to 12 2015: Grades 1–10: Languages, AP, EsP", "cats": [{"n": "Written Works", "w": 30, "parts": null}, {"n": "Performance Tasks", "w": 50, "parts": null}, {"n": "Quarterly Assessment", "w": 20, "parts": null}], "scale": "desc15", "pass": 75, "conv": "2015", "dec": 0, "terms": 4, "tname": "Quarter"}, {"id": "o2", "group": "K to 12, old table (2015)", "label": "Grades 1–10: Science, Math (40/40/20)", "name": "K to 12 2015: Grades 1–10: Science, Math", "cats": [{"n": "Written Works", "w": 40, "parts": null}, {"n": "Performance Tasks", "w": 40, "parts": null}, {"n": "Quarterly Assessment", "w": 20, "parts": null}], "scale": "desc15", "pass": 75, "conv": "2015", "dec": 0, "terms": 4, "tname": "Quarter"}, {"id": "o3", "group": "K to 12, old table (2015)", "label": "Grades 1–10: MAPEH, EPP / TLE (20/60/20)", "name": "K to 12 2015: Grades 1–10: MAPEH, EPP / TLE", "cats": [{"n": "Written Works", "w": 20, "parts": null}, {"n": "Performance Tasks", "w": 60, "parts": null}, {"n": "Quarterly Assessment", "w": 20, "parts": null}], "scale": "desc15", "pass": 75, "conv": "2015", "dec": 0, "terms": 4, "tname": "Quarter"}, {"id": "o4", "group": "K to 12, old table (2015)", "label": "SHS: Core subjects (25/50/25)", "name": "K to 12 2015: SHS: Core subjects", "cats": [{"n": "Written Works", "w": 25, "parts": null}, {"n": "Performance Tasks", "w": 50, "parts": null}, {"n": "Quarterly Assessment", "w": 25, "parts": null}], "scale": "desc15", "pass": 75, "conv": "2015", "dec": 0, "terms": 4, "tname": "Quarter"}, {"id": "o5", "group": "K to 12, old table (2015)", "label": "SHS Academic track: all other subjects (25/45/30)", "name": "K to 12 2015: SHS Academic track: all other subjects", "cats": [{"n": "Written Works", "w": 25, "parts": null}, {"n": "Performance Tasks", "w": 45, "parts": null}, {"n": "Quarterly Assessment", "w": 30, "parts": null}], "scale": "desc15", "pass": 75, "conv": "2015", "dec": 0, "terms": 4, "tname": "Quarter"}, {"id": "o6", "group": "K to 12, old table (2015)", "label": "SHS Academic track: Work Immersion, Research, Business Enterprise Simulation, Exhibit, Performance (35/40/25)", "name": "K to 12 2015: SHS Academic track: Work Immersion, Research, Business Enterprise Simulation, Exhibit, Performance", "cats": [{"n": "Written Works", "w": 35, "parts": null}, {"n": "Performance Tasks", "w": 40, "parts": null}, {"n": "Quarterly Assessment", "w": 25, "parts": null}], "scale": "desc15", "pass": 75, "conv": "2015", "dec": 0, "terms": 4, "tname": "Quarter"}, {"id": "o7", "group": "K to 12, old table (2015)", "label": "SHS TVL, Sports, Arts and Design tracks: all subjects (20/60/20)", "name": "K to 12 2015: SHS TVL, Sports, Arts and Design tracks: all subjects", "cats": [{"n": "Written Works", "w": 20, "parts": null}, {"n": "Performance Tasks", "w": 60, "parts": null}, {"n": "Quarterly Assessment", "w": 20, "parts": null}], "scale": "desc15", "pass": 75, "conv": "2015", "dec": 0, "terms": 4, "tname": "Quarter"}],TAB={'2026':[[99.5, 100], [98.32, 99], [97.14, 98], [95.96, 97], [94.78, 96], [93.6, 95], [92.42, 94], [91.24, 93], [90.06, 92], [88.88, 91], [87.7, 90], [86.52, 89], [85.34, 88], [84.16, 87], [82.98, 86], [81.8, 85], [80.62, 84], [79.44, 83], [78.26, 82], [77.08, 81], [75.9, 80], [74.72, 79], [73.54, 78], [72.36, 77], [71.18, 76], [70.0, 75], [65.34, 74], [60.67, 73], [56.01, 72], [51.34, 71], [46.67, 70], [42.01, 69], [37.34, 68], [32.68, 67], [28.01, 66], [23.35, 65], [18.68, 64], [14.01, 63], [9.35, 62], [4.68, 61], [0.0, 60]],'2015':[[100.0, 100], [98.4, 99], [96.8, 98], [95.2, 97], [93.6, 96], [92.0, 95], [90.4, 94], [88.8, 93], [87.2, 92], [85.6, 91], [84.0, 90], [82.4, 89], [80.8, 88], [79.2, 87], [77.6, 86], [76.0, 85], [74.4, 84], [72.8, 83], [71.2, 82], [69.6, 81], [68.0, 80], [66.4, 79], [64.8, 78], [63.2, 77], [61.6, 76], [60.0, 75], [56.0, 74], [52.0, 73], [48.0, 72], [44.0, 71], [40.0, 70], [36.0, 69], [32.0, 68], [28.0, 67], [24.0, 66], [20.0, 65], [16.0, 64], [12.0, 63], [8.0, 62], [4.0, 61], [0.0, 60]]},SCALES={"letter": [[93, "A"], [90, "A−"], [87, "B+"], [83, "B"], [80, "B−"], [77, "C+"], [73, "C"], [70, "C−"], [67, "D+"], [63, "D"], [60, "D−"], [0, "F"]], "gpa": [[93, "A · 4.0"], [90, "A− · 3.7"], [87, "B+ · 3.3"], [83, "B · 3.0"], [80, "B− · 2.7"], [77, "C+ · 2.3"], [73, "C · 2.0"], [70, "C− · 1.7"], [67, "D+ · 1.3"], [63, "D · 1.0"], [60, "D− · 0.7"], [0, "F · 0.0"]], "desc": [[90, "Advancing"], [80, "Benchmarking"], [75, "Connecting"], [65, "Developing"], [0, "Emerging"]], "desc15": [[90, "Outstanding"], [85, "Very Satisfactory"], [80, "Satisfactory"], [75, "Fairly Satisfactory"], [0, "Did Not Meet Expectations"]], "pct": []};
+var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
+function num(v){if(v===null||v===undefined)return null;var n=parseFloat(String(v).replace(',','.'));return isNaN(n)?null:n}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function keep(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function fromPreset(id){var p=clone(P.filter(function(x){return x.id===id})[0]||P[0]);p.bands=p.bands||clone(SCALES[p.scale]||SCALES.pct);delete p.label;delete p.group;return p}
+function blankScores(st){return st.cats.map(function(c){return c.parts?c.parts.map(function(){return ['','']}):[['',''],['',''],['','']]})}
+function fit(){ // keep score lists in step with the categories
+  D.sc=D.st.cats.map(function(c,i){var old=D.sc[i]||[];if(c.parts)return c.parts.map(function(_,j){return old[j]||['','']});return old.length?old:[['',''],['','']]});
+  var n=D.st.terms||1;D.tg=(D.tg||[]).slice(0,n);while(D.tg.length<n)D.tg.push('')}
+var D=keep('qp-gc2'),shared=null;
+try{var m=location.hash.match(/[#&]s=([^&]+)/);if(m){var j=decodeURIComponent(escape(atob(m[1].replace(/-/g,'+').replace(/_/g,'/'))));shared=JSON.parse(j)}}catch(e){shared=null}
+if(!D||!D.st)D={st:fromPreset(P[0].id),sc:null,tg:[],target:''};
+if(shared&&shared.cats){var keepScores=D.st&&JSON.stringify(D.st.cats)===JSON.stringify(shared.cats);D.st=shared;if(!D.st.bands)D.st.bands=clone(SCALES[D.st.scale]||SCALES.pct);if(!keepScores)D.sc=null;
+  $('#gcShared').hidden=false;$('#gcShared b').textContent=shared.name||'a shared setup';history.replaceState(null,'',location.pathname+location.search)}
+var mt=location.hash.match(/[#&]t=([^&]+)/);if(mt){try{var ct=decodeURIComponent(mt[1]).split(',').map(function(x){var a=x.split(':').map(num);return a[0]!==null&&a[1]!==null?[a[0],a[1]]:null}).filter(Boolean);
+  if(ct.length){D.st.conv='custom';D.st.ctab=ct;D.st.dec=0;var mp=location.hash.match(/[#&]pass=([\d.]+)/);if(mp)D.st.pass=num(mp[1]);$('#gcShared').hidden=false;$('#gcShared').innerHTML='Your transmutation table is now set as the conversion table. Open <b>Grading setup</b> to see it.';history.replaceState(null,'',location.pathname+location.search)}}catch(e){}}
+if(!D.sc)D.sc=blankScores(D.st);fit();
+function save(){keep('qp-gc2',D)}
+function total(){return D.st.cats.reduce(function(s,c){return s+(num(c.w)||0)},0)}
+function pct(list){var s=0,h=0,n=0;list.forEach(function(r){var a=num(r[0]),b=num(r[1]);if(a!==null&&b){s+=a;h+=b;n++}});return n?s/h*100:null}
+function catPct(i){var c=D.st.cats[i],sc=D.sc[i];if(!c.parts)return {p:pct(sc),done:pct(sc)!==null?1:0};
+  var tw=0,sw=0,dw=0;c.parts.forEach(function(pt,j){var w=num(pt.w)||0,p=pct([sc[j]]);tw+=w;if(p!==null){sw+=w*p;dw+=w}});
+  return {p:dw&&dw>=tw-1e-9?sw/tw:null,part:dw?{sw:sw,dw:dw,tw:tw}:null,done:tw?dw/tw:0}}
+function convTable(){var c=D.st.conv;if(c==='none'||!c)return null;if(c==='custom')return (D.st.ctab||[]).slice().sort(function(a,b){return b[0]-a[0]});return TAB[c]}
+function convert(ig){var t=convTable();if(!t)return null;for(var i=0;i<t.length;i++)if(ig>=t[i][0]-1e-9)return t[i][1];return t.length?t[t.length-1][1]:null}
+function minFor(g){var t=convTable();if(!t)return g;var best=null;t.forEach(function(r){if(r[1]>=g&&(best===null||r[0]<best))best=r[0]});return best}
+function rnd(x,d){var f=Math.pow(10,d);return Math.round(x*f+1e-9)/f}
+function label(g){var b=(D.st.bands||[]).slice().sort(function(a,b){return b[0]-a[0]});for(var i=0;i<b.length;i++)if(g>=num(b[i][0])-1e-9)return b[i][1];return ''}
+function fmt(x,d){return x===null||x===undefined?'–':Number(x).toFixed(d)}
+
+// ---------- setup editor ----------
+function drawSetup(){var st=D.st;
+  $('#gcName').value=st.name||'';
+  $('#gcCats').innerHTML=st.cats.map(function(c,i){return '<div class="sc-cat"><div class="it sc-row"><input value="'+esc(c.n)+'" data-ci="'+i+'" data-f="n" aria-label="Category name"><input inputmode="decimal" value="'+esc(c.w)+'" data-ci="'+i+'" data-f="w" aria-label="Weight in percent"><span>%</span><button class="x" type="button" data-cdel="'+i+'" aria-label="Remove category">✕</button></div>'+
+    (c.parts?'<div class="sc-parts"><span class="note2">Parts of '+esc(c.n||'this category')+' (their % add up to 100):</span>'+c.parts.map(function(p,j){return '<div class="it sc-row"><input value="'+esc(p.n)+'" data-ci="'+i+'" data-pj="'+j+'" data-f="n" aria-label="Part name"><input inputmode="decimal" value="'+esc(p.w)+'" data-ci="'+i+'" data-pj="'+j+'" data-f="w" aria-label="Part weight"><span>%</span><button class="x" type="button" data-pdel="'+i+'.'+j+'" aria-label="Remove part">✕</button></div>'}).join('')+'<button class="addit" type="button" data-padd="'+i+'">+ Add a part</button></div>'
+      :'<button class="addit sc-split" type="button" data-split="'+i+'">Split into parts (e.g. Midterm 50%, Final 50%)</button>')+'</div>'}).join('');
+  var t=total();$('#gcTot').innerHTML='Total: <b>'+rnd(t,2)+'%</b>'+(Math.abs(t-100)>.01?' <span style="color:var(--bad)">(should be 100%)</span>':' ✓');
+  $('#gcScale').value=st.scale in SCALES?st.scale:'custom';
+  $('#gcBands').innerHTML=(st.bands||[]).map(function(b,i){return '<div class="it sc-band"><span>From</span><input inputmode="decimal" value="'+esc(b[0])+'" data-bi="'+i+'" data-bj="0" aria-label="Lowest grade for this label"><input value="'+esc(b[1])+'" data-bi="'+i+'" data-bj="1" aria-label="Label"><button class="x" type="button" data-bdel="'+i+'" aria-label="Remove">✕</button></div>'}).join('');
+  $('#gcPass').value=st.pass==null?'':st.pass;$('#gcConv').value=st.conv||'none';$('#gcDec').value=String(st.dec==null?1:st.dec);
+  $('#gcCtabBox').hidden=st.conv!=='custom';$('#gcCtab').value=(st.ctab||[]).map(function(r){return r[0]+' '+r[1]}).join('\n');
+  $('#gcTerms').value=String(st.terms||1);$('#gcTname').value=st.tname||'Term';
+  $('#gcTwBox').hidden=(st.terms||1)<2;$('#gcTwEq').checked=!st.tw;
+  $('#gcTw').hidden=!st.tw;$('#gcTw').innerHTML=st.tw?st.tw.map(function(w,i){return '<label>'+esc(st.tname||'Term')+' '+(i+1)+' %<input inputmode="decimal" value="'+esc(w)+'" data-tw="'+i+'"></label>'}).join(''):'';
+  wireSetup()}
+function changed(structure){if(structure)fit();save();drawScores();calc()}
+function wireSetup(){var st=D.st;
+  $$('#gcCats input').forEach(function(x){x.oninput=function(){var c=st.cats[+x.dataset.ci],o=x.dataset.pj!=null?c.parts[+x.dataset.pj]:c;o[x.dataset.f]=x.value;
+    var t=total();$('#gcTot').innerHTML='Total: <b>'+rnd(t,2)+'%</b>'+(Math.abs(t-100)>.01?' <span style="color:var(--bad)">(should be 100%)</span>':' ✓');changed()}});
+  $$('[data-cdel]').forEach(function(b){b.onclick=function(){if(st.cats.length<2)return;var i=+b.dataset.cdel;st.cats.splice(i,1);D.sc.splice(i,1);drawSetup();changed(1)}});
+  $$('[data-split]').forEach(function(b){b.onclick=function(){var i=+b.dataset.split;st.cats[i].parts=[{n:'Part 1',w:50},{n:'Part 2',w:50}];D.sc[i]=[['',''],['','']];drawSetup();changed(1)}});
+  $$('[data-padd]').forEach(function(b){b.onclick=function(){var i=+b.dataset.padd;st.cats[i].parts.push({n:'Part '+(st.cats[i].parts.length+1),w:''});drawSetup();changed(1)}});
+  $$('[data-pdel]').forEach(function(b){b.onclick=function(){var a=b.dataset.pdel.split('.'),i=+a[0],j=+a[1],c=st.cats[i];c.parts.splice(j,1);D.sc[i].splice(j,1);if(c.parts.length<2){c.parts=null;D.sc[i]=[['',''],['','']]}drawSetup();changed(1)}});
+  $$('#gcBands input').forEach(function(x){x.oninput=function(){st.bands[+x.dataset.bi][+x.dataset.bj]=x.dataset.bj==='0'?x.value:x.value;st.scale='custom';$('#gcScale').value='custom';changed()}});
+  $$('[data-bdel]').forEach(function(b){b.onclick=function(){st.bands.splice(+b.dataset.bdel,1);st.scale='custom';drawSetup();changed()}});
+  $$('#gcTw input').forEach(function(x){x.oninput=function(){st.tw[+x.dataset.tw]=x.value;changed()}})}
+$('#gcName').oninput=function(){D.st.name=this.value;save()};
+$('#gcAddCat').onclick=function(){D.st.cats.push({n:'Category '+(D.st.cats.length+1),w:'',parts:null});D.sc.push([['',''],['','']]);drawSetup();changed(1)};
+$('#gcScale').onchange=function(){D.st.scale=this.value;if(this.value!=='custom')D.st.bands=clone(SCALES[this.value]);drawSetup();changed()};
+$('#gcAddBand').onclick=function(){D.st.bands.push(['','']);D.st.scale='custom';drawSetup()};
+$('#gcPass').oninput=function(){D.st.pass=this.value===''?null:this.value;changed()};
+$('#gcConv').onchange=function(){D.st.conv=this.value;if(this.value==='custom'&&!(D.st.ctab||[]).length)D.st.ctab=clone(TAB['2026']);drawSetup();changed()};
+$('#gcCtab').oninput=function(){D.st.ctab=this.value.split(/\n+/).map(function(l){var a=l.trim().split(/[\s,;→>-]+/).map(num);return a.length>=2&&a[0]!==null&&a[1]!==null?[a[0],a[1]]:null}).filter(Boolean);changed()};
+$('#gcDec').onchange=function(){D.st.dec=+this.value;changed()};
+$('#gcTerms').onchange=function(){D.st.terms=+this.value;if(D.st.tw){D.st.tw=D.st.tw.slice(0,D.st.terms);while(D.st.tw.length<D.st.terms)D.st.tw.push('')}drawSetup();changed(1)};
+$('#gcTname').onchange=function(){D.st.tname=this.value;drawSetup();changed(1)};
+$('#gcTwEq').onchange=function(){D.st.tw=this.checked?null:Array.from({length:D.st.terms},function(){return rnd(100/D.st.terms,2)});drawSetup();changed()};
+
+// ---------- presets ----------
+(function(){var groups={};P.forEach(function(p){(groups[p.group]=groups[p.group]||[]).push(p)});
+  $('#gcPreset').innerHTML='<option value="">Choose a ready setup…</option>'+Object.keys(groups).map(function(g){return '<optgroup label="'+esc(g)+'">'+groups[g].map(function(p){return '<option value="'+p.id+'">'+esc(p.label)+'</option>'}).join('')+'</optgroup>'}).join('')})();
+$('#gcPreset').onchange=function(){if(!this.value)return;var has=D.sc.some(function(l){return l.some(function(r){return r[0]!==''})});
+  if(has&&!window.confirm('Switch to this setup? Scores you typed for the current setup will be cleared.')){this.value='';return}
+  D.st=fromPreset(this.value);D.sc=blankScores(D.st);D.tg=[];fit();this.value='';$('#gcShared').hidden=true;drawSetup();changed();
+  $('#gcSetup').open=D.st.id==='custom'};
+$('#gcLink').onclick=function(){var st=clone(D.st);if(st.scale!=='custom')delete st.bands;if(st.conv!=='custom')delete st.ctab;
+  var s=btoa(unescape(encodeURIComponent(JSON.stringify(st)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  var u=location.origin+location.pathname+'#s='+s,b=this;function ok(){b.textContent='✓ Link copied';setTimeout(function(){b.textContent='🔗 Copy setup link'},2000)}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(ok,function(){window.prompt('Copy this link:',u)});else window.prompt('Copy this link:',u)};
+$('#gcClear').onclick=function(){if(!window.confirm('Clear all scores? Your setup stays.'))return;D.sc=blankScores(D.st);D.tg=[];fit();changed()};
+
+// ---------- scores ----------
+function row(i,j,v,lab){return '<div class="it"><input inputmode="decimal" placeholder="'+(lab?esc(lab):'Score')+'" value="'+esc(v[0])+'" data-si="'+i+'" data-sj="'+j+'" data-k="0" aria-label="'+(lab?esc(lab)+' score':'Score')+'"><span>out of</span><input inputmode="decimal" placeholder="Total" value="'+esc(v[1])+'" data-si="'+i+'" data-sj="'+j+'" data-k="1" aria-label="Highest possible score"><button class="x" type="button" '+(lab?'disabled style="visibility:hidden"':'data-sdel="'+i+'.'+j+'"')+' aria-label="Remove">✕</button></div>'}
+function drawScores(){$('#gcScores').innerHTML=D.st.cats.map(function(c,i){var sc=D.sc[i];
+  return '<div class="comp"><h3>'+esc(c.n||'Category '+(i+1))+' <span>'+esc(c.w===''?'?':c.w)+'%</span></h3>'+(c.parts?'<p class="note2" style="margin:0">'+c.parts.map(function(p){return esc(p.n)+' '+esc(p.w)+'%'}).join(' · ')+'</p>':'')+
+   '<div class="items">'+(c.parts?c.parts.map(function(p,j){return row(i,j,sc[j],p.n)}).join(''):sc.map(function(v,j){return row(i,j,v)}).join(''))+'</div>'+
+   (c.parts?'':'<button class="addit" type="button" data-sadd="'+i+'">+ Add a score</button>')+'</div>'}).join('');
+  $$('#gcScores input').forEach(function(x){x.oninput=function(){D.sc[+x.dataset.si][+x.dataset.sj][+x.dataset.k]=x.value;calc()}});
+  $$('[data-sdel]').forEach(function(b){b.onclick=function(){var a=b.dataset.sdel.split('.'),l=D.sc[+a[0]];if(l.length>1){l.splice(+a[1],1);drawScores();calc()}}});
+  $$('[data-sadd]').forEach(function(b){b.onclick=function(){var i=+b.dataset.sadd;D.sc[i].push(['','']);drawScores();var l=$$('[data-si="'+i+'"][data-k="0"]');l[l.length-1].focus()}});
+  var n=D.st.terms||1;$('#gcFinal').hidden=n<2;
+  $('#gcTermIn').innerHTML=Array.from({length:n},function(_,i){return '<label>'+esc(D.st.tname||'Term')+' '+(i+1)+(D.st.tw?' ('+esc(D.st.tw[i])+'%)':'')+'<input inputmode="decimal" data-tg="'+i+'" value="'+esc(D.tg[i])+'"></label>'}).join('');
+  $$('#gcTermIn input').forEach(function(x){x.oninput=function(){D.tg[+x.dataset.tg]=x.value;calcFinal()}});
+  $('#gcTermName').textContent=(D.st.tname||'Term').toLowerCase()}
+
+// ---------- results ----------
+function gradeOf(ig){var c=convert(ig),d=D.st.dec==null?1:D.st.dec;return c!==null?c:rnd(ig,d)}
+function verdict(g){var p=num(D.st.pass),l=label(g);return (l?'<span class="tag">'+esc(l)+'</span>':'')+(p!==null?'<span class="pf '+(g>=p-1e-9?'ok':'bad')+'">'+(g>=p-1e-9?'Passing':'Below the pass mark of '+p)+'</span>':'')}
+function calc(){var st=D.st,W=total(),done=0,dw=0,rows=[],rem=[];
+  st.cats.forEach(function(c,i){var w=num(c.w)||0,r=catPct(i);
+    if(r.p!==null){done+=w*r.p;dw+=w}else if(r.part){done+=w*r.part.sw/r.part.tw;dw+=w*r.part.dw/r.part.tw;rem.push(esc(c.n)+' (remaining parts)')}else rem.push(esc(c.n)+' ('+w+'%)');
+    rows.push('<tr><td>'+esc(c.n)+'</td><td>'+fmt(r.p,2)+'</td><td>'+w+'%</td><td>'+(r.p!==null?fmt(r.p*w/100,2):'–')+'</td></tr>')});
+  var html='<table><tr><th>Category</th><th>Score %</th><th>Weight</th><th>Weighted</th></tr>'+rows.join('')+'</table>',out=$('#gcRes');
+  if(Math.abs(W-100)>.01)html+='<p class="note2" style="color:var(--bad);margin:0">The weights add up to '+rnd(W,2)+'%, not 100%. Results are scaled to 100%.</p>';
+  if(!dw){out.innerHTML=html+'<p class="note2" style="margin:0">Type a score and the total possible score in at least one category.</p>';$('#gcNeed').hidden=true;save();return}
+  var full=dw>=W-1e-6,ig=rnd(done/(full?W:dw),2),g=gradeOf(ig),conv=convTable();
+  html+='<div class="big"><span>'+(full?'':'So far ')+(conv?'Initial grade <b style="font-size:26px">'+fmt(ig,2)+'</b></span><span>Grade <b>'+g+'</b>':'Grade <b>'+fmt(g,st.dec==null?1:st.dec)+'</b>')+'</span>'+verdict(g)+'</div>';
+  html+='<p class="note2" style="margin:0">'+(full?'':'Based on the '+rnd(dw,2)+'% of the grade that has scores so far. ')+(conv?'Converted with the '+({'2026':'2026–2027 adjusted','2015':'2015','custom':'your'}[st.conv])+' table. ':'')+'</p>';
+  out.innerHTML=html;
+  $('#gcNeed').hidden=full;if(!full){$('#gcNeedWhat').innerHTML=rem.join(', ');need(done,dw,W)}save()}
+function need(done,dw,W){var t=num(D.target),r=$('#gcNeedRes');$('#gcTarget').value=D.target||'';
+  if(t===null){r.innerHTML='<span class="note2">Type the grade you’re aiming for.</span>';return}
+  var tig=minFor(t);if(tig===null){r.innerHTML='<span class="note2">That grade isn’t on the conversion table.</span>';return}
+  var n=(tig*W-done)/(W-dw);
+  r.innerHTML='<div class="big"><span>You need about <b>'+fmt(Math.max(0,n),1)+'%</b></span></div><span class="note2">'+(n>100?'That’s above 100%, so this target can’t be reached with the remaining work alone.':n<=0?'You’ve already reached it, even with zero on the rest.':'That’s the average score needed on the remaining work to reach '+t+(convTable()?' (an initial grade of '+fmt(tig,2)+')':'')+'.')+'</span>'}
+$('#gcTarget').oninput=function(){D.target=this.value;calc()};
+function calcFinal(){var n=D.st.terms||1,v=[],ws=[];for(var i=0;i<n;i++){var x=num(D.tg[i]);if(x!==null){v.push(x);ws.push(D.st.tw?num(D.st.tw[i])||0:1)}}
+  var r=$('#gcFRes');save();if(v.length<n){r.innerHTML='<span class="note2">Type all '+n+' '+esc((D.st.tname||'term').toLowerCase())+' grades. The final grade is their '+(D.st.tw?'weighted ':'')+'average.</span>';return}
+  var sw=ws.reduce(function(a,b){return a+b},0),f=v.reduce(function(a,x,i){return a+x*ws[i]},0)/sw,d=D.st.dec==null?1:D.st.dec,fg=rnd(f,d);
+  r.innerHTML='<div class="big"><span>Final grade <b>'+fmt(fg,d)+'</b></span>'+verdict(fg)+'</div>'}
+$('#gcUse').onclick=function(){var txt=$$('#gcRes .big b');if(!txt.length)return;var val=txt[txt.length-1].textContent;var i=D.tg.findIndex(function(x){return x===''});if(i<0)i=0;D.tg[i]=val;drawScores();calcFinal();$('#gcFinal').scrollIntoView({behavior:'smooth',block:'center'})};
+drawSetup();drawScores();calc();calcFinal();
+if(D.st.id==='custom')$('#gcSetup').open=true;
+})();
+</script><div class="calc-text">
+<h2>How to use it</h2>
 <ol>
-<li><b>Percentage score</b> for each component = total raw score ÷ total highest possible score × 100.</li>
-<li><b>Exams</b> (for most subjects) combine Summative Test 1 (30%), Summative Test 2 (30%) and the Term Exam (40%).</li>
-<li><b>Weighted score</b> = percentage score × the component’s weight.</li>
-<li><b>Initial grade</b> = the sum of the weighted scores.</li>
-<li><b>Term grade</b> = the initial grade transmuted with the SY 2026–2027 adjusted table, rounded to a whole number. From SY 2027–2028, Grades 4 to 12 use the initial grade itself, with no transmutation.</li>
-<li><b>Final grade</b> = the average of the three term grades, rounded. The <b>general average</b> is the average of all final grades.</li>
+<li><b>Choose a ready setup</b>, or open <b>Grading setup</b> to make your own: name your categories (homework, quizzes, labs, exams…) and give each a weight. A category can be split into parts, like Midterm 40% and Final 60%.</li>
+<li><b>Pick a grade scale:</b> letters A to F, letters with GPA points, numbers only, or your own labels with the lowest grade for each. Add a pass mark if your school has one.</li>
+<li><b>Type the scores</b> as “score out of total”, like 18 out of 20. Add as many as you need. The calculator adds them up, so a 50-point test counts more than a 10-point quiz in the same category.</li>
+<li><b>Read the grade.</b> If some work isn’t graded yet, you’ll see the grade so far and what you need on the rest to reach your target.</li>
+<li><b>More than one term?</b> Set the number of terms to get the final grade, with equal or different weights.</li>
 </ol>
-<h2>Example</h2>
-<p>A Grade 7 Math student has 82% in Written Work, 80% in Performance Tasks and 85.6% in Exams. With weights of 20%, 50% and 30%: 16.40 + 40.00 + 25.68 = an initial grade of <b>82.08</b>. On the SY 2026–2027 table, 81.80–82.97 becomes <b>85</b>, which is “Benchmarking.”</p>
-<h2>Descriptors (Grades 4 to 12)</h2>
-<table class="ttab"><thead><tr><th>Grade</th><th>Descriptor</th></tr></thead><tbody><tr><td>90–100</td><td>Advancing (Namumukod-tangi)</td></tr><tr><td>80–89</td><td>Benchmarking (Napamamalas)</td></tr><tr><td>75–79</td><td>Connecting (Natutungo)</td></tr><tr><td>65–74</td><td>Developing (Napauunlad)</td></tr><tr><td>Below 65</td><td>Emerging (Nagsisimula)</td></tr></tbody></table>
-<p>The passing grade is <b>75</b>. Kindergarten to Grade 1 use descriptive ratings instead of numbers this school year, with Grades 2 and 3 following in the next two school years.</p>
+<h2>Share the same setup with your class or department</h2>
+<p>Tap <b>Copy setup link</b> and send it. Everyone who opens it gets your categories, weights, scale and terms, ready to type their own scores. Students can check their grade the same way you compute it. The link carries the setup only. Scores stay on each person’s own device, and nothing is stored on our servers.</p>
+<h2>How the grade is computed</h2>
+<ol>
+<li><b>Category score</b> = total points earned ÷ total points possible × 100. For a category with parts, each part is scored on its own, then combined by its weight.</li>
+<li><b>Weighted score</b> = category score × its weight. The grade is the sum of the weighted scores.</li>
+<li><b>Conversion (optional).</b> Some schools convert this “initial grade” with a table, also called transmutation. You can use a ready table or type your own.</li>
+<li><b>Final grade</b> = the average of the term grades, or their weighted average if the terms count differently.</li>
+</ol>
+<h2>Examples</h2>
+<p><b>Weighted course:</b> homework 92% (20%), quizzes 85% (30%), projects 88% (20%) and a final exam 80% (30%): 18.4 + 25.5 + 17.6 + 24.0 = <b>85.5%</b>, a B on the A to F scale.</p>
+<p><b>Three terms with a conversion table:</b> with the K to 12 three-term setup for Grades 4–10 Math, Written Works 82%, Performance Tasks 80% and Exams 85.6% give 16.40 + 40.00 + 25.68 = an initial grade of <b>82.08</b>, which the 2026–2027 adjusted table converts to <b>85</b> (Benchmarking). See the full <a href="/tools/transmutation-table/">transmutation table</a>.</p>
 <h2>Questions</h2>
-<h3>Is this an official computation?</h3><p>QuizPolice is an independent tool and is not affiliated with any government agency. It follows the 2026 grading guidelines as published, including the SY 2026–2027 adjusted transmutation table. Small differences can come from how your school rounds percentage scores. Always confirm with your school’s official e-Class Record.</p>
-<h3>Can I still use the old table?</h3><p>Yes. Choose “Old table (2015)” and the old weights, for example for Grade 12 learners who are not yet on the strengthened SHS curriculum, or for schools that still use it.</p>
-<h3>Are my scores saved?</h3><p>Only in your own browser, so they’re still here when you come back. Nothing is sent to QuizPolice.</p>
-<h2>More free tools</h2><ul><li><a href="/tools/transmutation-table/">Transmutation table</a></li><li><a href="/tools/weighted-grade-calculator/">Weighted grade calculator</a></li><li><a href="/practice/">Practice games for students</a></li><li><a href="https://pizarrapad.telarlabs.net/tools/">Classroom timer, name picker and more</a></li></ul></article>
+<h3>Is this an official calculator?</h3><p>No. QuizPolice is an independent tool and is not affiliated with any school system or government agency. The ready setups follow published rules as closely as we can, but small differences can come from how a school rounds scores. Always check against your school’s official records.</p>
+<h3>Can I change a ready setup?</h3><p>Yes. Pick it, then open <b>Grading setup</b> and change anything: names, weights, labels, the pass mark or the conversion table.</p>
+<h3>Are my scores saved?</h3><p>Only in your own browser, so they’re still here when you come back on the same device. Clearing your browser data removes them.</p>
+<h3>Can I print it?</h3><p>Yes. Tap <b>Print</b> for a clean page with the scores and the grade.</p>
+</div><h2 class="more">More free tools</h2><ul class="more"><li><a href="/tools/quick-grader/">Quick grader</a></li><li><a href="/tools/transmutation-table/">Transmutation table maker</a></li><li><a href="/tools/test-set-shuffler/">Test set shuffler</a></li><li><a href="/tools/exam-seating-chart/">Exam seating chart</a></li><li><a href="/tools/exam-clock/">Exam clock</a></li><li><a href="/practice/">Practice games for students</a></li><li><a href="https://pizarrapad.telarlabs.net/tools/">Classroom timer, name picker and more</a></li></ul></article>
 </main>
 <footer class="foot"><div class="wrap foot-in">
   <div><a class="logo" href="/"><svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l14 5v10c0 9-6 16-14 19C12 34 6 27 6 18V8z" fill="#1C2F5E"/><path d="M20 11l2.6 5.3 5.8.8-4.2 4.1 1 5.8L20 24.3 14.8 27l1-5.8-4.2-4.1 5.8-.8z" fill="#E8A317"/></svg><span>QuizPolice</span></a><p class="muted">Free quiz monitoring for Google Forms, Microsoft Forms and Wayground. Part of the Telar Labs teacher tools.</p></div>
   <div class="foot-cols">
-    <div><h4>Use it</h4><a href="/teacher/">Teacher dashboard</a><a href="/join/">Join a quiz</a><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/guides/">Guides</a><a href="/practice/">Practice games</a><a href="/tools/grade-calculator/">K to 12 grade calculator</a><a href="/tools/">Grade tools</a><a href="/faq/">FAQ</a></div>
+    <div><h4>Use it</h4><a href="/teacher/">Teacher dashboard</a><a href="/join/">Join a quiz</a><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/guides/">Guides</a><a href="/practice/">Practice games</a><a href="/tools/grade-calculator/">Grade calculator</a><a href="/tools/">Teacher tools</a><a href="/faq/">FAQ</a></div>
     <div><h4><a href="https://telarlabs.net" style="color:inherit;margin:0">Telar Labs</a></h4><a href="https://telarlabs.net">Telar Labs home</a><a href="https://telarlabs.net/guides/">Telar Labs guides</a><a href="/about/">About</a><a href="/privacy/">Privacy policy</a><a href="/terms/">Terms of use</a><a href="/contact/">Contact</a></div>
   </div>
 </div><div class="wrap family"><span class="family-h"><a href="https://telarlabs.net">More from Telar Labs</a>:</span><a class="app-telarclips" href="https://clips.telarlabs.net" title="Free motion backgrounds and illustrated scenes for class videos, greetings and school programs.">Telar Clips</a><a class="app-pizarrapad" href="https://pizarrapad.telarlabs.net" title="Free online whiteboard, blackboard and greenboard for the classroom projector.">PizarraPad</a><a class="app-drafttrail" href="https://drafttrail.telarlabs.net" title="Free writing recorder that replays how an essay was written, step by step.">DraftTrail</a><a class="app-tixward" href="https://tixward.telarlabs.net" title="Event tickets and free bookings for courts and rooms, paid directly to organizers. Free for most events.">Tixward</a></div><div class="wrap fine">&copy; 2026 Telar Labs.</div></footer>
