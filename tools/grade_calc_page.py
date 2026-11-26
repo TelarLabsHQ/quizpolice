@@ -113,12 +113,12 @@ TEXT = '''<div class="calc-text">
 <h3>Can I print it?</h3><p>Yes. Tap <b>Print</b> for a clean page with the scores and the grade.</p>
 </div>'''
 
-from grades_content import trans_page, TRANS_TEXT
+from trans_page import trans_page, TRANS_TEXT
 TOOLS = [
  ('/tools/grade-calculator/', 'Grade Calculator: Weighted Categories, Your Own Grade Scale and Terms',
   'Free grade calculator for teachers and students. Set your own categories, weights, grade scale and pass mark, or start from a ready setup. Find what you need on the rest, add terms for a final grade, and share your setup as a link.',
   'Grade calculator', grade_calc, TEXT, 'Your own categories, weights and grade scale, or a ready setup. Share it as a link.'),
- ('/tools/transmutation-table/', 'Transmutation Table 2026–2027 and the Old 2015 Table',
-  'The transmutation table for SY 2026–2027 next to the old 2015 table, with an instant lookup. See what changed and when transmutation ends.',
-  'Transmutation table', trans_page, TRANS_TEXT, 'The 2026–2027 adjusted table and the old 2015 table, with a quick lookup.'),
+ ('/tools/transmutation-table/', 'Transmutation Table Maker: Make Your Own, or Use the K to 12 Tables',
+  'Free transmutation table maker: set your passing score and grades to make your own table, or get a raw score table for any number of items. The K to 12 2026–2027 and 2015 tables are included. Print, copy or share it.',
+  'Transmutation table maker', trans_page, TRANS_TEXT, 'Make your own table from a passing score, or use the K to 12 tables. Raw scores for any number of items.'),
 ]

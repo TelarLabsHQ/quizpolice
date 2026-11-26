@@ -74,24 +74,3 @@ var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){retu
 function num(v){var n=parseFloat(String(v).replace(',','.'));return isNaN(n)?null:n}
 function keep(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
 </script>'''
-
-def trans_page():
-    import json
-    return CSS + COMMON_JS + f'''
-<div class="gc"><div class="row2"><label>Initial grade<input id="ig" inputmode="decimal" placeholder="e.g. 82.08"></label><label>Table<select id="tb"><option value="new">SY 2026–2027 adjusted</option><option value="old">Old table (2015)</option></select></label></div>
-<div class="res" id="tr"><span class="note2">Type an initial grade to see its transmuted grade.</span></div></div>
-<script>var NEW={json.dumps(NEW_TABLE)},OLD={json.dumps(OLD_TABLE)};
-function go(){{var v=num($('#ig').value),t=$('#tb').value==='old'?OLD:NEW,r=$('#tr');if(v===null||v<0||v>100){{r.innerHTML='<span class="note2">Type an initial grade from 0 to 100.</span>';return}}
-var g=60;for(var i=0;i<t.length;i++)if(v>=t[i][0]-1e-9){{g=t[i][1];break}}r.innerHTML='<div class="big"><span>Transmuted grade <b>'+g+'</b></span><span class="note2">'+(g>=75?'Passing':'Below 75')+'</span></div>'}}
-$('#ig').oninput=go;$('#tb').onchange=go;</script>
-<div class="tts">{table_html(NEW_TABLE, 'SY 2026–2027 adjusted table')}{table_html(OLD_TABLE, 'Old table (2015)')}</div>'''
-
-TRANS_TEXT = '''
-<h2>What changed</h2>
-<p>Under the old table (2015), an initial grade of <b>60</b> was transmuted to a passing 75. Under the adjusted table for SY 2026–2027, an initial grade of <b>70</b> is needed for 75. From SY 2027–2028, Grades 4 to 12 drop transmutation entirely: an initial grade of 75 is a final 75. Kindergarten to Grade 3 move to descriptive ratings over the same period.</p>
-<p>The stated aim of the change is to make grades reflect what learners actually know, not to make passing harder. Teachers can plan support earlier when grades are more accurate.</p>
-<h2>How to use the table</h2>
-<ol><li>Compute the initial grade: the sum of the weighted scores of Written Work, Performance Tasks and Exams.</li><li>Find the band it falls in, and read the transmuted grade.</li></ol>
-<p>Easier: the <a href="/tools/grade-calculator/">grade calculator</a> does all the steps for you. Pick the K to 12 three-term setup, type the raw scores, and get the term and final grades.</p>
-<p class="note2">Always confirm with your school’s official records.</p>'''
-

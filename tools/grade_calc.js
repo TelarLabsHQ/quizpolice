@@ -17,6 +17,8 @@ try{var m=location.hash.match(/[#&]s=([^&]+)/);if(m){var j=decodeURIComponent(es
 if(!D||!D.st)D={st:fromPreset(P[0].id),sc:null,tg:[],target:''};
 if(shared&&shared.cats){var keepScores=D.st&&JSON.stringify(D.st.cats)===JSON.stringify(shared.cats);D.st=shared;if(!D.st.bands)D.st.bands=clone(SCALES[D.st.scale]||SCALES.pct);if(!keepScores)D.sc=null;
   $('#gcShared').hidden=false;$('#gcShared b').textContent=shared.name||'a shared setup';history.replaceState(null,'',location.pathname+location.search)}
+var mt=location.hash.match(/[#&]t=([^&]+)/);if(mt){try{var ct=decodeURIComponent(mt[1]).split(',').map(function(x){var a=x.split(':').map(num);return a[0]!==null&&a[1]!==null?[a[0],a[1]]:null}).filter(Boolean);
+  if(ct.length){D.st.conv='custom';D.st.ctab=ct;D.st.dec=0;var mp=location.hash.match(/[#&]pass=([\d.]+)/);if(mp)D.st.pass=num(mp[1]);$('#gcShared').hidden=false;$('#gcShared').innerHTML='Your transmutation table is now set as the conversion table. Open <b>Grading setup</b> to see it.';history.replaceState(null,'',location.pathname+location.search)}}catch(e){}}
 if(!D.sc)D.sc=blankScores(D.st);fit();
 function save(){keep('qp-gc2',D)}
 function total(){return D.st.cats.reduce(function(s,c){return s+(num(c.w)||0)},0)}
