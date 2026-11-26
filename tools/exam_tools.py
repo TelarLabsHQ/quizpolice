@@ -115,6 +115,8 @@ SEATING_TEXT = '''
 
 # ---------------- exam clock ----------------
 CLOCK = ECSS + '''<style>
+/* no ads over the projector views */
+.ec-on ins.adsbygoogle,.ec-on .google-auto-placed,.ec-on ins[data-anchor-status],.ec-on iframe[id^=aswift],.sc-proj ins.adsbygoogle,.sc-proj .google-auto-placed,.sc-proj ins[data-anchor-status],.sc-proj iframe[id^=aswift]{display:none!important;visibility:hidden!important}
 #ecRun{position:fixed;inset:0;z-index:60;background:#0f1a33;color:#fff;display:flex;flex-direction:column;padding:3vh 4vw;gap:2vh;font-family:"Archivo","Segoe UI",sans-serif}
 #ecRun[hidden]{display:none}#ecRun .t1{font-size:clamp(22px,4vw,54px);font-weight:800;text-align:center;line-height:1.15}#ecRun .t2{font-size:clamp(16px,2.2vw,30px);text-align:center;opacity:.8}
 #ecBig{font-size:clamp(80px,19vw,300px);font-weight:800;text-align:center;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em}

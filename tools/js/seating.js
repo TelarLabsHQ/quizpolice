@@ -49,9 +49,9 @@ $('#scGo').onclick=function(){S.blocked=S.blocked.filter(function(k){var a=k.spl
 $('#scRe').onclick=function(){S.seed=(S.seed*31+12345)%1e9;if($('#scOrder').value!=='random')$('#scOrder').value='random';make()};
 $('#scModeSwap').onclick=function(){mode='swap';sel=null;this.setAttribute('aria-pressed','true');$('#scModeBlock').setAttribute('aria-pressed','false');draw()};
 $('#scModeBlock').onclick=function(){mode='block';sel=null;this.setAttribute('aria-pressed','true');$('#scModeSwap').setAttribute('aria-pressed','false');draw()};
-$('#scProj').onclick=function(){document.body.classList.add('sc-proj');try{document.documentElement.requestFullscreen()}catch(e){}};
-$('#scExit').onclick=function(){document.body.classList.remove('sc-proj');try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}};
-document.addEventListener('keydown',function(e){if(e.key==='Escape')document.body.classList.remove('sc-proj')});
+$('#scProj').onclick=function(){document.body.classList.add('sc-proj');document.documentElement.classList.add('sc-proj');try{document.documentElement.requestFullscreen()}catch(e){}};
+$('#scExit').onclick=function(){document.body.classList.remove('sc-proj');document.documentElement.classList.remove('sc-proj');try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}};
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.body.classList.remove('sc-proj');document.documentElement.classList.remove('sc-proj')}});
 $('#scPrintBtn').onclick=function(){window.print()};
 ['scTitle'].forEach(function(id){$('#'+id).oninput=function(){S.title=this.value;save();if(S.seats)$('#scHead').textContent=S.title||'Exam seating chart'}});
 if(S.seats&&Object.keys(S.seats).length)draw();
