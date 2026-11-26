@@ -22,19 +22,19 @@ def table_html(t, cap):
 
 # weights: (label, WW, PT, EX, exam mode) exam mode: 'split' = ST1 30% + ST2 30% + Term exam 40%; 'te' = term exam only; 'qa' = one quarterly assessment (old order)
 GROUPS = [
- ('Grades 4–10 (DO 015, s. 2026)', [
+ ('Grades 4–10', [
    ('g4a', 'English, Filipino, Math, Science, AP, GMRC / Values Education', 20, 50, 30, 'split'),
    ('g4b', 'EPP / TLE, MAPEH', 20, 60, 20, 'split')]),
- ('Grades 2–3 (DO 015, s. 2026)', [
+ ('Grades 2–3', [
    ('g2a', 'Makabansa and other graded subjects', 20, 50, 30, 'split')]),
- ('Senior High School, strengthened curriculum (DO 015, s. 2026)', [
+ ('Senior High School, strengthened curriculum', [
    ('s1', 'Core subjects and other academic electives', 20, 50, 30, 'split'),
    ('s2', 'Field Exposure, Arts Apprenticeship, Creative Production and Innovation', 15, 70, 15, 'te'),
    ('s3', 'Arts, Sports, Health and Wellness electives', 20, 60, 20, 'split'),
    ('s4', 'Research electives, Design and Innovation', 40, 60, 0, 'split'),
    ('s5', 'TechPro electives', 15, 65, 20, 'split'),
    ('s6', 'Work Immersion', 20, 80, 0, 'split')]),
- ('Old weights (DO 8, s. 2015), e.g. Grade 12 not yet on the strengthened curriculum', [
+ ('Old weights (2015), e.g. Grade 12 not yet on the strengthened curriculum', [
    ('o1', 'Grades 1–10: Languages, AP, EsP', 30, 50, 20, 'qa'),
    ('o2', 'Grades 1–10: Science, Math', 40, 40, 20, 'qa'),
    ('o3', 'Grades 1–10: MAPEH, EPP / TLE', 20, 60, 20, 'qa'),
@@ -81,7 +81,7 @@ def deped_calc():
     return CSS + COMMON_JS + f'''
 <div class="gc" id="gc">
   <div class="row2">
-    <label>Grading rules<select id="mode"><option value="new">SY 2026–2027: adjusted table (DO 015, s. 2026)</option><option value="none">SY 2027–2028 on: no transmutation</option><option value="old">Old table (DO 8, s. 2015)</option></select></label>
+    <label>Grading rules<select id="mode"><option value="new">SY 2026–2027: adjusted table</option><option value="none">SY 2027–2028 on: no transmutation</option><option value="old">Old table (2015)</option></select></label>
     <label>Subject and weights (WW / PT / Exam)<select id="grp">{_opts()}</select></label>
   </div>
   <div class="row2" id="cw" hidden><label>Written Work %<input id="cww" inputmode="decimal" value="30"></label><label>Performance Tasks %<input id="cpt" inputmode="decimal" value="50"></label><label>Exam %<input id="cex" inputmode="decimal" value="20"></label></div>
@@ -127,7 +127,7 @@ function calc(){{var w=wts(),m=w[3],r=$('#res');
   var ig=Math.round((a.ps*w[0]+b.ps*w[1]+(w[2]?ex.ps*w[2]:0))/100*100)/100;
   var tg=S.mode==='none'?Math.round(ig):trans(ig);
   r.innerHTML=rows+(Math.abs(tw-100)>0.01?'<p class="note2" style="color:var(--bad)">The weights add up to '+tw+'%, not 100%.</p>':'')+'<div class="big"><span>Initial grade <b style="font-size:26px">'+ig.toFixed(2)+'</b></span><span>'+(S.mode==='old'?'Quarterly':'Term')+' grade <b>'+tg+'</b></span><span class="tag">'+desc(tg)+'</span></div>'+
-   '<p class="note2" style="margin:0">'+(S.mode==='none'?'No transmutation: the initial grade, rounded, is the term grade.':'Transmuted with the '+(S.mode==='old'?'DO 8, s. 2015':'SY 2026–2027 adjusted')+' table. '+(tg>=75?'Passing.':'Below the passing grade of 75.'))+'</p>';
+   '<p class="note2" style="margin:0">'+(S.mode==='none'?'No transmutation: the initial grade, rounded, is the term grade.':'Transmuted with the '+(S.mode==='old'?'2015':'SY 2026–2027 adjusted')+' table. '+(tg>=75?'Passing.':'Below the passing grade of 75.'))+'</p>';
   keep('qp-grades',S)}}
 function calcFG(){{var nT=S.mode==='old'?4:3,v=[];for(var i=0;i<nT;i++){{var x=num(S.terms[i]);if(x!==null)v.push(x)}}
   var r=$('#fgres');if(v.length<nT){{r.innerHTML='<span class="note2">Final grade = the average of the '+nT+' '+(S.mode==='old'?'quarterly':'term')+' grades, rounded to a whole number.</span>';return}}
@@ -144,8 +144,8 @@ draw();
 </script>'''
 
 DEPED_TEXT = '''
-<h2>How grades are computed under DO 015, s. 2026</h2>
-<p>Starting School Year 2026–2027, public schools follow <b>DepEd Order No. 015, s. 2026</b>, which replaces DO 8, s. 2015. The school year has <b>three terms</b>, only summative work counts toward grades (daily formative quizzes don’t), and transmutation is being phased out.</p>
+<h2>How grades are computed under the 2026 rules</h2>
+<p>Starting School Year 2026–2027, public schools follow <b>new grading guidelines</b> that replace the 2015 rules. The school year has <b>three terms</b>, only summative work counts toward grades (daily formative quizzes don’t), and transmutation is being phased out.</p>
 <ol>
 <li><b>Percentage score</b> for each component = total raw score ÷ total highest possible score × 100.</li>
 <li><b>Exams</b> (for most subjects) combine Summative Test 1 (30%), Summative Test 2 (30%) and the Term Exam (40%).</li>
@@ -160,30 +160,30 @@ DEPED_TEXT = '''
 <table class="ttab"><thead><tr><th>Grade</th><th>Descriptor</th></tr></thead><tbody><tr><td>90–100</td><td>Advancing (Namumukod-tangi)</td></tr><tr><td>80–89</td><td>Benchmarking (Napamamalas)</td></tr><tr><td>75–79</td><td>Connecting (Natutungo)</td></tr><tr><td>65–74</td><td>Developing (Napauunlad)</td></tr><tr><td>Below 65</td><td>Emerging (Nagsisimula)</td></tr></tbody></table>
 <p>The passing grade is <b>75</b>. Kindergarten to Grade 1 use descriptive ratings instead of numbers this school year, with Grades 2 and 3 following in the next two school years.</p>
 <h2>Questions</h2>
-<h3>Is this an official computation?</h3><p>QuizPolice is an independent tool and is not affiliated with the Department of Education. It follows DepEd Order No. 015, s. 2026 as published, including the SY 2026–2027 adjusted transmutation table. Small differences can come from how your school rounds percentage scores. Always confirm with your school’s official e-Class Record.</p>
-<h3>Can I still use the old table?</h3><p>Yes. Choose “Old table (DO 8, s. 2015)” and the old weights, for example for Grade 12 learners who are not yet on the strengthened SHS curriculum, or for schools that still use it.</p>
+<h3>Is this an official computation?</h3><p>QuizPolice is an independent tool and is not affiliated with any government agency. It follows the 2026 grading guidelines as published, including the SY 2026–2027 adjusted transmutation table. Small differences can come from how your school rounds percentage scores. Always confirm with your school’s official e-Class Record.</p>
+<h3>Can I still use the old table?</h3><p>Yes. Choose “Old table (2015)” and the old weights, for example for Grade 12 learners who are not yet on the strengthened SHS curriculum, or for schools that still use it.</p>
 <h3>Are my scores saved?</h3><p>Only in your own browser, so they’re still here when you come back. Nothing is sent to QuizPolice.</p>
-<p class="note2">Sources: DepEd Order No. 015, s. 2026 (Revised Classroom Assessment and Grading Guidelines) and DepEd Order No. 8, s. 2015.</p>'''
+'''
 
 def trans_page():
     import json
     return CSS + COMMON_JS + f'''
-<div class="gc"><div class="row2"><label>Initial grade<input id="ig" inputmode="decimal" placeholder="e.g. 82.08"></label><label>Table<select id="tb"><option value="new">SY 2026–2027 adjusted (DO 015, s. 2026)</option><option value="old">Old table (DO 8, s. 2015)</option></select></label></div>
+<div class="gc"><div class="row2"><label>Initial grade<input id="ig" inputmode="decimal" placeholder="e.g. 82.08"></label><label>Table<select id="tb"><option value="new">SY 2026–2027 adjusted</option><option value="old">Old table (2015)</option></select></label></div>
 <div class="res" id="tr"><span class="note2">Type an initial grade to see its transmuted grade.</span></div></div>
 <script>var NEW={json.dumps(NEW_TABLE)},OLD={json.dumps(OLD_TABLE)};
 function go(){{var v=num($('#ig').value),t=$('#tb').value==='old'?OLD:NEW,r=$('#tr');if(v===null||v<0||v>100){{r.innerHTML='<span class="note2">Type an initial grade from 0 to 100.</span>';return}}
 var g=60;for(var i=0;i<t.length;i++)if(v>=t[i][0]-1e-9){{g=t[i][1];break}}r.innerHTML='<div class="big"><span>Transmuted grade <b>'+g+'</b></span><span class="note2">'+(g>=75?'Passing':'Below 75')+'</span></div>'}}
 $('#ig').oninput=go;$('#tb').onchange=go;</script>
-<div class="tts">{table_html(NEW_TABLE, 'SY 2026–2027 adjusted table (DO 015, s. 2026)')}{table_html(OLD_TABLE, 'Old table (DO 8, s. 2015)')}</div>'''
+<div class="tts">{table_html(NEW_TABLE, 'SY 2026–2027 adjusted table')}{table_html(OLD_TABLE, 'Old table (2015)')}</div>'''
 
 TRANS_TEXT = '''
 <h2>What changed</h2>
-<p>Under the old table (DO 8, s. 2015), an initial grade of <b>60</b> was transmuted to a passing 75. Under the adjusted table for SY 2026–2027 (DO 015, s. 2026), an initial grade of <b>70</b> is needed for 75. From SY 2027–2028, Grades 4 to 12 drop transmutation entirely: an initial grade of 75 is a final 75. Kindergarten to Grade 3 move to descriptive ratings over the same period.</p>
-<p>DepEd says the change is meant to make grades reflect what learners actually know, not to make passing harder. Teachers can plan support earlier when grades are more accurate.</p>
+<p>Under the old table (2015), an initial grade of <b>60</b> was transmuted to a passing 75. Under the adjusted table for SY 2026–2027, an initial grade of <b>70</b> is needed for 75. From SY 2027–2028, Grades 4 to 12 drop transmutation entirely: an initial grade of 75 is a final 75. Kindergarten to Grade 3 move to descriptive ratings over the same period.</p>
+<p>The stated aim of the change is to make grades reflect what learners actually know, not to make passing harder. Teachers can plan support earlier when grades are more accurate.</p>
 <h2>How to use the table</h2>
 <ol><li>Compute the initial grade: the sum of the weighted scores of Written Work, Performance Tasks and Exams.</li><li>Find the band it falls in, and read the transmuted grade.</li></ol>
 <p>Easier: the <a href="/tools/grade-calculator/">K to 12 grade calculator</a> does all the steps for you, from raw scores to the term and final grade.</p>
-<p class="note2">Sources: DepEd Order No. 015, s. 2026 and DepEd Order No. 8, s. 2015. Always confirm with your school’s official e-Class Record.</p>'''
+<p class="note2">Always confirm with your school’s official e-Class Record.</p>'''
 
 def weighted_calc():
     return CSS + COMMON_JS + '''
@@ -215,14 +215,14 @@ WEIGHTED_TEXT = '''
 <p>Required final score = (the grade you want − current grade × (1 − final weight)) ÷ final weight. For example, to finish with 90% when you have 86% and the final counts for 30%, you need (90 − 86 × 0.7) ÷ 0.3 = <b>99.3%</b>.</p>
 <h2>Tips</h2>
 <ul><li>Check your syllabus for the exact weights; categories don’t always add up to 100%.</li><li>Leave a score empty for work that isn’t graded yet. The calculator shows your grade so far from what’s done.</li><li>Studying for that final? See <a href="/guides/how-to-study-for-a-quiz/">how to study for a quiz</a>, and warm up with the free <a href="/practice/">practice games</a>.</li></ul>
-<p>In the Philippines? Use the <a href="/tools/grade-calculator/">K to 12 grade calculator</a> for the DO 015, s. 2026 computation.</p>'''
+<p>In the Philippines? Use the <a href="/tools/grade-calculator/">K to 12 grade calculator</a> for the 2026 three-term computation.</p>'''
 
 TOOLS = [
- ('/tools/grade-calculator/', 'Grade Calculator 2026: Three-Term Grading with Transmutation (DO 015, s. 2026)',
-  'Free K to 12 grade calculator for SY 2026–2027: Written Work, Performance Tasks and Exams with the new weights, the adjusted transmutation table, three terms, final grade and descriptors. Also works with the old DO 8 table.',
-  'K to 12 grade calculator', deped_calc, DEPED_TEXT, 'Compute term and final grades with the new DO 015, s. 2026 rules.'),
- ('/tools/transmutation-table/', 'Transmutation Table 2026–2027 (DO 015, s. 2026) and the Old DO 8 Table',
-  'The transmutation table for SY 2026–2027 under DO 015, s. 2026, next to the old DO 8, s. 2015 table, with an instant lookup. See what changed and when transmutation ends.',
+ ('/tools/grade-calculator/', 'Grade Calculator 2026: Three-Term Grading with Transmutation',
+  'Free K to 12 grade calculator for SY 2026–2027: Written Work, Performance Tasks and Exams with the new weights, the adjusted transmutation table, three terms, final grade and descriptors. Also works with the old 2015 table.',
+  'K to 12 grade calculator', deped_calc, DEPED_TEXT, 'Compute term and final grades with the new 2026 rules.'),
+ ('/tools/transmutation-table/', 'Transmutation Table 2026–2027 and the Old 2015 Table',
+  'The transmutation table for SY 2026–2027 next to the old 2015 table, with an instant lookup. See what changed and when transmutation ends.',
   'Transmutation table', trans_page, TRANS_TEXT, 'The SY 2026–2027 adjusted table and the old table, with a quick lookup.'),
  ('/tools/weighted-grade-calculator/', 'Weighted Grade Calculator and Final Exam Grade Calculator',
   'Free weighted grade calculator: add categories with weights and scores to get your course grade and letter grade, then find the score you need on your final exam.',
