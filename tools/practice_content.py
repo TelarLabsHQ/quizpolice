@@ -254,6 +254,7 @@ GEO_TEXT = '''<h2>How to play</h2>
 
 HUB_TEXT = '''<p class="lead">Free, quick practice games for students. No sign-up, no downloads, and they work on any phone or computer.</p>
 <div class="ptiles">
+<a href="/practice/flashcards/"><b>Flash card maker</b>Make your own flash cards, then flip, study, quiz yourself and print them. Share a deck with your class by link.</a>
 <a href="/practice/math-sprint/"><b>Math Sprint</b>60 seconds of quick math: adding, subtracting, times tables and division. Beat your best score.</a>
 <a href="/practice/geography/"><b>Geography Practice</b>Countries and capital cities from every continent, 10 questions at a time.</a>
 <a href="/practice/percent-sprint/"><b>Percent &amp; Estimation Sprint</b>Percentages, discounts, tips, fractions and quick estimates. Everyday math for high school and college.</a>
@@ -263,6 +264,7 @@ HUB_TEXT = '''<p class="lead">Free, quick practice games for students. No sign-u
 </div>
 <h2>Which game is right for you?</h2>
 <table class="ptable"><thead><tr><th>Game</th><th>Best for</th><th>Subject</th><th>Round</th></tr></thead><tbody>
+<tr><td><a href="/practice/flashcards/">Flash card maker</a></td><td>Any age</td><td>Any subject: your own cards</td><td>Your pace</td></tr>
 <tr><td><a href="/practice/math-sprint/">Math Sprint</a></td><td>Ages 6 to 14</td><td>Number facts: +, −, ×, ÷</td><td>60 seconds</td></tr>
 <tr><td><a href="/practice/percent-sprint/">Percent &amp; Estimation Sprint</a></td><td>High school, college, adults</td><td>Percentages, fractions, estimation</td><td>60 seconds</td></tr>
 <tr><td><a href="/practice/geography/">Geography Practice</a></td><td>Ages 9 and up</td><td>Countries and capitals</td><td>10 questions</td></tr>
@@ -827,3 +829,6 @@ def hist_text():
 PAGES.append(('/practice/world-history/', 'World History Timeline: Which Came First? History Quiz Game',
   'A free world history game: which came first, and pick the year. About 60 key events from every continent, from the pyramids to the Moon landing.',
   'World History Timeline', hist_game, hist_text()))
+
+from flashcards import PAGE as _FC
+PAGES.insert(0, _FC)
