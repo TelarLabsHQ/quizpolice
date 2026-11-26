@@ -1,10 +1,42 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><!--home-domain--><script>(function(){var M={"quizpolice.pages.dev":"quizpolice.telarlabs.net","tixward.pages.dev":"tixward.telarlabs.net","drafttrail.pages.dev":"drafttrail.telarlabs.net","drafttrail-c4t.pages.dev":"drafttrail.telarlabs.net","pizarrapad.pages.dev":"pizarrapad.telarlabs.net","telarclips.pages.dev":"clips.telarlabs.net","telar-clips.pages.dev":"clips.telarlabs.net","telarlabs-home.pages.dev":"telarlabs.net","telar-stories.pages.dev":"stories.telarlabs.net"},to=M[location.hostname];if(!to)return;
-function go(){location.replace("https://"+to+location.pathname+location.search+location.hash)}
-try{if(localStorage.length||sessionStorage.length)return}catch(e){return}
-if(window.indexedDB&&indexedDB.databases){indexedDB.databases().then(function(d){if(!d.length)go()},function(){})}else go()})();</script>
+<meta charset="utf-8"><!--home-domain--><script>(function(){
+var M={"quizpolice.pages.dev":"quizpolice.telarlabs.net","tixward.pages.dev":"tixward.telarlabs.net","drafttrail.pages.dev":"drafttrail.telarlabs.net","drafttrail-c4t.pages.dev":"drafttrail.telarlabs.net","pizarrapad.pages.dev":"pizarrapad.telarlabs.net","telarclips.pages.dev":"clips.telarlabs.net","telar-clips.pages.dev":"clips.telarlabs.net","telarlabs-home.pages.dev":"telarlabs.net","telar-stories.pages.dev":"stories.telarlabs.net"};
+var K=/^(pizarrapad|quizpolice|qp-|tixward|telar-tixward|drafttrail)/,KNOWN=["pizarrapad-images","drafttrail"],to=M[location.hostname];
+function lsKeys(){var o={};try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(K.test(k))o[k]=localStorage.getItem(k)}}catch(e){}return o}
+function dbNames(){if(!window.indexedDB)return Promise.resolve([]);if(indexedDB.databases)return indexedDB.databases().then(function(d){return d.map(function(x){return x.name}).filter(function(n){return K.test(n||"")})},function(){return []});return Promise.resolve([])}
+function dump(name){return new Promise(function(res){var rq=indexedDB.open(name);rq.onerror=function(){res(null)};rq.onsuccess=function(){var db=rq.result,N=[].slice.call(db.objectStoreNames),out=[];if(!N.length){db.close();return res(null)}
+ var tx=db.transaction(N,"readonly");N.forEach(function(n){var os=tx.objectStore(n),s={name:n,keyPath:os.keyPath,autoIncrement:os.autoIncrement,indexes:[].slice.call(os.indexNames).map(function(i){var x=os.index(i);return {name:i,keyPath:x.keyPath,unique:x.unique,multiEntry:x.multiEntry}}),items:[]};out.push(s);
+  var c=os.openCursor();c.onsuccess=function(){var r=c.result;if(r){s.items.push([r.primaryKey,r.value]);r.continue()}}});
+ tx.oncomplete=function(){db.close();res(out.some(function(s){return s.items.length})?{name:name,version:db.version,stores:out}:null)};tx.onerror=function(){res(null)}}})}
+function restore(d){return new Promise(function(res){var mk=function(db){d.stores.forEach(function(s){if(!db.objectStoreNames.contains(s.name)){var os=db.createObjectStore(s.name,s.keyPath==null?{autoIncrement:s.autoIncrement}:{keyPath:s.keyPath,autoIncrement:s.autoIncrement});s.indexes.forEach(function(x){os.createIndex(x.name,x.keyPath,{unique:x.unique,multiEntry:x.multiEntry})})}})};
+ var put=function(db){var N=d.stores.map(function(s){return s.name}).filter(function(n){return db.objectStoreNames.contains(n)});if(!N.length){db.close();return res()}var tx=db.transaction(N,"readwrite");
+  d.stores.forEach(function(s){if(N.indexOf(s.name)<0)return;var os=tx.objectStore(s.name);s.items.forEach(function(it){if(os.keyPath==null)os.put(it[1],it[0]);else os.put(it[1])})});tx.oncomplete=tx.onerror=function(){db.close();res()}};
+ var rq=indexedDB.open(d.name,d.version);rq.onupgradeneeded=function(){mk(rq.result)};rq.onsuccess=function(){put(rq.result)};
+ rq.onerror=function(e){e.preventDefault&&e.preventDefault();var r2=indexedDB.open(d.name);r2.onsuccess=function(){put(r2.result)};r2.onerror=function(){res()}}})}
+// ---- on the new address: receive work moved from an old address
+if(!to){if(/[?&]telar-move=1/.test(location.search)&&window.opener){var OK=Object.keys(M).map(function(h){return location.protocol+"//"+h});
+  addEventListener("message",function(e){if(OK.indexOf(e.origin)<0||!e.data||e.data.t!=="telar-move-data")return;var ls=e.data.ls||{},clash=Object.keys(ls).filter(function(k){var v=null;try{v=localStorage.getItem(k)}catch(x){}return v!==null&&v!==ls[k]});
+   var all=!clash.length||confirm("This new address already has some saved work. Replace it with the work from the old address?\n\nOK = use the old address’s work. Cancel = keep both where possible.");
+   try{Object.keys(ls).forEach(function(k){if(all||localStorage.getItem(k)===null)localStorage.setItem(k,ls[k])})}catch(x){}
+   Promise.all((e.data.idb||[]).map(restore)).then(function(){try{e.source.postMessage({t:"telar-move-done"},e.origin)}catch(x){}location.replace(e.data.path||"/")})});
+  window.opener.postMessage({t:"telar-move-ready"},"*")}return}
+// ---- on an old address
+var url=location.protocol+"//"+to+location.pathname+location.search+location.hash,go=function(){location.replace(url)};
+try{if(localStorage.getItem("telar-moved")){go();return}}catch(e){}
+var ls=lsKeys();dbNames().then(function(names){if(!Object.keys(ls).length&&!names.length){go();return}
+ var show=function(){try{if(sessionStorage.getItem("telar-stay"))return}catch(e){}
+  var b=document.createElement("div");b.setAttribute("role","dialog");b.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;z-index:2147483646;max-width:560px;margin:0 auto;background:#fff;color:#14181f;border:1px solid #d9dde5;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.25);padding:16px 18px;font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif";
+  b.innerHTML='<b style="font-size:17px">We have a new address: '+to+'</b><p style="margin:6px 0 12px">Your saved work is on this old address. Move it to the new one, so it’s there next time.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button data-a="mv" style="background:#1d6b4f;color:#fff;border:0;border-radius:10px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer">Move my work and go there</button><button data-a="go" style="background:#fff;border:1px solid #c8ccd4;border-radius:10px;padding:10px 14px;font:inherit;cursor:pointer">Go without it</button><button data-a="no" style="background:none;border:0;padding:10px 6px;font:inherit;color:#5b6474;cursor:pointer;text-decoration:underline">Not now</button></div><p data-m style="margin:10px 0 0;color:#5b6474;display:none"></p>';
+  document.body.appendChild(b);var msg=function(t){var p=b.querySelector("[data-m]");p.style.display="block";p.textContent=t};
+  b.querySelector('[data-a="no"]').onclick=function(){try{sessionStorage.setItem("telar-stay","1")}catch(e){}b.remove()};
+  b.querySelector('[data-a="go"]').onclick=go;
+  b.querySelector('[data-a="mv"]').onclick=function(){var w=window.open(location.protocol+"//"+to+"/?telar-move=1");if(!w){msg("Your browser blocked the new tab. Allow pop-ups for this site, then try again.");return}msg("Moving your work…");
+   addEventListener("message",function(e){if(e.origin!==location.protocol+"//"+to||!e.data)return;
+    if(e.data.t==="telar-move-ready")Promise.all(names.map(dump)).then(function(idb){w.postMessage({t:"telar-move-data",ls:lsKeys(),idb:idb.filter(Boolean),path:location.pathname+location.search+location.hash},location.protocol+"//"+to)});
+    if(e.data.t==="telar-move-done"){try{localStorage.setItem("telar-moved","1")}catch(x){}msg("✓ Moved. Your work is now at "+to+".");setTimeout(go,1500)}})}};
+ if(document.body)show();else addEventListener("DOMContentLoaded",show)})})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>How to Stop Students from Switching Tabs in Google Forms | QuizPolice</title>
 <meta name="description" content="Can Google Forms detect when students switch tabs? What locked mode does, who can use it, and how to see or limit tab switching on any device.">
