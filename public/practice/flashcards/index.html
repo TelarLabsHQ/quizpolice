@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><!--home-domain--><script>(function(){
+var M={"quizpolice.pages.dev":"quizpolice.telarlabs.net","tixward.pages.dev":"tixward.telarlabs.net","drafttrail.pages.dev":"drafttrail.telarlabs.net","drafttrail-c4t.pages.dev":"drafttrail.telarlabs.net","pizarrapad.pages.dev":"pizarrapad.telarlabs.net","telarclips.pages.dev":"clips.telarlabs.net","telar-clips.pages.dev":"clips.telarlabs.net","telarlabs-home.pages.dev":"telarlabs.net","telar-stories.pages.dev":"stories.telarlabs.net"};
+var K=/^(pizarrapad|quizpolice|qp-|tixward|telar-tixward|drafttrail)/,KNOWN=["pizarrapad-images","drafttrail"],to=M[location.hostname];
+function lsKeys(){var o={};try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(K.test(k))o[k]=localStorage.getItem(k)}}catch(e){}return o}
+function dbNames(){if(!window.indexedDB)return Promise.resolve([]);if(indexedDB.databases)return indexedDB.databases().then(function(d){return d.map(function(x){return x.name}).filter(function(n){return K.test(n||"")})},function(){return []});return Promise.resolve([])}
+function dump(name){return new Promise(function(res){var rq=indexedDB.open(name);rq.onerror=function(){res(null)};rq.onsuccess=function(){var db=rq.result,N=[].slice.call(db.objectStoreNames),out=[];if(!N.length){db.close();return res(null)}
+ var tx=db.transaction(N,"readonly");N.forEach(function(n){var os=tx.objectStore(n),s={name:n,keyPath:os.keyPath,autoIncrement:os.autoIncrement,indexes:[].slice.call(os.indexNames).map(function(i){var x=os.index(i);return {name:i,keyPath:x.keyPath,unique:x.unique,multiEntry:x.multiEntry}}),items:[]};out.push(s);
+  var c=os.openCursor();c.onsuccess=function(){var r=c.result;if(r){s.items.push([r.primaryKey,r.value]);r.continue()}}});
+ tx.oncomplete=function(){db.close();res(out.some(function(s){return s.items.length})?{name:name,version:db.version,stores:out}:null)};tx.onerror=function(){res(null)}}})}
+function restore(d){return new Promise(function(res){var mk=function(db){d.stores.forEach(function(s){if(!db.objectStoreNames.contains(s.name)){var os=db.createObjectStore(s.name,s.keyPath==null?{autoIncrement:s.autoIncrement}:{keyPath:s.keyPath,autoIncrement:s.autoIncrement});s.indexes.forEach(function(x){os.createIndex(x.name,x.keyPath,{unique:x.unique,multiEntry:x.multiEntry})})}})};
+ var put=function(db){var N=d.stores.map(function(s){return s.name}).filter(function(n){return db.objectStoreNames.contains(n)});if(!N.length){db.close();return res()}var tx=db.transaction(N,"readwrite");
+  d.stores.forEach(function(s){if(N.indexOf(s.name)<0)return;var os=tx.objectStore(s.name);s.items.forEach(function(it){if(os.keyPath==null)os.put(it[1],it[0]);else os.put(it[1])})});tx.oncomplete=tx.onerror=function(){db.close();res()}};
+ var rq=indexedDB.open(d.name,d.version);rq.onupgradeneeded=function(){mk(rq.result)};rq.onsuccess=function(){put(rq.result)};
+ rq.onerror=function(e){e.preventDefault&&e.preventDefault();var r2=indexedDB.open(d.name);r2.onsuccess=function(){put(r2.result)};r2.onerror=function(){res()}}})}
+// ---- on the new address: receive work moved from an old address
+if(!to){if(/[?&]telar-move=1/.test(location.search)&&window.opener){var OK=Object.keys(M).map(function(h){return location.protocol+"//"+h});
+  addEventListener("message",function(e){if(OK.indexOf(e.origin)<0||!e.data||e.data.t!=="telar-move-data")return;var ls=e.data.ls||{},clash=Object.keys(ls).filter(function(k){var v=null;try{v=localStorage.getItem(k)}catch(x){}return v!==null&&v!==ls[k]});
+   var all=!clash.length||confirm("This new address already has some saved work. Replace it with the work from the old address?\n\nOK = use the old address’s work. Cancel = keep both where possible.");
+   try{Object.keys(ls).forEach(function(k){if(all||localStorage.getItem(k)===null)localStorage.setItem(k,ls[k])})}catch(x){}
+   Promise.all((e.data.idb||[]).map(restore)).then(function(){try{e.source.postMessage({t:"telar-move-done"},e.origin)}catch(x){}location.replace(e.data.path||"/")})});
+  window.opener.postMessage({t:"telar-move-ready"},"*")}return}
+// ---- on an old address
+var url=location.protocol+"//"+to+location.pathname+location.search+location.hash,go=function(){location.replace(url)};
+try{if(localStorage.getItem("telar-moved")){go();return}}catch(e){}
+var ls=lsKeys();dbNames().then(function(names){if(!Object.keys(ls).length&&!names.length){go();return}
+ var show=function(){try{if(sessionStorage.getItem("telar-stay"))return}catch(e){}
+  var b=document.createElement("div");b.setAttribute("role","dialog");b.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;z-index:2147483646;max-width:560px;margin:0 auto;background:#fff;color:#14181f;border:1px solid #d9dde5;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.25);padding:16px 18px;font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif";
+  b.innerHTML='<b style="font-size:17px">We have a new address: '+to+'</b><p style="margin:6px 0 12px">Your saved work is on this old address. Move it to the new one, so it’s there next time.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button data-a="mv" style="background:#1d6b4f;color:#fff;border:0;border-radius:10px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer">Move my work and go there</button><button data-a="go" style="background:#fff;border:1px solid #c8ccd4;border-radius:10px;padding:10px 14px;font:inherit;cursor:pointer">Go without it</button><button data-a="no" style="background:none;border:0;padding:10px 6px;font:inherit;color:#5b6474;cursor:pointer;text-decoration:underline">Not now</button></div><p data-m style="margin:10px 0 0;color:#5b6474;display:none"></p>';
+  document.body.appendChild(b);var msg=function(t){var p=b.querySelector("[data-m]");p.style.display="block";p.textContent=t};
+  b.querySelector('[data-a="no"]').onclick=function(){try{sessionStorage.setItem("telar-stay","1")}catch(e){}b.remove()};
+  b.querySelector('[data-a="go"]').onclick=go;
+  b.querySelector('[data-a="mv"]').onclick=function(){var w=window.open(location.protocol+"//"+to+"/?telar-move=1");if(!w){msg("Your browser blocked the new tab. Allow pop-ups for this site, then try again.");return}msg("Moving your work…");
+   addEventListener("message",function(e){if(e.origin!==location.protocol+"//"+to||!e.data)return;
+    if(e.data.t==="telar-move-ready")Promise.all(names.map(dump)).then(function(idb){w.postMessage({t:"telar-move-data",ls:lsKeys(),idb:idb.filter(Boolean),path:location.pathname+location.search+location.hash},location.protocol+"//"+to)});
+    if(e.data.t==="telar-move-done"){try{localStorage.setItem("telar-moved","1")}catch(x){}msg("✓ Moved. Your work is now at "+to+".");setTimeout(go,1500)}})}};
+ if(document.body)show();else addEventListener("DOMContentLoaded",show)})})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free Flash Card Maker: Make, Study, Quiz and Print Flashcards Online | QuizPolice</title>
+<meta name="description" content="Make flash cards online for free: type or paste your terms, flip and study, quiz yourself, print cut-out cards, and share a deck with your class by link. No sign-up.">
+<link rel="canonical" href="https://quizpolice.telarlabs.net/practice/flashcards/">
+<meta property="og:title" content="Free Flash Card Maker: Make, Study, Quiz and Print Flashcards Online | QuizPolice"><meta property="og:description" content="Make flash cards online for free: type or paste your terms, flip and study, quiz yourself, print cut-out cards, and share a deck with your class by link. No sign-up."><meta property="og:url" content="https://quizpolice.telarlabs.net/practice/flashcards/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"><meta name="theme-color" content="#1C2F5E">
+<link rel="preload" href="/assets/fonts/source-sans-3-400.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/assets/fonts/fonts.css">
+<link rel="stylesheet" href="/assets/site.css?v=88462d5e">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4326677240395780" crossorigin="anonymous"></script>
+</head>
+<body>
+<header class="top"><div class="wrap top-in">
+  <span class="tl-wrap"><a class="logo" href="/"><svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l14 5v10c0 9-6 16-14 19C12 34 6 27 6 18V8z" fill="#1C2F5E"/><path d="M20 11l2.6 5.3 5.8.8-4.2 4.1 1 5.8L20 24.3 14.8 27l1-5.8-4.2-4.1 5.8-.8z" fill="#E8A317"/></svg><span>QuizPolice</span></a><a class="tl-by" href="https://telarlabs.net" title="Telar Labs home"><span>by </span>Telar Labs</a><style>.tl-wrap{display:flex;align-items:center;min-width:0}.tl-by{margin-left:10px;font-size:13px;font-weight:500;line-height:1;color:inherit;opacity:.65;text-decoration:none;white-space:nowrap;flex:none}.tl-by:hover{opacity:1;text-decoration:underline}@media(max-width:560px){.tl-wrap{flex-direction:column;align-items:flex-start}.tl-by{margin:3px 0 0;font-size:11.5px}}</style></span>
+  <nav class="nav"><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/guides/">Guides</a><a href="/practice/">Practice</a><a href="/faq/">FAQ</a></nav>
+  <a class="btn btn-ghost btn-sm" href="/join/">I'm a student</a><a class="btn btn-sm" href="/teacher/">Teacher dashboard</a>
+</div></header>
+<main>
+<article class="wrap prose"><style>
+.game{max-width:620px;margin:8px auto 34px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 10px 30px rgba(20,27,43,.08)}
+.game h2{margin:0 0 4px;font-size:22px}.game .gsub{margin:0 0 14px;color:var(--muted);font-size:15px}
+.gchips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
+.gchips button{border:2px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font:inherit;font-size:15px;font-weight:700;color:var(--fg);cursor:pointer}
+.gchips button.on{border-color:var(--brand);background:var(--brand);color:#fff}
+.glabel{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:4px 0 0}
+.gbtn{display:block;width:100%;background:var(--brand);color:#fff;border:0;border-radius:12px;padding:14px;font:inherit;font-size:18px;font-weight:800;cursor:pointer}
+.gbtn.ghost{background:transparent;color:var(--brand);border:2px solid var(--brand)}
+.gbar{height:8px;background:#E6EAF2;border-radius:99px;overflow:hidden;margin-bottom:12px}.gbar i{display:block;height:100%;background:var(--badge);width:100%}
+.gtop{display:flex;justify-content:space-between;font-weight:700;color:var(--muted);font-size:15px;margin-bottom:6px}
+.gq{font-family:var(--head);font-weight:800;font-size:44px;text-align:center;margin:6px 0 4px;color:var(--fg)}
+.gin{font-family:var(--head);font-weight:800;font-size:36px;text-align:center;min-height:54px;border:2px solid var(--line);border-radius:12px;margin:0 auto 12px;max-width:220px;background:var(--bg)}
+.gin.ok{border-color:#2e9e5b;background:#e5f6ec}.gin.bad{border-color:#d64545;background:#fdeaea}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:320px;margin:0 auto}
+.pad button{font:inherit;font-size:24px;font-weight:800;padding:12px 0;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--fg);cursor:pointer;touch-action:manipulation}
+.pad button:active{background:#E6EAF2}.pad .go{background:var(--brand);color:#fff;border-color:var(--brand)}
+.gopts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.gopts button{font:inherit;font-size:17px;font-weight:700;padding:14px 10px;border-radius:12px;border:2px solid var(--line);background:#fff;color:var(--fg);cursor:pointer;min-height:62px;touch-action:manipulation}
+.gopts button.ok{border-color:#2e9e5b;background:#e5f6ec}.gopts button.bad{border-color:#d64545;background:#fdeaea}
+.gopts button:disabled{cursor:default;opacity:1}
+.gq2{font-family:var(--head);font-weight:800;font-size:24px;text-align:center;margin:8px 0 0;line-height:1.3}
+.gres{text-align:center}.gbig{font-family:var(--head);font-weight:800;font-size:56px;color:var(--brand);line-height:1.1;margin:6px 0}
+.gmiss{text-align:left;margin:14px 0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.gmiss li{padding:8px 4px;border-bottom:1px solid var(--line);font-size:16px}
+.grow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.gfb{text-align:center;min-height:26px;font-weight:700;margin-top:2px}
+.ptiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:18px 0}
+.ptiles a{display:block;border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--card);text-decoration:none;color:var(--fg)}
+.ptiles b{display:block;font-size:20px;color:var(--brand);margin-bottom:4px}
+.ptable{width:100%;border-collapse:collapse;font-size:15px;margin:10px 0 18px}.ptable th,.ptable td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}.ptable th{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+@media(max-width:560px){.ptable th:nth-child(4),.ptable td:nth-child(4){display:none}}
+@media(max-width:480px){.game{padding:16px 14px}.gq{font-size:38px}.gopts{grid-template-columns:1fr}}
+
+.gshare{display:block;margin:12px auto 0;background:none;border:0;color:var(--brand);font:inherit;font-weight:700;font-size:15px;cursor:pointer;text-decoration:underline}
+.chal{margin-top:10px;background:var(--badge,#C3303A)}
+</style><script>
+function qpShare(b){const g=b.closest('.game'),name=(g.querySelector('h2')||{}).textContent||document.title,url=location.origin+location.pathname,msg='Try this free '+name+' game, no sign-up needed 🎯';
+ const done=t=>{const o=b.textContent;b.textContent=t;setTimeout(()=>b.textContent=o,2200)};
+ if(navigator.share){navigator.share({title:name,text:msg,url}).catch(()=>{})}
+ else if(navigator.clipboard){navigator.clipboard.writeText(msg+' '+url).then(()=>done('✓ Link copied'),()=>done(url))}
+ else done(url)}
+function qpChallenge(b){const g=b.closest('.game'),name=(g.querySelector('h2')||{}).textContent||document.title,score=((g.querySelector('.gbig')||{}).textContent||'').trim(),
+ note=((g.querySelector('.gres .muted')||{}).textContent||'').split(' · ')[0].trim(),lvl=note&&!/best|perfect|sharp/i.test(note)?' ('+note+')':'',
+ url=location.origin+location.pathname,msg='I got '+score+' on '+name+lvl+'. Can you beat me? 🎯';
+ const done=t=>{const o=b.textContent;b.textContent=t;setTimeout(()=>b.textContent=o,2200)};
+ if(navigator.share){navigator.share({title:name,text:msg,url}).catch(()=>{})}
+ else if(navigator.clipboard){navigator.clipboard.writeText(msg+' '+url).then(()=>done('✓ Copied! Paste it to a friend'),()=>done(msg+' '+url))}
+ else done(msg+' '+url)}
+</script><p class="gmeta muted" style="font-size:14px;margin:0 0 6px"><a href="/practice/">Practice games</a></p><h1>Flash card maker</h1><style>
+.fc{max-width:760px;margin:8px auto 34px;background:var(--card,#fff);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(20,27,43,.08);display:flex;flex-direction:column;gap:12px}
+.fc [hidden]{display:none!important}
+.fc-top{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.fc-top select{flex:1 1 220px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;background:#fff}
+.fc-b{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 14px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;color:var(--fg)}.fc-b.pri{background:var(--brand);border-color:var(--brand);color:#fff}.fc-b:disabled{opacity:.45;cursor:default}
+.fc-b.got{background:var(--ok-bg,#E3F4EA);border-color:#9fd2b6;color:var(--ok,#1E7F4E)}.fc-b.learn{background:var(--warn-bg,#FFF0D9);border-color:#e3c08f;color:var(--warn,#A35A00)}
+.fc-tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:10px}.fc-tabs button{border:2px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;color:var(--fg)}
+.fc-tabs button[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:#fff}
+.fc-shared{background:var(--ok-bg,#E3F4EA);color:var(--ok,#1E7F4E);border-radius:10px;padding:8px 12px;margin:0;font-size:15px}
+.fc-l{display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:14px}.fc input[type=text],.fc-l input,.fc textarea{font:inherit;font-size:16px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;min-width:0;width:100%;box-sizing:border-box;resize:vertical}
+.fc-rows{display:flex;flex-direction:column;gap:8px}.fc-row{display:grid;grid-template-columns:22px minmax(0,1fr) minmax(0,1fr) 28px;gap:8px;align-items:start}
+@media(max-width:560px){.fc-row{grid-template-columns:22px minmax(0,1fr) 28px}.fc-row textarea[data-j="1"]{grid-column:2}.fc-row .fc-x{grid-row:1;grid-column:3}}
+.fc-n{color:var(--muted);font-weight:700;font-size:13px;padding-top:12px;text-align:right}.fc-x{border:0;background:none;color:var(--muted);font-size:17px;cursor:pointer;padding-top:10px}
+.fc-btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.fc-paste summary{cursor:pointer;font-weight:700}.fc-paste{border:1px dashed var(--line);border-radius:12px;padding:10px 12px}
+.fc-opts{display:flex;gap:14px;flex-wrap:wrap;align-items:center}.fc-chk{display:flex;gap:8px;align-items:flex-start;font-weight:600;font-size:15px}.fc-chk input{width:20px;height:20px;flex:none;margin-top:1px}
+.fc-bar{height:8px;background:#E6EAF2;border-radius:99px;overflow:hidden}.fc-bar i{display:block;height:100%;background:var(--badge,#E8A317);transition:width .3s}
+.fc-card{display:block;width:100%;height:300px;perspective:1200px;background:none;border:0;padding:0;cursor:pointer;font:inherit;color:inherit}
+.fc-in{position:relative;display:block;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}.fc-card.flip .fc-in{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:22px;border-radius:18px;border:2px solid var(--line);background:#fff;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 8px 22px rgba(20,27,43,.08);overflow:auto}
+.fc-face small{position:absolute;top:12px;left:16px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.fc-face b{font-size:clamp(20px,4.2vw,30px);line-height:1.3;text-align:center}.fc-back{transform:rotateY(180deg);background:#F5F8FF;border-color:#c8d5f2}.fc-back b{font-weight:600;font-size:clamp(17px,3.4vw,23px)}
+.fc-judge{justify-content:center}.fc-judge .fc-b{min-width:130px;padding:12px 16px}
+.fc-q{font-family:var(--head);font-weight:800;font-size:clamp(22px,4.5vw,30px);text-align:center;padding:16px 8px}
+.fc-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:560px){.fc-choices{grid-template-columns:1fr}}
+.fc-ch{border:2px solid var(--line);background:#fff;border-radius:12px;padding:12px;font:inherit;font-size:15.5px;text-align:left;cursor:pointer;color:var(--fg);line-height:1.35}
+.fc-ch.ok{border-color:#1E7F4E;background:#E3F4EA;font-weight:700}.fc-ch.no{border-color:#B4232F;background:#FDE5E7}
+.fc-done{text-align:center;padding:10px}.fc-done h3{font-size:34px;margin:0 0 6px}.fc-miss{text-align:left;background:#F7F8FB;border-radius:12px;padding:10px 14px;margin:10px 0;display:flex;flex-direction:column;gap:6px;font-size:15px}
+.fc-pl{display:flex;flex-direction:column;gap:10px}
+#fcPrint{display:none}
+@media print{body *{visibility:hidden}#fcPrint,#fcPrint *{visibility:visible}#fcPrint{display:block;position:absolute;left:0;top:0;width:100%}@page{margin:10mm}
+ .fcp-page{break-after:page;page-break-after:always;font-family:Arial,sans-serif;color:#111}.fcp-page:last-child{break-after:auto;page-break-after:auto}.fcp-h{font-size:10px;color:#777;margin-bottom:4px}
+ .fcp-row{display:grid;grid-template-columns:1fr 1fr;border:1px dashed #999;border-bottom:0;height:31mm}.fcp-row:last-child{border-bottom:1px dashed #999}.fcp-row div{display:flex;align-items:center;justify-content:center;text-align:center;padding:4mm;font-size:13pt}.fcp-row div:first-child{border-right:1px dashed #bbb;font-weight:700}
+ .fcp-grid{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:52mm;border-top:1px dashed #999;border-left:1px dashed #999}.fcp-grid div{border-right:1px dashed #999;border-bottom:1px dashed #999;display:flex;align-items:center;justify-content:center;text-align:center;padding:5mm;font-size:14pt}}
+</style>
+<div class="fc">
+  <p class="fc-shared" id="fcShared" hidden>📥 You opened a shared deck: <b></b>. It’s saved on this device as your own copy.</p>
+  <div class="fc-top"><select id="fcDeck" aria-label="My decks"></select><button type="button" class="fc-b" id="fcNew">+ New deck</button><button type="button" class="fc-b" id="fcShare">🔗 Share this deck</button><button type="button" class="fc-b" id="fcDel" aria-label="Delete this deck">🗑</button></div>
+  <p class="muted small" id="fcLinkNote" hidden style="margin:0"></p>
+  <div class="fc-tabs" id="fcTabs"><button type="button" data-t="make">✏️ Make</button><button type="button" data-t="study">🃏 Study</button><button type="button" data-t="quiz">❓ Quiz</button><button type="button" data-t="print">🖨 Print</button></div>
+  <div id="fcPane"></div>
+</div>
+<div id="fcPrint" aria-hidden="true"></div><script>(function(){
+// Flash card maker: decks are saved in this browser only; a share link carries the whole deck (compressed) after the # so nothing is sent to a server.
+var $=function(s){return document.querySelector(s)},$$=function(s){return [].slice.call(document.querySelectorAll(s))};
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function br(s){return esc(s).replace(/\n/g,'<br>')}
+function keep(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function shuf(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+var SAMPLE={id:'sample',t:'Science vocabulary',c:[['Photosynthesis','How plants use sunlight, water and carbon dioxide to make food'],['Evaporation','When a liquid turns into a gas, like water drying in the sun'],['Gravity','The force that pulls objects toward each other, like things falling to the ground'],['Habitat','The natural home of a plant or animal'],['Mammal','A warm-blooded animal with hair that feeds its young with milk'],['Atom','The smallest unit of an element'],['Ecosystem','Living things and their environment, working together'],['Condensation','When a gas turns into a liquid, like drops on a cold glass']]};
+var D=keep('qp-flash')||{decks:[SAMPLE],cur:'sample'};if(!D.decks.length)D.decks=[SAMPLE];
+function deck(){return D.decks.filter(function(d){return d.id===D.cur})[0]||D.decks[0]}
+function cards(){return deck().c.filter(function(x){return String(x[0]).trim()||String(x[1]).trim()})}
+function save(){keep('qp-flash',D)}
+var tab='make';
+// ---------- share links ----------
+function b64u(bytes){var s='';for(var i=0;i<bytes.length;i++)s+=String.fromCharCode(bytes[i]);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function unb64u(s){s=s.replace(/-/g,'+').replace(/_/g,'/');var b=atob(s),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a}
+async function pack(obj){var raw=new TextEncoder().encode(JSON.stringify(obj));
+  if(window.CompressionStream){try{var cs=new Blob([raw]).stream().pipeThrough(new CompressionStream('deflate-raw'));return 'z'+b64u(new Uint8Array(await new Response(cs).arrayBuffer()))}catch(e){}}return 'b'+b64u(raw)}
+async function unpack(s){var k=s.charAt(0),bytes=unb64u(s.slice(1));
+  if(k==='z'){var ds=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));bytes=new Uint8Array(await new Response(ds).arrayBuffer())}return JSON.parse(new TextDecoder().decode(bytes))}
+// ---------- deck picker ----------
+function drawDecks(){$('#fcDeck').innerHTML=D.decks.map(function(d){return '<option value="'+d.id+'"'+(d.id===deck().id?' selected':'')+'>'+esc(d.t||'Untitled deck')+' ('+d.c.length+')</option>'}).join('')}
+$('#fcDeck').onchange=function(){D.cur=this.value;save();resetStudy();draw()};
+$('#fcNew').onclick=function(){var d={id:uid(),t:'',c:[['',''],['',''],['','']]};D.decks.unshift(d);D.cur=d.id;save();tab='make';draw();$('#fcTitle').focus()};
+$('#fcDel').onclick=function(){if(!window.confirm('Delete the deck “'+(deck().t||'Untitled deck')+'” from this device?'))return;D.decks=D.decks.filter(function(d){return d.id!==deck().id});if(!D.decks.length)D.decks=[{id:uid(),t:'',c:[['','']]}];D.cur=D.decks[0].id;save();resetStudy();draw()};
+$('#fcShare').onclick=async function(){var c=cards();if(!c.length)return;var b=this,s=await pack({t:deck().t,c:c}),u=location.origin+location.pathname+'#d='+s;
+  function ok(){b.textContent='✓ Link copied';setTimeout(function(){b.textContent='🔗 Share this deck'},2200)}
+  $('#fcLinkNote').hidden=false;$('#fcLinkNote').textContent=u.length>6000?'This deck makes a long link ('+Math.round(u.length/1000)+'k characters). It works in most apps, but some chats may cut it. Splitting the deck in two is safer.':'Anyone with the link gets a copy of this deck. Their changes won’t affect yours.';
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(ok,function(){window.prompt('Copy this link:',u)});else window.prompt('Copy this link:',u)};
+// ---------- make ----------
+function make(){var d=deck();
+  return '<label class="fc-l">Deck title<input id="fcTitle" maxlength="80" value="'+esc(d.t)+'" placeholder="e.g. Spanish greetings, Chapter 3 vocabulary"></label>'+
+   '<div class="fc-rows">'+d.c.map(function(x,i){return '<div class="fc-row"><span class="fc-n">'+(i+1)+'</span><textarea rows="2" data-i="'+i+'" data-j="0" placeholder="Front: term or question" aria-label="Card '+(i+1)+' front">'+esc(x[0])+'</textarea><textarea rows="2" data-i="'+i+'" data-j="1" placeholder="Back: answer or meaning" aria-label="Card '+(i+1)+' back">'+esc(x[1])+'</textarea><button type="button" class="fc-x" data-del="'+i+'" aria-label="Delete card '+(i+1)+'">✕</button></div>'}).join('')+'</div>'+
+   '<div class="fc-btns"><button type="button" class="fc-b" id="fcAdd">+ Add a card</button><span class="muted small">'+cards().length+' cards · saved on this device as you type</span></div>'+
+   '<details class="fc-paste"><summary>Paste a list or two columns from a spreadsheet</summary><p class="muted small">One card per line. Put the front and back in two columns from Excel or Google Sheets, or separate them with a dash ( - ), a colon or a tab.</p><textarea id="fcBulk" rows="6" placeholder="Hola - Hello&#10;Gracias - Thank you&#10;Adiós - Goodbye"></textarea><div class="fc-btns"><button type="button" class="fc-b pri" id="fcBulkGo">Add these cards</button><span class="muted small" id="fcBulkMsg"></span></div></details>'}
+function parseBulk(t){return t.replace(/\r/g,'').split('\n').map(function(l){l=l.trim();if(!l)return null;var m;
+  if(l.indexOf('\t')>=0){m=l.split('\t');return [m[0].trim(),m.slice(1).join(' ').trim()]}
+  m=l.match(/^(.+?)\s+[-–—=]\s+(.+)$/)||l.match(/^(.+?)\s*[:;]\s+(.+)$/)||l.match(/^(.+?)\s*,\s*(.+)$/);return m?[m[1].trim(),m[2].trim()]:[l,'']}).filter(Boolean)}
+function wireMake(){var d=deck();
+  $('#fcTitle').oninput=function(){d.t=this.value;save();drawDecks()};
+  $$('.fc-rows textarea').forEach(function(x){x.oninput=function(){d.c[+x.dataset.i][+x.dataset.j]=x.value;save()};x.onchange=drawDecks});
+  $$('[data-del]').forEach(function(b){b.onclick=function(){d.c.splice(+b.dataset.del,1);if(!d.c.length)d.c.push(['','']);save();drawDecks();draw()}});
+  $('#fcAdd').onclick=function(){d.c.push(['','']);save();draw();var l=$$('.fc-rows textarea[data-j="0"]');l[l.length-1].focus()};
+  $('#fcBulkGo').onclick=function(){var n=parseBulk($('#fcBulk').value);if(!n.length)return;d.c=d.c.filter(function(x){return String(x[0]).trim()||String(x[1]).trim()}).concat(n);save();drawDecks();draw();
+    $('#fcBulkMsg').textContent='✓ Added '+n.length+' cards'}}
+// ---------- study ----------
+var ST=null;
+function resetStudy(){ST=null}
+function startStudy(only){var c=cards(),idx=c.map(function(_,i){return i});if(only)idx=only;if($('#fcShuf')&&$('#fcShuf').checked)idx=shuf(idx);ST={q:idx,i:0,flip:false,got:[],learn:[],rev:ST?ST.rev:false,shuf:ST?ST.shuf:false}}
+function study(){var c=cards();if(!c.length)return '<p class="muted">Add some cards first.</p>';if(!ST)startStudy();
+  if(ST.i>=ST.q.length)return '<div class="fc-done"><h3>Round done! 🎉</h3><p><b>'+ST.got.length+'</b> got it · <b>'+ST.learn.length+'</b> still learning</p><div class="fc-btns" style="justify-content:center">'+(ST.learn.length?'<button type="button" class="fc-b pri" id="fcAgainL">Study the '+ST.learn.length+' still-learning cards</button>':'')+'<button type="button" class="fc-b" id="fcAgain">Study all again</button><button type="button" class="fc-b" id="fcToQuiz">Take the quiz</button></div></div>';
+  var x=c[ST.q[ST.i]],f=ST.rev?x[1]:x[0],b=ST.rev?x[0]:x[1];
+  return '<div class="fc-opts"><label class="fc-chk"><input type="checkbox" id="fcShuf"'+(ST.shuf?' checked':'')+'> Shuffle</label><label class="fc-chk"><input type="checkbox" id="fcRev"'+(ST.rev?' checked':'')+'> Show the back first</label><span class="muted small">Card '+(ST.i+1)+' of '+ST.q.length+' · ✓ '+ST.got.length+'</span></div>'+
+   '<div class="fc-bar"><i style="width:'+Math.round(ST.i/ST.q.length*100)+'%"></i></div>'+
+   '<button type="button" class="fc-card'+(ST.flip?' flip':'')+'" id="fcCard" aria-live="polite" aria-label="Flash card. Tap to flip."><span class="fc-in"><span class="fc-face fc-front"><small>'+(ST.rev?'Back':'Front')+'</small><b>'+br(f)+'</b></span><span class="fc-face fc-back"><small>'+(ST.rev?'Front':'Back')+'</small><b>'+br(b)+'</b></span></span></button>'+
+   '<p class="muted small" style="text-align:center;margin:6px 0 0">Tap the card or press Space to flip. Arrow keys move.</p>'+
+   (ST.flip?'<div class="fc-btns fc-judge"><button type="button" class="fc-b learn" id="fcLearn">↻ Still learning</button><button type="button" class="fc-b got" id="fcGot">✓ Got it</button></div>':'<div class="fc-btns fc-judge"><button type="button" class="fc-b" id="fcPrev"'+(ST.i?'':' disabled')+'>◀ Back</button><button type="button" class="fc-b pri" id="fcFlip">Flip</button><button type="button" class="fc-b" id="fcSkip">Next ▶</button></div>')}
+function wireStudy(){var on=function(id,f){var e=$('#'+id);if(e)e.onclick=f};
+  on('fcCard',function(){ST.flip=!ST.flip;draw()});on('fcFlip',function(){ST.flip=true;draw()});
+  on('fcGot',function(){ST.got.push(ST.q[ST.i]);ST.i++;ST.flip=false;draw()});on('fcLearn',function(){ST.learn.push(ST.q[ST.i]);ST.i++;ST.flip=false;draw()});
+  on('fcSkip',function(){ST.i++;ST.flip=false;draw()});on('fcPrev',function(){if(ST.i){ST.i--;ST.flip=false;draw()}});
+  on('fcAgain',function(){startStudy();draw()});on('fcAgainL',function(){startStudy(ST.learn.slice());draw()});on('fcToQuiz',function(){tab='quiz';QZ=null;draw()});
+  var s=$('#fcShuf');if(s)s.onchange=function(){ST.shuf=this.checked;var r=ST.rev,sh=ST.shuf;startStudy();ST.rev=r;ST.shuf=sh;draw()};
+  var r=$('#fcRev');if(r)r.onchange=function(){ST.rev=this.checked;ST.flip=false;draw()}}
+// ---------- quiz ----------
+var QZ=null;
+function startQuiz(){var c=cards(),n=Math.min(10,c.length);QZ={q:shuf(c.map(function(_,i){return i})).slice(0,n),i:0,score:0,miss:[],pick:null,opts:null}}
+function quiz(){var c=cards();if(c.length<4)return '<p class="muted">The quiz needs at least 4 cards, so there are wrong answers to choose from.</p>';if(!QZ)startQuiz();
+  if(QZ.i>=QZ.q.length)return '<div class="fc-done"><h3>'+QZ.score+' / '+QZ.q.length+'</h3><p>'+(QZ.score===QZ.q.length?'Perfect score! 🌟':QZ.score>=QZ.q.length*.7?'Great job!':'Keep practicing, you’re getting there.')+'</p>'+
+    (QZ.miss.length?'<div class="fc-miss"><b>Review:</b>'+QZ.miss.map(function(i){return '<div><b>'+br(c[i][0])+'</b> → '+br(c[i][1])+'</div>'}).join('')+'</div>':'')+
+    '<div class="fc-btns" style="justify-content:center">'+(QZ.miss.length?'<button type="button" class="fc-b pri" id="fcStudyMiss">Study the ones I missed</button>':'')+'<button type="button" class="fc-b" id="fcQAgain">New quiz</button></div></div>';
+  var k=QZ.q[QZ.i],x=c[k];if(!QZ.opts){var others=shuf(c.map(function(_,i){return i}).filter(function(i){return i!==k&&String(c[i][1]).trim()!==String(x[1]).trim()})).slice(0,3);QZ.opts=shuf(others.concat([k]))}
+  return '<div class="fc-opts"><span class="muted small">Question '+(QZ.i+1)+' of '+QZ.q.length+' · Score '+QZ.score+'</span></div><div class="fc-bar"><i style="width:'+Math.round(QZ.i/QZ.q.length*100)+'%"></i></div>'+
+   '<div class="fc-q">'+br(x[0])+'</div><div class="fc-choices">'+QZ.opts.map(function(o){var cls=QZ.pick===null?'':o===k?' ok':o===QZ.pick?' no':'';return '<button type="button" class="fc-ch'+cls+'" data-o="'+o+'"'+(QZ.pick!==null?' disabled':'')+'>'+br(c[o][1])+'</button>'}).join('')+'</div>'+
+   (QZ.pick!==null?'<div class="fc-btns" style="justify-content:center"><button type="button" class="fc-b pri" id="fcNext">'+(QZ.i+1<QZ.q.length?'Next question ▶':'See my score')+'</button></div>':'')}
+function wireQuiz(){$$('.fc-ch').forEach(function(b){b.onclick=function(){var o=+b.dataset.o,k=QZ.q[QZ.i];QZ.pick=o;if(o===k)QZ.score++;else QZ.miss.push(k);draw()}});
+  var n=$('#fcNext');if(n){n.onclick=function(){QZ.i++;QZ.pick=null;QZ.opts=null;draw()};n.focus()}
+  var a=$('#fcQAgain');if(a)a.onclick=function(){startQuiz();draw()};var m=$('#fcStudyMiss');if(m)m.onclick=function(){var l=QZ.miss.slice();tab='study';startStudy(l);draw()}}
+// ---------- print ----------
+function print(){var c=cards();
+  return '<p class="muted small" style="margin:0">Print on A4 or Letter, then cut along the dashed lines.</p><div class="fc-pl"><label class="fc-chk"><input type="radio" name="fcLay" value="fold" checked> <span><b>Fold cards</b> · front and back side by side. Cut each row and fold it in the middle. Works on any printer.</span></label>'+
+   '<label class="fc-chk"><input type="radio" name="fcLay" value="duplex"> <span><b>Double-sided</b> · fronts on one page, backs on the next, lined up for printing on both sides (flip on the long edge).</span></label></div>'+
+   '<div class="fc-btns"><button type="button" class="fc-b pri" id="fcPrintGo">🖨 Print or save as PDF ('+c.length+' cards)</button></div>'}
+function printHTML(lay){var c=cards(),t=esc(deck().t||'Flash cards'),h='';
+  if(lay==='fold'){for(var i=0;i<c.length;i+=8){h+='<div class="fcp-page"><div class="fcp-h">'+t+'</div><div class="fcp-fold">'+c.slice(i,i+8).map(function(x){return '<div class="fcp-row"><div>'+br(x[0])+'</div><div>'+br(x[1])+'</div></div>'}).join('')+'</div></div>'}}
+  else{for(var j=0;j<c.length;j+=10){var g=c.slice(j,j+10);while(g.length<10)g.push(['','']);
+    h+='<div class="fcp-page"><div class="fcp-h">'+t+' · fronts</div><div class="fcp-grid">'+g.map(function(x){return '<div>'+br(x[0])+'</div>'}).join('')+'</div></div>';
+    var back=[];for(var r=0;r<5;r++){back.push(g[r*2+1],g[r*2])}   // mirror each row so backs line up when printed on the other side
+    h+='<div class="fcp-page"><div class="fcp-h">'+t+' · backs</div><div class="fcp-grid">'+back.map(function(x){return '<div>'+br(x[1])+'</div>'}).join('')+'</div></div>'}}
+  return h}
+function wirePrint(){$('#fcPrintGo').onclick=function(){var lay=($$('input[name="fcLay"]').filter(function(r){return r.checked})[0]||{}).value||'fold';$('#fcPrint').innerHTML=printHTML(lay);window.print()}}
+window.addEventListener('afterprint',function(){$('#fcPrint').innerHTML=''});
+// ---------- tabs ----------
+function draw(){drawDecks();$$('#fcTabs button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.t===tab))});var p=$('#fcPane');
+  if(tab==='make'){p.innerHTML=make();wireMake()}else if(tab==='study'){p.innerHTML=study();wireStudy()}else if(tab==='quiz'){p.innerHTML=quiz();wireQuiz()}else{p.innerHTML=print();wirePrint()}}
+$$('#fcTabs button').forEach(function(b){b.onclick=function(){tab=b.dataset.t;if(tab==='study')resetStudy();if(tab==='quiz')QZ=null;draw()}});
+document.addEventListener('keydown',function(e){if(tab!=='study'||!ST||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
+  if(e.key===' '||e.key==='Enter'){e.preventDefault();ST.flip=!ST.flip;draw()}else if(e.key==='ArrowRight'){ST.i=Math.min(ST.q.length,ST.i+1);ST.flip=false;draw()}else if(e.key==='ArrowLeft'&&ST.i){ST.i--;ST.flip=false;draw()}});
+// open a shared deck from the link
+var m=location.hash.match(/[#&]d=([A-Za-z0-9_-]+)/);
+if(m){unpack(m[1]).then(function(o){if(o&&o.c&&o.c.length){var sig=JSON.stringify(o.c),ex=D.decks.filter(function(d){return JSON.stringify(d.c)===sig})[0];
+    if(ex)D.cur=ex.id;else{var d={id:uid(),t:o.t||'Shared deck',c:o.c};D.decks.unshift(d);D.cur=d.id}save();tab='study';resetStudy();$('#fcShared').hidden=false;$('#fcShared b').textContent=o.t||'a shared deck'}
+    history.replaceState(null,'',location.pathname);draw()},function(){history.replaceState(null,'',location.pathname);draw()})}else draw();
+})();
+</script>
+<h2>How to make flash cards</h2>
+<ol><li><b>Make a deck.</b> Type a term on the front and its meaning on the back. Or open <b>Paste a list</b> and paste two columns from Excel or Google Sheets, or lines like “Hola - Hello”.</li>
+<li><b>Study.</b> Tap a card to flip it, then mark it <b>Got it</b> or <b>Still learning</b>. At the end of a round, study only the cards you’re still learning.</li>
+<li><b>Quiz yourself.</b> Ten multiple-choice questions from your own cards, with a review of the ones you missed.</li>
+<li><b>Print</b> cut-out cards, or <b>share the deck</b> with a link.</li></ol>
+<h2>Tips for studying with flash cards</h2>
+<ul><li><b>Say the answer before you flip.</b> Trying to remember, even when you get it wrong, makes the memory stronger than just reading.</li>
+<li><b>Keep cards short:</b> one idea per card. Split long answers into two cards.</li>
+<li><b>Study a little every day.</b> Ten minutes a day for a week works better than an hour the night before.</li>
+<li><b>Mix it up.</b> Turn on Shuffle, and try <b>Show the back first</b> to practice in the other direction, like English to Spanish.</li>
+<li><b>Focus on the hard ones.</b> After each round, study the still-learning cards until they’re all “got it”.</li></ul>
+<h2>For teachers</h2>
+<ul><li><b>Share a deck with your class:</b> make it once, tap <b>Share this deck</b>, and post the link in your class group or learning platform. Each student gets their own copy to study.</li>
+<li><b>Paste from your lesson plan:</b> copy a vocabulary table from a document or spreadsheet into <b>Paste a list</b>.</li>
+<li><b>Print for the classroom:</b> fold cards work on any printer. For card stock, use double-sided printing.</li>
+<li>Before a test, students can also warm up with the <a href="/practice/">practice games</a>.</li></ul>
+<h2>Questions</h2>
+<h3>Do I need an account?</h3><p>No. Your decks are saved in this browser on this device. To move a deck to another phone or computer, open its share link there.</p>
+<h3>How does the share link work?</h3><p>The whole deck is packed into the link itself, so nothing is uploaded to our servers. Anyone who opens it gets their own copy, and their changes don’t affect yours.</p>
+<h3>Can I add pictures?</h3><p>Not yet. Cards can have text, line breaks and emoji.</p>
+<h3>How many cards can a deck have?</h3><p>As many as you like on your device. For sharing, decks of up to about 200 short cards make links that work in most apps.</p><h2>More practice</h2><ul><li><a href="/practice/math-sprint/">Math Sprint</a></li><li><a href="/practice/geography/">Geography Practice</a></li><li><a href="/practice/spot-the-fallacy/">Spot the Fallacy</a></li><li><a href="/practice/percent-sprint/">Percent &amp; Estimation Sprint</a></li><li><a href="/practice/world-history/">World History Timeline</a></li><li><a href="/guides/how-to-study-for-a-quiz/">How to study for a quiz</a></li></ul></article>
+</main>
+<footer class="foot"><div class="wrap foot-in">
+  <div><a class="logo" href="/"><svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l14 5v10c0 9-6 16-14 19C12 34 6 27 6 18V8z" fill="#1C2F5E"/><path d="M20 11l2.6 5.3 5.8.8-4.2 4.1 1 5.8L20 24.3 14.8 27l1-5.8-4.2-4.1 5.8-.8z" fill="#E8A317"/></svg><span>QuizPolice</span></a><p class="muted">Free quiz monitoring for Google Forms, Microsoft Forms and Wayground. Part of the Telar Labs teacher tools.</p></div>
+  <div class="foot-cols">
+    <div><h4>Use it</h4><a href="/teacher/">Teacher dashboard</a><a href="/join/">Join a quiz</a><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/guides/">Guides</a><a href="/practice/">Practice games</a><a href="/practice/flashcards/">Flash card maker</a><a href="/tools/grade-calculator/">Grade calculator</a><a href="/tools/">Teacher tools</a><a href="/faq/">FAQ</a></div>
+    <div><h4><a href="https://telarlabs.net" style="color:inherit;margin:0">Telar Labs</a></h4><a href="https://telarlabs.net">Telar Labs home</a><a href="https://telarlabs.net/guides/">Telar Labs guides</a><a href="/about/">About</a><a href="/privacy/">Privacy policy</a><a href="/terms/">Terms of use</a><a href="/contact/">Contact</a></div>
+  </div>
+</div><div class="wrap family"><span class="family-h"><a href="https://telarlabs.net">More from Telar Labs</a>:</span><a class="app-telarclips" href="https://clips.telarlabs.net" title="Free motion backgrounds and illustrated scenes for class videos, greetings and school programs.">Telar Clips</a><a class="app-pizarrapad" href="https://pizarrapad.telarlabs.net" title="Free online whiteboard, blackboard and greenboard for the classroom projector.">PizarraPad</a><a class="app-drafttrail" href="https://drafttrail.telarlabs.net" title="Free writing recorder that replays how an essay was written, step by step.">DraftTrail</a><a class="app-tixward" href="https://tixward.telarlabs.net" title="Event tickets and free bookings for courts and rooms, paid directly to organizers. Free for most events.">Tixward</a></div><div class="wrap fine">&copy; 2026 Telar Labs.</div></footer>
+</body>
+</html>
