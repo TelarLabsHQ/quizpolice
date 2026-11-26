@@ -110,7 +110,7 @@ def home():
 <section class="wrap section"><div class="callout"><h2>Honest about what it can and can't see</h2><p>QuizPolice only knows when a student leaves the quiz page on the same device. It can't see other phones, the student's screen, or what they search. It's a strong reminder and a record, not mind-reading, and we tell students exactly what is monitored before they start.</p><a class="btn" href="/how-it-works/">Read how it works</a></div></section>'''
     body += ('<section class="wrap section"><h2>Guides for teachers</h2><ul class="glist" style="list-style:none;padding:0;display:grid;gap:12px">' + ''.join(f'<li style="border:1px solid var(--line);border-radius:12px;padding:14px 16px"><a href="/guides/{g["slug"]}/" style="font-weight:700">{E(g["title"])}</a></li>' for g in GUIDES) + '</ul><p><a href="/guides/">All guides →</a></p></section>'
              + '<section class="wrap section"><h2>Practice games for students</h2><p>Free, quick games for warm-ups and homework: <a href="/practice/math-sprint/" style="font-weight:700">Math Sprint</a> and <a href="/practice/geography/" style="font-weight:700">Geography Practice</a>. No sign-up needed.</p></section>'
-             + '<section class="wrap section"><h2>Free teacher tools</h2><p>A <a href="/tools/grade-calculator/" style="font-weight:700">grade calculator</a> you can set up with your own categories, weights and grade scale, and share as a link. Plus the <a href="/tools/transmutation-table/" style="font-weight:700">transmutation table</a>. <a href="/tools/">All tools →</a></p></section>')
+             + '<section class="wrap section"><h2>Free teacher tools</h2><p>A <a href="/tools/grade-calculator/" style="font-weight:700">grade calculator</a> you can set up with your own categories, weights and grade scale, and share as a link. For exam day: the <a href="/tools/test-set-shuffler/" style="font-weight:700">test set shuffler</a>, an <a href="/tools/exam-seating-chart/" style="font-weight:700">exam seating chart</a> and an <a href="/tools/exam-clock/" style="font-weight:700">exam clock</a> for the projector. <a href="/tools/">All tools →</a></p></section>')
     body += family_promo('More free tools for teachers')
     page('/', f'{NAME} – Free Quiz Monitor for Google Forms, Microsoft Forms & Wayground',
          'Free online quiz monitoring for teachers. See when students leave a Google Forms, Microsoft Forms or Wayground quiz, lock after too many exits, and download results.', body)
@@ -269,7 +269,9 @@ def guides():
 
 # ---------------------------------------------------------------- practice games for students
 from practice_content import GAME_CSS, PAGES as PRACTICE, HUB_TEXT, BEFORE
-from grade_calc_page import TOOLS as GRADE_TOOLS
+from grade_calc_page import TOOLS as _GT
+from exam_tools import TOOLS as _ET
+GRADE_TOOLS = _GT + _ET
 from grades_content import CSS as GRADE_CSS
 def practice():
     prose(BEFORE[0], BEFORE[1], BEFORE[2], f'<p class="gmeta muted" style="font-size:14px;margin:0 0 6px">For students</p><h1>Before your quiz</h1>{BEFORE[3]}')
@@ -282,9 +284,10 @@ def practice():
               f'{game()}{text}<h2>More practice</h2><ul>{other}<li><a href="/guides/how-to-study-for-a-quiz/">How to study for a quiz</a></li></ul>')
 
 def grade_tools():
-    cards = ''.join(f'<a href="{t[0]}"><b>{E(t[3])}</b><span>{E(t[6])}</span></a>' for t in GRADE_TOOLS)
-    prose('/tools/', 'Free Teacher Tools: Grade Calculator and More', 'Free tools for teachers and students: a customizable grade calculator you can share as a link, and the transmutation table. They work in your browser, with no sign-up.',
-          f'{GRADE_CSS}<h1>Teacher tools</h1><p class="lead">Free tools for teachers and students. They work in your browser, on phones and computers, with no sign-up.</p><div class="gtools">{cards}</div>'
+    cardz = lambda L: ''.join(f'<a href="{t[0]}"><b>{E(t[3])}</b><span>{E(t[6])}</span></a>' for t in L)
+    cards = cardz(_GT)
+    prose('/tools/', 'Free Teacher Tools: Grade Calculator, Test Set Shuffler, Seating Chart and Exam Clock', 'Free teacher tools: a customizable grade calculator, a test set shuffler for Sets A, B, C, an exam seating chart and a projector exam clock. They work in your browser, with no sign-up.',
+          f'{GRADE_CSS}<h1>Teacher tools</h1><p class="lead">Free tools for teachers and students. They work in your browser, on phones and computers, with no sign-up.</p><h2>Grades</h2><div class="gtools">{cards}</div><h2>Exam day</h2><div class="gtools">{cardz(_ET)}</div>'
           '<h2>More for students</h2><p>Warm up with the free <a href="/practice/">practice games</a>, and read <a href="/guides/how-to-study-for-a-quiz/">how to study for a quiz</a>.</p>')
     for path, title, desc, short, tool, text, blurb in GRADE_TOOLS:
         other = ''.join(f'<li><a href="{q[0]}">{E(q[3])}</a></li>' for q in GRADE_TOOLS if q[0] != path)

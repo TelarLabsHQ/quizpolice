@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><!--home-domain--><script>(function(){var M={"quizpolice.pages.dev":"quizpolice.telarlabs.net","tixward.pages.dev":"tixward.telarlabs.net","drafttrail.pages.dev":"drafttrail.telarlabs.net","drafttrail-c4t.pages.dev":"drafttrail.telarlabs.net","pizarrapad.pages.dev":"pizarrapad.telarlabs.net","telarclips.pages.dev":"clips.telarlabs.net","telar-clips.pages.dev":"clips.telarlabs.net","telarlabs-home.pages.dev":"telarlabs.net","telar-stories.pages.dev":"stories.telarlabs.net"},to=M[location.hostname];if(!to)return;
+function go(){location.replace("https://"+to+location.pathname+location.search+location.hash)}
+try{if(localStorage.length||sessionStorage.length)return}catch(e){return}
+if(window.indexedDB&&indexedDB.databases){indexedDB.databases().then(function(d){if(!d.length)go()},function(){})}else go()})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test Set Shuffler: Make Sets A, B, C with Answer Keys (Free) | QuizPolice</title>
+<meta name="description" content="Paste your test questions and make Sets A, B, C with shuffled questions and choices, each with its own answer key. Print-ready, free, no sign-up, nothing uploaded.">
+<link rel="canonical" href="https://quizpolice.telarlabs.net/tools/test-set-shuffler/">
+<meta property="og:title" content="Test Set Shuffler: Make Sets A, B, C with Answer Keys (Free) | QuizPolice"><meta property="og:description" content="Paste your test questions and make Sets A, B, C with shuffled questions and choices, each with its own answer key. Print-ready, free, no sign-up, nothing uploaded."><meta property="og:url" content="https://quizpolice.telarlabs.net/tools/test-set-shuffler/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"><meta name="theme-color" content="#1C2F5E">
+<link rel="preload" href="/assets/fonts/source-sans-3-400.woff2" as="font" type="font/woff2" crossorigin><link rel="stylesheet" href="/assets/fonts/fonts.css">
+<link rel="stylesheet" href="/assets/site.css?v=88462d5e">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4326677240395780" crossorigin="anonymous"></script>
+</head>
+<body>
+<header class="top"><div class="wrap top-in">
+  <span class="tl-wrap"><a class="logo" href="/"><svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l14 5v10c0 9-6 16-14 19C12 34 6 27 6 18V8z" fill="#1C2F5E"/><path d="M20 11l2.6 5.3 5.8.8-4.2 4.1 1 5.8L20 24.3 14.8 27l1-5.8-4.2-4.1 5.8-.8z" fill="#E8A317"/></svg><span>QuizPolice</span></a><a class="tl-by" href="https://telarlabs.net" title="Telar Labs home"><span>by </span>Telar Labs</a><style>.tl-wrap{display:flex;align-items:center;min-width:0}.tl-by{margin-left:10px;font-size:13px;font-weight:500;line-height:1;color:inherit;opacity:.65;text-decoration:none;white-space:nowrap;flex:none}.tl-by:hover{opacity:1;text-decoration:underline}@media(max-width:560px){.tl-wrap{flex-direction:column;align-items:flex-start}.tl-by{margin:3px 0 0;font-size:11.5px}}</style></span>
+  <nav class="nav"><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/guides/">Guides</a><a href="/practice/">Practice</a><a href="/faq/">FAQ</a></nav>
+  <a class="btn btn-ghost btn-sm" href="/join/">I'm a student</a><a class="btn btn-sm" href="/teacher/">Teacher dashboard</a>
+</div></header>
+<main>
+<article class="wrap prose"><p class="gmeta muted" style="font-size:14px;margin:0 0 6px"><a href="/tools/">Teacher tools</a></p><h1>Test set shuffler</h1><style>
+.gc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;margin:16px 0 24px}
+.gc label{display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:15px}.gc select,.gc input{font:inherit;font-size:16px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--fg);min-width:0}
+.gc [hidden]{display:none!important}.gc select{width:100%;max-width:100%;text-overflow:ellipsis}.gc label{min-width:0}
+.gc .row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}@media(max-width:560px){.gc .row2{grid-template-columns:1fr}}
+.comp{border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}.comp h3{font-size:17px;margin:0;display:flex;justify-content:space-between;gap:8px}.comp h3 span{font-family:var(--body);font-weight:600;color:var(--muted);font-size:14px}
+.items{display:flex;flex-direction:column;gap:6px}.it{display:grid;grid-template-columns:1fr auto 1fr auto;gap:6px;align-items:center}.it span{color:var(--muted);font-size:14px}.it input{width:100%}
+.x{border:0;background:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px 6px}
+.addit{align-self:flex-start;border:1px dashed var(--line);background:none;border-radius:9px;padding:6px 12px;font:inherit;font-size:14px;color:var(--info);cursor:pointer}
+.res{background:var(--info-bg);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px}.res table{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed}.res th{font-size:13px;color:var(--muted);font-weight:600}.res td,.res th{padding:4px 6px;text-align:right;border-bottom:1px solid #cdd9f2}.res td:first-child,.res th:first-child{text-align:left}
+.big{display:flex;gap:16px;align-items:baseline;flex-wrap:wrap}.big b{font-family:var(--head);font-size:40px;line-height:1}.big .tag{background:var(--brand);color:#fff;border-radius:99px;padding:4px 12px;font-weight:700;font-size:15px}
+.ttab{border-collapse:collapse;width:100%;font-size:15px;background:var(--card)}.ttab caption{text-align:left;font-weight:800;padding:6px 0}.ttab td,.ttab th{border:1px solid var(--line);padding:5px 8px;text-align:left}.ttab tbody tr:nth-child(even){background:#f7f9fc}
+.tts{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}@media(max-width:700px){.tts{grid-template-columns:1fr}}
+.note2{font-size:14px;color:var(--muted)}
+.gtools{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.gtools a{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;text-decoration:none;color:var(--fg)}.gtools a b{display:block}.gtools a span{color:var(--muted);font-size:14px}
+</style><style>
+.et-tabs{display:flex;gap:6px;flex-wrap:wrap}.et-tabs button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:7px 14px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;color:var(--fg)}.et-tabs button[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:#fff}
+.gc textarea{font:inherit;font-size:15px;padding:10px;border:1px solid var(--line);border-radius:10px;width:100%;box-sizing:border-box;line-height:1.45}
+.gc .chk{flex-direction:row;align-items:center;font-weight:600;gap:8px}.gc .chk input{width:20px;height:20px;flex:none}
+.gc-btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 14px;font:inherit;font-size:15px;font-weight:700;cursor:pointer;color:var(--fg)}.gc-btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.gc-top{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}@media(max-width:560px){.row3{grid-template-columns:1fr 1fr}}
+.warnbox{background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:8px 12px;font-size:15px;margin:0}
+</style><style>
+.sheet{background:#fff;border:1px solid var(--line);border-radius:10px;padding:28px 30px;color:#111;font-family:"Source Sans 3",Arial,sans-serif;font-size:15.5px;line-height:1.45}
+.sheet h3{font-family:inherit;font-size:19px;margin:0;text-align:center}.sheet .sub{text-align:center;margin:2px 0 10px;font-weight:700}
+.sheet .who{display:grid;grid-template-columns:2fr 1fr;gap:6px 18px;margin:12px 0}.sheet .who span{border-bottom:1px solid #444;padding-top:10px;font-size:14px}
+.sheet .ins{font-style:italic;margin:6px 0 10px}.sheet h4{font-size:16px;margin:14px 0 6px}
+.sheet ol.qs{padding-left:26px;margin:0}.sheet ol.qs>li{margin:0 0 10px;break-inside:avoid}.sheet .ch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 18px;margin-top:3px}.sheet .ch.one{grid-template-columns:1fr}
+.sheet .blank{display:inline-block;min-width:110px;border-bottom:1px solid #444}
+.keys{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px 14px;font-size:15px}.keys small{color:#666}
+#tsOut{display:flex;flex-direction:column;gap:14px}
+@media print{body *{visibility:hidden}#tsPrint,#tsPrint *{visibility:visible}#tsPrint{position:absolute;left:0;top:0;width:100%}
+ #tsPrint .sheet{border:0;border-radius:0;padding:0;break-after:page;page-break-after:always}#tsPrint .sheet:last-child{break-after:auto;page-break-after:auto}}
+</style>
+<div class="gc">
+  <div class="row2"><label>Test title<input id="tsTitle" maxlength="120" placeholder="e.g. Science 7 · Second Quarter Test"></label><label>School or class (optional)<input id="tsSchool" maxlength="120" placeholder="e.g. Riverside High School"></label></div>
+  <label>Instructions (optional)<input id="tsIns" maxlength="240" placeholder="e.g. Choose the letter of the best answer. Write your answers on the answer sheet."></label>
+  <label>Questions<textarea id="tsText" rows="16" spellcheck="false"></textarea></label>
+  <details><summary style="cursor:pointer;font-weight:700">How to type the questions</summary><ul class="note2" style="margin:8px 0 0;padding-left:20px">
+   <li>Leave a <b>blank line</b> between questions.</li><li>Put each choice on its own line, starting with a letter: <code>a)</code>, <code>A.</code> or <code>(a)</code>.</li>
+   <li>Mark the correct choice with a <b>*</b> at the end, or add a line <code>Answer: B</code>. For questions without choices, <code>Answer: photosynthesis</code> goes into the key.</li>
+   <li>Start a line with <b>#</b> for a part heading, like <code># Part II. True or False</code>. Questions are shuffled within each part, and parts keep their order.</li>
+   <li>Choices like “All of the above”, “Both A and B” or True/False keep their order.</li><li>Tip: copy your questions from Word or Google Docs and paste them here.</li></ul></details>
+  <div class="row3"><label>Number of sets<select id="tsSets"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option></select></label>
+   <label class="chk" style="align-self:end"><input type="checkbox" id="tsQ" checked> Shuffle question order</label><label class="chk" style="align-self:end"><input type="checkbox" id="tsC" checked> Shuffle the choices</label></div>
+  <label class="chk"><input type="checkbox" id="tsA" checked> Keep Set A in the original order</label>
+  <p class="warnbox" id="tsWarn" hidden></p>
+  <div class="gc-top"><button class="gc-btn pri" type="button" id="tsGo">Make the sets</button><button class="gc-btn" type="button" id="tsRe">🔀 Shuffle again</button><span class="note2" id="tsInfo"></span></div>
+</div>
+<div id="tsRes" hidden>
+  <div class="gc-top" style="margin-bottom:10px"><div class="et-tabs" id="tsTabs"></div></div>
+  <div class="gc-top" style="margin-bottom:12px"><select id="tsWhat" class="gc-btn" aria-label="What to print"></select><button class="gc-btn pri" type="button" id="tsPrintBtn">🖨 Print</button><button class="gc-btn" type="button" id="tsCopy">Copy this set as text</button></div>
+  <div id="tsOut"></div>
+</div>
+<div id="tsPrint" aria-hidden="true"></div>
+<script>(function(){
+var $=function(s){return document.querySelector(s)},$$=function(s){return [].slice.call(document.querySelectorAll(s))};
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function keep(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuf(a,r){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(r()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
+var L='ABCDEFGHIJ';
+var SAMPLE='# Part I. Multiple choice\nWhat is the largest planet in our solar system?\na) Earth\nb) Jupiter *\nc) Mars\nd) Saturn\n\nWhich gas do plants take in to make food?\na) Oxygen\nb) Nitrogen\nc) Carbon dioxide *\nd) Hydrogen\n\nWhat is the boiling point of water at sea level?\na) 50 °C\nb) 90 °C\nc) 100 °C *\nd) 120 °C\n\nWhich of these are mammals?\na) Whales\nb) Bats\nc) Both A and B *\nd) Neither A nor B\n\n# Part II. True or false\nThe Pacific is the largest ocean on Earth.\na) True *\nb) False\n\nSound travels faster than light.\na) True\nb) False *\n\n# Part III. Identification\nWhat do you call the process by which plants make food from sunlight?\nAnswer: Photosynthesis';
+var S=keep('qp-shuffler')||{title:'',school:'',ins:'Choose the letter of the best answer.',text:SAMPLE,sets:3,q:true,c:true,a:true,seed:Date.now()%1e9};
+$('#tsTitle').value=S.title;$('#tsSchool').value=S.school;$('#tsIns').value=S.ins;$('#tsText').value=S.text;$('#tsSets').value=String(S.sets);$('#tsQ').checked=S.q;$('#tsC').checked=S.c;$('#tsA').checked=S.a;
+function read(){S.title=$('#tsTitle').value;S.school=$('#tsSchool').value;S.ins=$('#tsIns').value;S.text=$('#tsText').value;S.sets=+$('#tsSets').value;S.q=$('#tsQ').checked;S.c=$('#tsC').checked;S.a=$('#tsA').checked;keep('qp-shuffler',S)}
+
+var CH=/^\(?([a-jA-J])\s*[\).:]\s*(.*)$/,ANS=/^(answer|ans|key|correct answer)\s*[:\-]\s*(.+)$/i,PIN=/(all|none|both|neither) of (the )?(above|these)|^(both|neither)\s+[a-j]\s+(and|nor)\s+[a-j]\b|^[a-j]\s+and\s+[a-j]$|^(true|false|yes|no)$/i;
+function parse(text){var parts=[{h:'',qs:[]}],warn=[];
+  text.replace(/\r/g,'').split(/\n\s*\n/).forEach(function(block){var lines=block.split('\n').map(function(l){return l.trim()}).filter(Boolean);if(!lines.length)return;
+    var q={t:[],ch:[],ans:null,key:'',n:0};
+    lines.forEach(function(l){var m;
+      if(l.charAt(0)==='#'){if(q.t.length||q.ch.length){push(q);q={t:[],ch:[],ans:null,key:'',n:0}}parts.push({h:l.replace(/^#+\s*/,''),qs:[]});return}
+      if((m=l.match(ANS))){var a=m[2].trim();if(q.ch.length&&/^[a-j]$/i.test(a.replace(/[\).]$/,'')))q.ans=L.indexOf(a.charAt(0).toUpperCase());else q.key=a;return}
+      if(q.t.length&&(m=l.match(CH))&&m[2]){var t=m[2],star=/\s*\*$/.test(t)||/^\*\s*/.test(t);t=t.replace(/\s*\*$/,'').replace(/^\*\s*/,'');if(star)q.ans=q.ch.length;q.ch.push(t);return}
+      if(q.ch.length){push(q);q={t:[],ch:[],ans:null,key:'',n:0}}
+      q.t.push(q.t.length?l:l.replace(/^\d+\s*[\).]\s*/,''))});
+    if(q.t.length||q.ch.length)push(q)});
+  function push(q){q.pin=q.ch.some(function(c){return PIN.test(c)});parts[parts.length-1].qs.push(q)}
+  parts=parts.filter(function(p){return p.qs.length||p.h});var n=0;parts.forEach(function(p){p.qs.forEach(function(q){q.n=++n;if(q.ch.length&&q.ans===null)warn.push(n)})});
+  return {parts:parts,n:n,warn:warn}}
+
+var R=null,view=0;
+function make(){read();var P=parse(S.text);if(!P.n){$('#tsWarn').hidden=false;$('#tsWarn').textContent='Type or paste at least one question.';$('#tsRes').hidden=true;return}
+  $('#tsWarn').hidden=!P.warn.length;$('#tsWarn').textContent=P.warn.length?'No answer marked for question'+(P.warn.length>1?'s ':' ')+P.warn.join(', ')+'. Add a * after the correct choice, or the key will show a dash.':'';
+  var sets=[];for(var s=0;s<S.sets;s++){var r=rng(S.seed+s*7919),orig=S.a&&s===0;
+    sets.push(P.parts.map(function(p){var qs=(S.q&&!orig)?shuf(p.qs,r):p.qs.slice();
+      return {h:p.h,qs:qs.map(function(q){var idx=q.ch.map(function(_,i){return i});if(S.c&&!orig&&!q.pin)idx=shuf(idx,r);return {q:q,idx:idx}})}}))}
+  R={P:P,sets:sets};$('#tsRes').hidden=false;$('#tsInfo').textContent=P.n+' questions, '+S.sets+' sets.';
+  $('#tsTabs').innerHTML=sets.map(function(_,i){return '<button type="button" data-v="'+i+'">Set '+L[i]+'</button>'}).join('')+'<button type="button" data-v="k">Answer keys</button>';
+  $$('#tsTabs button').forEach(function(b){b.onclick=function(){view=b.dataset.v==='k'?'k':+b.dataset.v;show()}});
+  $('#tsWhat').innerHTML='<option value="all">All sets, then the answer keys</option><option value="sets">All sets (no keys)</option>'+sets.map(function(_,i){return '<option value="'+i+'">Set '+L[i]+' only</option>'}).join('')+'<option value="k">Answer keys only</option>';
+  if(view!=='k'&&view>=sets.length)view=0;show()}
+function sheet(i){var set=R.sets[i],n=0;
+  return '<div class="sheet">'+(S.school?'<div class="sub" style="font-weight:600">'+esc(S.school)+'</div>':'')+'<h3>'+esc(S.title||'Test')+'</h3><div class="sub">Set '+L[i]+'</div>'+
+   '<div class="who"><span>Name:</span><span>Score:</span><span>Section / Class:</span><span>Date:</span></div>'+(S.ins?'<p class="ins">'+esc(S.ins)+'</p>':'')+
+   set.map(function(p){var start=n+1;var body='<ol class="qs" start="'+start+'">'+p.qs.map(function(x){n++;var q=x.q,longc=q.ch.some(function(c){return c.length>38});
+     return '<li>'+q.t.map(esc).join('<br>')+(q.ch.length?'<div class="ch'+(longc?' one':'')+'">'+x.idx.map(function(ci,k){return '<span>'+L[k]+'. '+esc(q.ch[ci])+'</span>'}).join('')+'</div>':' <span class="blank"></span>')+'</li>'}).join('')+'</ol>';
+     return (p.h?'<h4>'+esc(p.h)+'</h4>':'')+body}).join('')+'</div>'}
+function keyOf(i){var out=[],n=0;R.sets[i].forEach(function(p){p.qs.forEach(function(x){n++;var q=x.q,a;
+   if(q.ch.length)a=q.ans===null?'–':L[x.idx.indexOf(q.ans)];else a=q.key?esc(q.key):'–';
+   out.push('<span><b>'+n+'.</b> '+a+' <small>(Q'+q.n+')</small></span>')})});return out.join('')}
+function keys(){return '<div class="sheet"><h3>'+esc(S.title||'Test')+': answer keys</h3><p class="sub" style="font-weight:400">(Q#) is the question’s number in the original list, for item analysis.</p>'+R.sets.map(function(_,i){return '<h4>Set '+L[i]+'</h4><div class="keys">'+keyOf(i)+'</div>'}).join('')+'</div>'}
+function show(){$$('#tsTabs button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.v===String(view)))});$('#tsOut').innerHTML=view==='k'?keys():sheet(view);$('#tsCopy').hidden=view==='k'}
+function txt(i){var n=0,o=[(S.title||'Test')+' – Set '+L[i],''];R.sets[i].forEach(function(p){if(p.h)o.push(p.h,'');p.qs.forEach(function(x){n++;o.push(n+'. '+x.q.t.join(' '));x.idx.forEach(function(ci,k){o.push('   '+L[k]+'. '+x.q.ch[ci])});o.push('')})});return o.join('\n')}
+$('#tsGo').onclick=make;$('#tsRe').onclick=function(){S.seed=(S.seed*31+12345)%1e9;make()};
+['tsTitle','tsSchool','tsIns'].forEach(function(id){$('#'+id).oninput=function(){read();if(R)show()}});
+$('#tsCopy').onclick=function(){var t=txt(view),b=this;function ok(){b.textContent='✓ Copied';setTimeout(function(){b.textContent='Copy this set as text'},1800)}if(navigator.clipboard)navigator.clipboard.writeText(t).then(ok,function(){});};
+$('#tsPrintBtn').onclick=function(){var w=$('#tsWhat').value,h='';if(w==='all'||w==='sets')h=R.sets.map(function(_,i){return sheet(i)}).join('');else if(w!=='k')h=sheet(+w);if(w==='all'||w==='k')h+=keys();$('#tsPrint').innerHTML=h;window.print()};
+if(S.text)make();
+})();
+</script>
+<h2>Why use different test sets?</h2>
+<p>When students sit close together, a different order of questions and choices makes copying from a neighbor much harder. Set A’s answer to number 5 is a different question on Set B. Combined with an <a href="/tools/exam-seating-chart/">exam seating chart</a> that puts different sets side by side, it’s one of the simplest ways to keep a paper test fair.</p>
+<h2>How it works</h2>
+<ol><li><b>Paste your questions</b> with their choices, and mark the answers with a *.</li><li><b>Choose 2 to 6 sets.</b> Each set gets its own order of questions, and of choices within each question.</li>
+<li><b>Print</b> all the sets, one at a time, and the answer keys. Each key also shows the question’s original number, which helps with item analysis.</li></ol>
+<h2>Tips</h2>
+<ul><li><b>Keep Set A in the original order</b> so it matches your table of specifications.</li><li>Write choices so they make sense in any order. Avoid “the answer above” or “see number 3”.</li>
+<li>For matching-type or essay parts, put them in their own part (with <b>#</b>) and keep it short, or add them by hand after printing.</li>
+<li>Giving the test online? Google Forms and Microsoft Forms can shuffle questions themselves, and <a href="/teacher/">QuizPolice</a> shows you when students leave the quiz.</li></ul>
+<h2>Questions</h2>
+<h3>Are my questions uploaded?</h3><p>No. Everything happens in your browser. Your questions are saved only on this device so they’re here next time.</p>
+<h3>Can I make the same sets again?</h3><p>Yes. The sets stay the same until you tap <b>Shuffle again</b>, even if you close the page.</p><h2 class="more">More free tools</h2><ul class="more"><li><a href="/tools/grade-calculator/">Grade calculator</a></li><li><a href="/tools/transmutation-table/">Transmutation table</a></li><li><a href="/tools/exam-seating-chart/">Exam seating chart</a></li><li><a href="/tools/exam-clock/">Exam clock</a></li><li><a href="/practice/">Practice games for students</a></li><li><a href="https://pizarrapad.telarlabs.net/tools/">Classroom timer, name picker and more</a></li></ul></article>
+</main>
+<footer class="foot"><div class="wrap foot-in">
+  <div><a class="logo" href="/"><svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3l14 5v10c0 9-6 16-14 19C12 34 6 27 6 18V8z" fill="#1C2F5E"/><path d="M20 11l2.6 5.3 5.8.8-4.2 4.1 1 5.8L20 24.3 14.8 27l1-5.8-4.2-4.1 5.8-.8z" fill="#E8A317"/></svg><span>QuizPolice</span></a><p class="muted">Free quiz monitoring for Google Forms, Microsoft Forms and Wayground. Part of the Telar Labs teacher tools.</p></div>
+  <div class="foot-cols">
+    <div><h4>Use it</h4><a href="/teacher/">Teacher dashboard</a><a href="/join/">Join a quiz</a><a href="/how-it-works/">How it works</a><a href="/supported-quizzes/">Supported quizzes</a><a href="/guides/">Guides</a><a href="/practice/">Practice games</a><a href="/tools/grade-calculator/">Grade calculator</a><a href="/tools/">Teacher tools</a><a href="/faq/">FAQ</a></div>
+    <div><h4><a href="https://telarlabs.net" style="color:inherit;margin:0">Telar Labs</a></h4><a href="https://telarlabs.net">Telar Labs home</a><a href="https://telarlabs.net/guides/">Telar Labs guides</a><a href="/about/">About</a><a href="/privacy/">Privacy policy</a><a href="/terms/">Terms of use</a><a href="/contact/">Contact</a></div>
+  </div>
+</div><div class="wrap family"><span class="family-h"><a href="https://telarlabs.net">More from Telar Labs</a>:</span><a class="app-telarclips" href="https://clips.telarlabs.net" title="Free motion backgrounds and illustrated scenes for class videos, greetings and school programs.">Telar Clips</a><a class="app-pizarrapad" href="https://pizarrapad.telarlabs.net" title="Free online whiteboard, blackboard and greenboard for the classroom projector.">PizarraPad</a><a class="app-drafttrail" href="https://drafttrail.telarlabs.net" title="Free writing recorder that replays how an essay was written, step by step.">DraftTrail</a><a class="app-tixward" href="https://tixward.telarlabs.net" title="Event tickets and free bookings for courts and rooms, paid directly to organizers. Free for most events.">Tixward</a></div><div class="wrap fine">&copy; 2026 Telar Labs.</div></footer>
+</body>
+</html>
