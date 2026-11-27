@@ -95,7 +95,7 @@ var ls=lsKeys();dbNames().then(function(names){if(!Object.keys(ls).length&&!name
     <p class="note">Can't see the quiz? Tell your teacher. Don't open it in another tab, because that counts as leaving.</p>
   </div>
 
-  <div class="panel pad" id="doneBox" hidden style="text-align:center"><h1 style="font-size:24px">All done</h1><p class="note">Your teacher can see that you finished. You may close this page.</p><div class="waitcard"><b>Before you go 👋</b><p class="wsub">Finished early, or heading to your next class? Try a 1-minute challenge now, or come back to it later.</p>
+  <div class="panel pad" id="doneBox" hidden style="text-align:center"><h1 style="font-size:24px">All done</h1><p class="note">Your teacher can see that you finished.</p><div class="waitcard"><b>Before you go 👋</b><p class="wsub">Finished early, or heading to your next class? Try a 1-minute challenge now, or come back to it later.</p>
       <div class="wgrid">
         <a href="/practice/math-sprint/" target="_blank" rel="noopener"><span>➕</span>Math Sprint<small>60 seconds of quick math</small></a>
         <a href="/practice/geography/" target="_blank" rel="noopener"><span>🌍</span>Geography<small>Countries and capitals</small></a>
@@ -228,7 +228,7 @@ addEventListener('message',async e=>{ if(!DT||e.origin!==DTO||!e.data||e.data.sr
   if(m.type==='snapshot'&&me.status!=='done') sendEssay(m.rec,false,false);
   if(m.type==='submit'){ finishing=true; const r=await sendEssay(m.rec,true,m.auto); me.status='done';
     if(m.auto){ showAutoDone(); }
-    else { clearInterval(poller); $('#quiz').hidden=true; $('#doneBox').hidden=false; nextCard(); $('#doneBox h1').textContent='Handed in'; $('#doneBox .note').textContent='Your teacher received your writing. You may close this page.'; finishLater(); }
+    else { clearInterval(poller); $('#quiz').hidden=true; $('#doneBox').hidden=false; nextCard(); $('#doneBox h1').textContent='Handed in'; $('#doneBox .note').textContent='Your teacher received your writing.'; finishLater(); }
     finishing=false; } });
 setInterval(()=>{ if(DT&&token&&me.status!=='done'&&!$('#quiz').hidden) toDT({type:'snapshot'}) },60000);
 function setTiming(d){ if(d.server_time) skew=d.server_time-Date.now(); T={timing:d.timing,start_at:d.start_at,limit_min:d.limit_min,deadline:d.deadline,grace_s:d.grace_s}; }
@@ -294,7 +294,7 @@ $('#dYes').onclick=async()=>{ finishing=true; me.status='done'; $('#doneOv').hid
 })();
 </script>
 
-<div class="nxc" id="nxc" role="dialog" aria-label="What's next" hidden><button class="nxx" type="button" id="nxX" aria-label="Close">✕</button><b class="nxt">🎉 Nice work!</b><p class="nxs">Your teacher can see that you finished. Want to keep going?</p><div class="nxb"><a class="btn pri" href="/practice/">🎮 Check practice games</a><a class="btn" href="/">🏠 Go to QuizPolice home</a></div></div>
+<div class="nxc" id="nxc" role="dialog" aria-label="What's next" hidden><button class="nxx" type="button" id="nxX" aria-label="Close">✕</button><b class="nxt">🎉 Nice work!</b><p class="nxs">Want to keep going?</p><div class="nxb"><a class="btn pri" href="/practice/">🎮 Check practice games</a><a class="btn" href="/">🏠 Go to QuizPolice home</a></div></div>
 <style>.nxc{position:fixed;left:12px;right:12px;bottom:12px;z-index:50;max-width:520px;margin:0 auto;background:var(--panel,#fff);border:1px solid var(--line);border-radius:18px;box-shadow:0 16px 44px rgba(20,27,43,.28);padding:18px 18px 16px;text-align:center;animation:nxin .35s ease-out}
 .nxc[hidden]{display:none}.nxt{font-size:19px}.nxs{margin:6px 0 12px;color:var(--muted)}.nxb{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.nxb .btn{flex:1 1 200px;text-decoration:none}
 .nxx{position:absolute;top:8px;right:10px;border:0;background:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px 8px}@keyframes nxin{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
