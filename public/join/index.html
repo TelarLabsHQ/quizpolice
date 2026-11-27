@@ -95,7 +95,7 @@ var ls=lsKeys();dbNames().then(function(names){if(!Object.keys(ls).length&&!name
     <p class="note">Can't see the quiz? Tell your teacher. Don't open it in another tab, because that counts as leaving.</p>
   </div>
 
-  <div class="panel pad" id="doneBox" hidden style="text-align:center"><h1 style="font-size:24px">All done</h1><p class="note">Your teacher can see that you finished.</p><div class="waitcard"><b>Before you go 👋</b><p class="wsub">Finished early, or heading to your next class? Try a 1-minute challenge now, or come back to it later.</p>
+  <div class="panel pad" id="doneBox" hidden style="text-align:center"><h1 style="font-size:24px">All done</h1><p class="note">Your teacher can see that you finished.</p><div class="bigdone" id="bigDone" hidden><button class="bdx" type="button" id="bdX">✕ Close</button><div class="bde" aria-hidden="true">🎉</div><b class="bdt">Nice work!</b><p class="bds">Your quiz is done.</p><a class="btn pri bdb" href="/">🏠 Go to QuizPolice homepage</a></div><div class="waitcard"><b>Before you go 👋</b><p class="wsub">Finished early, or heading to your next class? Try a 1-minute challenge now, or come back to it later.</p>
       <div class="wgrid">
         <a href="/practice/math-sprint/" target="_blank" rel="noopener"><span>➕</span>Math Sprint<small>60 seconds of quick math</small></a>
         <a href="/practice/geography/" target="_blank" rel="noopener"><span>🌍</span>Geography<small>Countries and capitals</small></a>
@@ -294,12 +294,11 @@ $('#dYes').onclick=async()=>{ finishing=true; me.status='done'; $('#doneOv').hid
 })();
 </script>
 
-<div class="nxc" id="nxc" role="dialog" aria-label="What's next" hidden><button class="nxx" type="button" id="nxX" aria-label="Close">✕</button><b class="nxt">🎉 Nice work!</b><p class="nxs">Want to keep going?</p><div class="nxb"><a class="btn pri" href="/practice/">🎮 Check practice games</a><a class="btn" href="/">🏠 Go to QuizPolice home</a></div></div>
-<style>.nxc{position:fixed;left:12px;right:12px;bottom:12px;z-index:50;max-width:520px;margin:0 auto;background:var(--panel,#fff);border:1px solid var(--line);border-radius:18px;box-shadow:0 16px 44px rgba(20,27,43,.28);padding:18px 18px 16px;text-align:center;animation:nxin .35s ease-out}
-.nxc[hidden]{display:none}.nxt{font-size:19px}.nxs{margin:6px 0 12px;color:var(--muted)}.nxb{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.nxb .btn{flex:1 1 200px;text-decoration:none}
-.nxx{position:absolute;top:8px;right:10px;border:0;background:none;font-size:18px;color:var(--muted);cursor:pointer;padding:4px 8px}@keyframes nxin{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
-body.nxpad{padding-bottom:200px}</style>
-<script>function nextCard(){/* shown once, a moment after the student finishes; closes in one tap; never shown during the quiz */try{var k='qp-next-'+(new URLSearchParams(location.search).get('c')||'');if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1')}catch(e){}
- setTimeout(function(){var c=document.getElementById('nxc');c.hidden=false;document.body.classList.add('nxpad');document.getElementById('nxX').onclick=function(){c.hidden=true;document.body.classList.remove('nxpad')}},1200)}</script>
+<style>.bigdone{position:relative;margin:18px 0 4px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(180deg,#EEF3FF,#fff);padding:46px 20px 34px;min-height:52vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;animation:bdin .4s ease-out}
+.bigdone[hidden]{display:none}.bde{font-size:72px;line-height:1}.bdt{font-size:30px;font-family:var(--f-head)}.bds{margin:0 0 10px;color:var(--muted);font-size:18px}.bdb{height:56px;font-size:17px;padding:0 14px;text-decoration:none;width:100%;max-width:360px;white-space:nowrap}
+.bdx{position:absolute;top:12px;right:12px;border:1px solid var(--line);background:#fff;border-radius:99px;padding:7px 14px;font:inherit;font-weight:700;color:var(--muted);cursor:pointer}@keyframes bdin{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}</style>
+<script>function nextCard(){/* right after the student finishes: a big "nice work" card with one link home; closing it shows "Before you go" with the practice games */
+ var c=document.getElementById('bigDone'),w=document.querySelector('#doneBox .waitcard');try{var k='qp-next-'+(new URLSearchParams(location.search).get('c')||'');if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1')}catch(e){}
+ c.hidden=false;w.hidden=true;document.getElementById('bdX').onclick=function(){c.hidden=true;w.hidden=false;w.scrollIntoView({behavior:'smooth',block:'start'})}}</script>
 </body>
 </html>
